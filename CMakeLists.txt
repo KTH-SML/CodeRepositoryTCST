@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(hybrid_controller)
+
+add_compile_options(-std=c++11)
+
+find_package(catkin REQUIRED roscpp message_generation)
+find_package(Boost REQUIRED)
+find_package(Armadillo REQUIRED)
+
+add_message_files(
+  FILES
+  HybridState.msg
+  ControlInput.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+catkin_package(
+  INCLUDE_DIRS include
+#  LIBRARIES HybridState
+  CATKIN_DEPENDS message_runtime
+#  DEPENDS system_lib
+)
+
+include_directories(
+ include
+  ${catkin_INCLUDE_DIRS}
+  ${ARMADILLO_INCLUDE_DIRS}
+)
+
+add_executable(${PROJECT_NAME}_node src/hybrid_controller_node.cpp)
+
+target_link_libraries(${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
+  -lopenblas
+  -llapack
+  ${ARMADILLO_LIBRARIES}
+)
+
+add_dependencies(${PROJECT_NAME}_node hybrid_controller generate_message_cpp)
