@@ -1,18 +1,31 @@
-#include <vector>
+#ifndef PPC_HPP
+#define PPC_HPP
+
+#include <math.h>
+#include <armadillo> 
+#include <string>
+#include <stdexcept>
 
 class PPC{
-    //parameter values should be computed and store for each agent
-    double gamma_0, gamma_inf, l, rho_max, r;
-public:    
-    std::vector<double> g(std::vector<double> x);
-    std::vector<double> f(std::vector<double> x);
-    std::vector<double> f_c(std::vector<double> X);
-    double rho_psi(std::vector<double>* X, double t);
-    double drho_psi(std::vector<double>* X, double t);
-    std::vector<double> u(
-        std::vector<double>* g,
-        std::vector<double>* e, 
-        std::vector<double>* X, 
-        std::vector<double>* x, 
+    double gamma_0, gamma_inf, l, rho_max, r, t_0, t_star;//should be defined in the constructor
+public:
+    void init(double a, double b, std::string formula_type, std::string formula, double t_0, arma::vec x);
+
+    arma::mat g(arma::vec x);
+    arma::vec f(arma::vec x);
+    arma::vec f_c(arma::vec X);
+
+    double rho_psi(arma::vec x);
+    //double rho_conjunction(parsed functions);
+    arma::vec drho_psi(arma::vec x);
+
+    double gamma(double t);
+
+    double e(arma::vec x, double t);
+
+    arma::vec u(
+        arma::vec x, 
         double t);
-};
+    };
+    
+#endif   

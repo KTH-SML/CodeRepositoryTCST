@@ -20,24 +20,31 @@ generate_messages(
 
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES HybridState
+  LIBRARIES PPC
   CATKIN_DEPENDS message_runtime
-#  DEPENDS system_lib
+#  DEPENDS 
 )
 
 include_directories(
  include
   ${catkin_INCLUDE_DIRS}
   ${ARMADILLO_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME}_node src/hybrid_controller_node.cpp)
-
-target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
+add_library(PPC src/PPC.cpp)
+target_link_libraries(PPC
   -lopenblas
   -llapack
   ${ARMADILLO_LIBRARIES}
 )
 
+add_executable(${PROJECT_NAME}_node src/hybrid_controller_node.cpp)
+target_link_libraries(${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
+  -lopenblas
+  -llapack
+  ${ARMADILLO_LIBRARIES}
+  PPC
+)
 add_dependencies(${PROJECT_NAME}_node hybrid_controller generate_message_cpp)

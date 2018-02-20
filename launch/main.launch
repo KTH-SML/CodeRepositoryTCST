@@ -1,8 +1,15 @@
 <launch>
 
+	<!-- formulas: -->
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
+
+
+	<!-- controllers: -->
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
 		<remap from="/control_input" to="/control_input_robot0" />
         <remap from="/pose" to ="/pose_robot0" />
+		<param name="~robot_id" type="int" value="0"/>
+		<!--<param name="~formula" type="string" value="1-sqrt((x-10)^2+(y-10)^2)"/>-->
 	</node>
 	<!-->
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
@@ -15,6 +22,7 @@
 	</node>
 	-->
 
+	<!-- virtual robots -->
 	<param name="n_robots" type="int" value="1"/>
 
 	<node pkg="robot" type="robot_node" name="robot0" output="screen" >
@@ -31,5 +39,9 @@
 		<remap from="/pose" to="/pose_robot2" />
 	</node>
 	-->
+
+	
+	<node pkg="rviz" type="rviz" name="rviz" />
+	
 
 </launch>
