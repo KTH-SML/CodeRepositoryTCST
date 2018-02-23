@@ -13,7 +13,7 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QDialog, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QVBoxLayout, QGridLayout, QRadioButton, QGroupBox, QCheckBox
 from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QRectF, QSizeF, QLineF, Slot, pyqtSlot, Qt
-from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont, QGraphicsEllipseItem, QGraphicsTextItem
+from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsLineItem
 
 class Map_dialog(QDialog):
     signalCheckBoxIndex = pyqtSignal([int], [int])
@@ -50,6 +50,7 @@ class Map_dialog(QDialog):
         self.button_save_FTS.setEnabled(False)
         self.button_reset.pressed.connect(self.on_button_reset_pressed)
         self.button_set_edges.pressed.connect(self.on_button_set_edges_pressed)
+        self.button_cancel.clicked.connect(self.on_button_cancel_pressed)
         #self.button_set_edges.setEnabled(False)
 
         self.regionCounter = 0
@@ -58,6 +59,7 @@ class Map_dialog(QDialog):
         self.region_of_interest = {}
         self.ellipse_items_labels = []
         self.pixel_coords_list = []
+        self.line_dict = {}
 
         self.graphicsScene = current_graphicsScene
         self.graphicsScene.signalMousePos.connect(self.pointSelection)
@@ -71,7 +73,7 @@ class Map_dialog(QDialog):
         print(map_file)
         pixmap = QPixmap(map_file)
         mapSize = pixmap.size()
-        self.graphicsScene.addPixmap(pixmap)
+        #self.graphicsScene.addPixmap(pixmap)
 
         self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
 
@@ -101,7 +103,7 @@ class Map_dialog(QDialog):
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
 
-        #self.accept()
+        self.accept()
 
     @Slot(bool)
     def on_button_reset_pressed(self):
@@ -112,6 +114,8 @@ class Map_dialog(QDialog):
             self.grid.removeWidget(self.groupBox_list[0])
             self.groupBox_list[0].deleteLater()
             del self.groupBox_list[0]
+        for i in range(0, len(self.line_dict)):
+            self.graphicsScene.removeItem(self.line_dict[self.line_dict.keys()[i]])
         self.vbox = QVBoxLayout()
         self.vbox_list = []
         self.FTS_matrix = []
@@ -120,7 +124,9 @@ class Map_dialog(QDialog):
         self.region_of_interest = {}
         self.region_list = []
         self.regionCounter = 0
+        self.pixel_coords_list = []
         self.button_save_FTS.setEnabled(False)
+        self.line_dict = {}
 
     @Slot(bool)
     def on_button_set_edges_pressed(self):
@@ -177,14 +183,27 @@ class Map_dialog(QDialog):
         return world_coords
 
     @Slot(bool)
-    def edge_both_ways(self, state):
+    def edge_both_ways(self, state):        
         for i in range(0, self.regionCounter):
             for j in range(0, self.regionCounter):
                 if self.FTS_matrix[i][j].checkState() != self.FTS_matrix[j][i].checkState():
                     if state == 2:
                         self.FTS_matrix[j][i].setCheckState(2)
+                        if str((j+1)*(i+1)) not in self.line_dict.keys():
+                            self.line_dict[str((j+1)*(i+1))] = QGraphicsLineItem(QLineF(self.pixel_coords_list[i], self.pixel_coords_list[j]))
+                            self.graphicsScene.addItem(self.line_dict[str((j+1)*(i+1))])
+                            print((j+1)*(i+1))
                     elif state == 0:
+                        print((j+1)*(i+1))
                         self.FTS_matrix[j][i].setCheckState(0)
+                        if str((j+1)*(i+1)) in self.line_dict.keys():
+                            self.graphicsScene.removeItem(self.line_dict[str((j+1)*(i+1))])
+                            del self.line_dict[str((j+1)*(i+1))]
+
+    @Slot(bool)
+    def on_button_cancel_pressed(self):
+        self.on_button_reset_pressed()
+        self.accept()
 
     def loadConfig(self, filename):
         stream = file(filename, 'r')

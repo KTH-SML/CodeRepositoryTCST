@@ -13,9 +13,9 @@ from geometry_msgs.msg import Point, Pose
 from visualization_msgs.msg import Marker, MarkerArray
 
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication
-from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper
-from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor
+from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene
+from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
+from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QGraphicsTextItem, QPixmap, QGraphicsLineItem
 
 from .map_dialog import Map_dialog
 from .initial_pose import Initial_pose
@@ -44,20 +44,41 @@ class SimulationWidget(QWidget):
         print('constructor loaded')
 
     def initialization(self):
-        self.button_setup.setEnabled(False)
+        #self.button_setup.setEnabled(False)
         self.button_initial_pose.setEnabled(False)
         self.comboBox_robot2.setEnabled(False)
         #self.button_RI.setEnabled(False)
         self.hard_task_input.setEnabled(False)
         self.soft_task_input.setEnabled(False)
+        self.comboBox_init_pose1.setEnabled(False)
+        self.comboBox_init_pose2.setEnabled(False)
         self.current_graphicsScene = MapGraphicsScene()
         self.current_graphicsScene.clear()
         self.graphicsView_main.setScene(self.current_graphicsScene)
         self.ellipse_items_RI = []
         self.ellipse_items_labels_RI = []
+        self.initial_pose_labels = [QGraphicsTextItem('start_01')]
         self.comboBox_robot1.setCurrentIndex(0)
         self.comboBox_robot2.setCurrentIndex(0)
         self.initial_pose = {}
+        self.comboBox_init_pose1.clear()
+        self.comboBox_init_pose2.clear()
+
+        self.scenario = self.world_comboBox.currentText()
+        map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
+        self.loadConfig(map_yaml)
+        if self.scenario == 'pal_office':
+            map = 'map.pgm'
+        else:
+            map = 'map.png'
+
+        map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
+        pixmap = QPixmap(map_file)
+        mapSize = pixmap.size()
+        self.current_graphicsScene.addPixmap(pixmap)
+
+        self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
+        self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
 
         self.region_pose_marker_array_msg = MarkerArray()
 
@@ -72,10 +93,16 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def on_button_RI_pressed(self):
         self.button_RI.setEnabled(True)
-        if len(self.ellipse_items_RI) > 0:
+        graphicScene_item = self.current_graphicsScene.items()
+        print(len(graphicScene_item))
+        if len(graphicScene_item) > 9:
             for i in range(0, len(self.ellipse_items_RI)):
                 self.current_graphicsScene.removeItem(self.ellipse_items_RI[i])
                 self.current_graphicsScene.removeItem(self.ellipse_items_labels_RI[i])
+            for i in range(0, len(self.initial_pose_labels)):
+                self.current_graphicsScene.removeItem(self.initial_pose_labels[i])
+        self.comboBox_init_pose1.clear()
+        self.comboBox_init_pose2.clear()
 
         map_dialog = Map_dialog(self.world_comboBox.currentText(), self.current_graphicsScene)
         map_dialog.exec_()
@@ -93,6 +120,9 @@ class SimulationWidget(QWidget):
             self.comboBox_init_pose2.model().sort(0)
             self.hard_task_input.setEnabled(True)
             self.soft_task_input.setEnabled(True)
+            self.current_graphicsScene.addItem(self.initial_pose_labels[0])
+            self.comboBox_init_pose1.setEnabled(True)
+
         print('works')
 
     @Slot(int)
@@ -124,10 +154,15 @@ class SimulationWidget(QWidget):
     def set_init_pose(self):
         self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]['position']
         print(self.region_list)
+
         index = self.region_list.index(self.comboBox_init_pose1.currentText())
         for i in range(0, len(self.region_list)):
             if index == i:
                 self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
+                rect = self.ellipse_items_RI[i].rect()
+                point = rect.topLeft()
+                self.initial_pose_labels[0].setPos(point.x() - 11, point.y() - 22)
+
             else:
                 self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
 
@@ -135,6 +170,7 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def on_button_setup_pressed(self):
         scenario = self.world_comboBox.currentText()
+        self.button_RI.setEnabled(False)
         self.button_setup.setEnabled(False)
         self.button_initial_pose.setEnabled(False)
         self.comboBox_robot1.setEnabled(False)
@@ -188,7 +224,7 @@ class SimulationWidget(QWidget):
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
-        launch2 = roslaunch.parent.ROSLaunchParent(uuid, ['/home/sml/tiago_public_ws/src/sim_GUI/launch/ltl_planner.launch'])
+        launch2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'launch', 'ltl_planner.launch')])
 
         sys.argv.append('robot_name:=tiago1')
         launch2.start()
@@ -278,6 +314,23 @@ class SimulationWidget(QWidget):
             self.region_pose_marker_array_msg.markers.append(self.region_pose_marker)
 
             self.marker_id_counter = self.marker_id_counter + 2
+
+    def loadConfig(self, filename):
+        stream = file(filename, 'r')
+        data = yaml.load(stream)
+        stream.close()
+        self.map_image = data['image']
+        self.map_resolution = data['resolution']
+        self.map_origin = tuple(data['origin'])
+        self.map_negate = data['negate']
+        self.map_occupied_thresh = data['occupied_thresh']
+        self.map_free_thresh = data['free_thresh']
+        rospy.loginfo('rqt_simulation map : %s' % (self.scenario))
+        rospy.loginfo('rqt_simulation map resolution : %.6f' % (self.map_resolution))
+        rospy.loginfo('rqt_simulation map origin : %s' % (self.map_origin,))
+        rospy.loginfo('rqt_simulation map negate : %s' % (self.map_negate))
+        rospy.loginfo('rqt_simulation map occupied threshold : %s' % (self.map_occupied_thresh))
+        rospy.loginfo('rqt_simulation map free threshold : %s' % (self.map_free_thresh))
 
 
 

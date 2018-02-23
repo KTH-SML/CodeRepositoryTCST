@@ -146,7 +146,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>390</y>
+     <y>420</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -179,17 +179,20 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>490</y>
-     <width>113</width>
+     <y>520</y>
+     <width>251</width>
      <height>23</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>([]&lt;&gt; r01) &amp;&amp; ([]&lt;&gt; r02)</string>
    </property>
   </widget>
   <widget class="QPushButton" name="button_setup">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>280</y>
+     <y>310</y>
      <width>251</width>
      <height>31</height>
     </rect>
@@ -202,7 +205,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>470</y>
+     <y>500</y>
      <width>101</width>
      <height>16</height>
     </rect>
@@ -215,7 +218,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>540</y>
+     <y>570</y>
      <width>113</width>
      <height>23</height>
     </rect>
@@ -228,7 +231,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>520</y>
+     <y>550</y>
      <width>101</width>
      <height>16</height>
     </rect>
@@ -241,7 +244,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>570</y>
+     <y>600</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -254,7 +257,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>330</y>
+     <y>360</y>
      <width>251</width>
      <height>31</height>
     </rect>
@@ -277,7 +280,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>230</y>
+     <y>260</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -287,10 +290,23 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>230</y>
+     <y>260</y>
      <width>101</width>
      <height>31</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>220</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Initial poses</string>
    </property>
   </widget>
  </widget>
