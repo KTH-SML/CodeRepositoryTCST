@@ -15,7 +15,7 @@ from visualization_msgs.msg import Marker, MarkerArray
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene
 from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
-from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QGraphicsTextItem, QPixmap, QGraphicsLineItem
+from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QGraphicsTextItem, QPixmap
 
 from .map_dialog import Map_dialog
 from .initial_pose import Initial_pose
