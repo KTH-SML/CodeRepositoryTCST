@@ -13,9 +13,9 @@ from geometry_msgs.msg import Point, Pose
 from visualization_msgs.msg import Marker, MarkerArray
 
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene
+from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem
 from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
-from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QGraphicsTextItem, QPixmap
+from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap
 
 from .map_dialog import Map_dialog
 from .initial_pose import Initial_pose
@@ -61,6 +61,7 @@ class SimulationWidget(QWidget):
         self.comboBox_robot1.setCurrentIndex(0)
         self.comboBox_robot2.setCurrentIndex(0)
         self.initial_pose = {}
+        self.region_of_interest = {}
         self.comboBox_init_pose1.clear()
         self.comboBox_init_pose2.clear()
 
@@ -152,19 +153,20 @@ class SimulationWidget(QWidget):
 
     @Slot(bool)
     def set_init_pose(self):
-        self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]['position']
-        print(self.region_list)
+        if len(self.region_of_interest) > 0:
+            self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]['position']
+            print(self.region_list)
 
-        index = self.region_list.index(self.comboBox_init_pose1.currentText())
-        for i in range(0, len(self.region_list)):
-            if index == i:
-                self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
-                rect = self.ellipse_items_RI[i].rect()
-                point = rect.topLeft()
-                self.initial_pose_labels[0].setPos(point.x() - 11, point.y() - 22)
+            index = self.region_list.index(self.comboBox_init_pose1.currentText())
+            for i in range(0, len(self.region_list)):
+                if index == i:
+                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
+                    rect = self.ellipse_items_RI[i].rect()
+                    point = rect.topLeft()
+                    self.initial_pose_labels[0].setPos(point.x() - 11, point.y() - 22)
 
-            else:
-                self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
+                else:
+                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
 
 
     @Slot(bool)
@@ -215,7 +217,7 @@ class SimulationWidget(QWidget):
         print('saved task')
         print(self.hard_task_input.text())
         print(self.soft_task_input.text())
-        task_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', 'pal_office', 'task.yaml')
+        task_file = os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'config', 'task', 'task.yaml')
         data = dict(
                     hard_task = self.hard_task_input.text(),
                     soft_task = self.soft_task_input.text())

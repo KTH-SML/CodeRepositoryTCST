@@ -30,7 +30,7 @@ from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
 
 
-from FTS.pal_office_fts import robot_model, compute_poly
+from ltl_tools.fts_loader import robot_model, compute_poly
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
 from ltl_tools.planner import ltl_planner
 import visualize_fts

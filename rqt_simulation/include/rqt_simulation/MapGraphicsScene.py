@@ -3,9 +3,9 @@
 
 from math import atan2, cos, sin, pi, atan
 
-from python_qt_binding.QtWidgets import QGraphicsScene
+from python_qt_binding.QtWidgets import QGraphicsScene, QGraphicsTextItem
 from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QLineF, pyqtSlot, Qt
-from python_qt_binding.QtGui import QPen, QFont, QGraphicsTextItem
+from python_qt_binding.QtGui import QPen, QFont
 
 class MapGraphicsScene(QGraphicsScene):
     signalMousePos = pyqtSignal(QPointF)

@@ -11,9 +11,9 @@ from math import atan2, cos, sin, pi, atan
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QDialog, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QVBoxLayout, QGridLayout, QRadioButton, QGroupBox, QCheckBox
+from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QDialog, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QVBoxLayout, QGridLayout, QRadioButton, QGroupBox, QCheckBox, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsLineItem
 from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QRectF, QSizeF, QLineF, Slot, pyqtSlot, Qt
-from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsLineItem
+from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont
 
 class Map_dialog(QDialog):
     signalCheckBoxIndex = pyqtSignal([int], [int])
@@ -99,7 +99,7 @@ class Map_dialog(QDialog):
             self.region_of_interest,
             #actions = 'TODO'
         )
-        env_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'env_GUI.yaml')
+        env_file = os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'config', 'FTS', 'env_GUI.yaml')
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
 
