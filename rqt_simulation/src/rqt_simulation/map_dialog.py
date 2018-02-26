@@ -99,7 +99,7 @@ class Map_dialog(QDialog):
             self.region_of_interest,
             #actions = 'TODO'
         )
-        env_file = os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'config', 'FTS', 'env_GUI.yaml')
+        env_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
 
@@ -143,15 +143,18 @@ class Map_dialog(QDialog):
         self.region_list.append('r' + str(self.regionCounter).zfill(2))
         self.region_of_interest.update({'r' + str(self.regionCounter).zfill(2) : position_of_interest})
         print(self.region_of_interest)
-        markerSize = 11
+        markerSize = 13
 
         self.ellipse_items.append(QGraphicsEllipseItem(QRectF(QPointF(pos.x() - markerSize/2, pos.y() - markerSize/2), QSizeF(markerSize, markerSize))))
         self.ellipse_items[self.regionCounter - 1].setBrush(QBrush(QColor('red')))
         self.graphicsScene.addItem(self.ellipse_items[self.regionCounter - 1])
 
+        label_font = QFont()
+        label_font.setPointSize(15)
         regionString = 'r' + str(self.regionCounter).zfill(2)
         self.ellipse_items_labels.append(QGraphicsTextItem(regionString))
         self.ellipse_items_labels[self.regionCounter - 1].setPos(pos)
+        self.ellipse_items_labels[self.regionCounter - 1].setFont(label_font)
         self.graphicsScene.addItem(self.ellipse_items_labels[self.regionCounter - 1])
         self.button_save_FTS.setEnabled(True)
 

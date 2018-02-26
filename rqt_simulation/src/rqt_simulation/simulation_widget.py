@@ -15,11 +15,16 @@ from visualization_msgs.msg import Marker, MarkerArray
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem
 from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
-from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap
+from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QMatrix
 
 from .map_dialog import Map_dialog
 from .initial_pose import Initial_pose
 from rqt_simulation.MapGraphicsScene import MapGraphicsScene
+
+from ltl_tools.planner import ltl_planner
+
+from ltl_tools.ts import MotionFts, ActionModel, MotActModel
+
 
 class SimulationWidget(QWidget):
 
@@ -34,18 +39,19 @@ class SimulationWidget(QWidget):
         self.button_RI.pressed.connect(self.on_button_RI_pressed)
         self.button_setup.clicked.connect(self.on_button_setup_pressed)
         self.button_execute_task.clicked.connect(self.on_button_execute_task_pressed)
-        self.button_initial_pose.clicked.connect(self.on_button_initial_pose_pressed)
         self.comboBox_robot1.currentIndexChanged.connect(self.on_comboBox_robot1_indexChanged)
         self.world_comboBox.currentIndexChanged.connect(self.initialization)
         self.comboBox_init_pose1.currentIndexChanged.connect(self.set_init_pose)
+        self.button_start_sim.clicked.connect(self.on_button_start_sim_pressed)
 
         self.initialization()
+
+        #self.graphicsView_main.scale(0.5, 0.5)
 
         print('constructor loaded')
 
     def initialization(self):
         #self.button_setup.setEnabled(False)
-        self.button_initial_pose.setEnabled(False)
         self.comboBox_robot2.setEnabled(False)
         #self.button_RI.setEnabled(False)
         self.hard_task_input.setEnabled(False)
@@ -64,6 +70,9 @@ class SimulationWidget(QWidget):
         self.region_of_interest = {}
         self.comboBox_init_pose1.clear()
         self.comboBox_init_pose2.clear()
+        self.prefix_plan = []
+        self.sufix_plan = []
+        self.line_dict = {}
 
         self.scenario = self.world_comboBox.currentText()
         map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
@@ -80,6 +89,16 @@ class SimulationWidget(QWidget):
 
         self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
         self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
+
+        rectF = self.graphicsView_main.geometry()
+
+        if (float(rectF.width())/mapSize.width() < float(rectF.height())/mapSize.height()):
+            scale = float(rectF.width())/mapSize.width()
+        else:
+            scale = float(rectF.height())/mapSize.height()
+
+        matrix = QMatrix(scale, 0, 0.0, scale, 0, 0)
+        self.graphicsView_main.setMatrix(matrix)
 
         self.region_pose_marker_array_msg = MarkerArray()
 
@@ -102,6 +121,8 @@ class SimulationWidget(QWidget):
                 self.current_graphicsScene.removeItem(self.ellipse_items_labels_RI[i])
             for i in range(0, len(self.initial_pose_labels)):
                 self.current_graphicsScene.removeItem(self.initial_pose_labels[i])
+            for i in range(0, len(self.line_dict)):
+                self.current_graphicsScene.removeItem(self.line_dict[self.line_dict.keys()[i]])
         self.comboBox_init_pose1.clear()
         self.comboBox_init_pose2.clear()
 
@@ -113,6 +134,7 @@ class SimulationWidget(QWidget):
         self.pixel_coords = map_dialog.pixel_coords_list
         self.region_list = map_dialog.region_list
         self.add_region_marker(self.region_of_interest, False)
+        self.line_dict = map_dialog.line_dict
         if len(self.ellipse_items_RI) > 0:
             for i in range(0, len(self.region_of_interest)):
                 self.comboBox_init_pose1.addItem(self.region_of_interest.keys()[i])
@@ -123,6 +145,8 @@ class SimulationWidget(QWidget):
             self.soft_task_input.setEnabled(True)
             self.current_graphicsScene.addItem(self.initial_pose_labels[0])
             self.comboBox_init_pose1.setEnabled(True)
+            if self.comboBox_robot2.currentIndex() != 0:
+                self.comboBox_init_pose2.setEnabled(True)
 
         print('works')
 
@@ -130,30 +154,14 @@ class SimulationWidget(QWidget):
     def on_comboBox_robot1_indexChanged(self):
         print(self.comboBox_robot1.currentIndex())
         if self.comboBox_robot1.currentIndex() == 0:
+            self.comboBox_robot2.setCurrentIndex(0)
             self.comboBox_robot2.setEnabled(False)
         else:
             self.comboBox_robot2.setEnabled(True)
-            self.button_initial_pose.setEnabled(True)
-
-    @Slot(bool)
-    def on_button_initial_pose_pressed(self):
-        if self.comboBox_robot2.currentIndex() == 0:
-            num_robots = 1
-        else:
-            num_robots = 2
-        initial_pose = Initial_pose(self.world_comboBox.currentText(), num_robots, self.current_graphicsScene)
-        initial_pose.exec_()
-
-        self.graphicsView_main.setScene(self.current_graphicsScene)
-        if len(initial_pose.region_of_interest) > 0:
-            print(initial_pose.region_of_interest['start_01'][0])
-            self.initial_pose = initial_pose.region_of_interest
-            self.button_setup.setEnabled(True)
-            self.button_RI.setEnabled(True)
 
     @Slot(bool)
     def set_init_pose(self):
-        if len(self.region_of_interest) > 0:
+        if self.comboBox_init_pose1.count() > 0:
             self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]['position']
             print(self.region_list)
 
@@ -174,7 +182,6 @@ class SimulationWidget(QWidget):
         scenario = self.world_comboBox.currentText()
         self.button_RI.setEnabled(False)
         self.button_setup.setEnabled(False)
-        self.button_initial_pose.setEnabled(False)
         self.comboBox_robot1.setEnabled(False)
         self.comboBox_robot2.setEnabled(False)
         self.world_comboBox.setEnabled(False)
@@ -182,13 +189,13 @@ class SimulationWidget(QWidget):
         roslaunch.configure_logging(uuid)
 
 
-        launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'launch', 'setup_simulation.launch')])
+        launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
         sys.argv.append('scenario:=' + scenario)
         print(sys.argv)
         launch_world.start()
 
 
-        launch_robot_1 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'launch', 'robot.launch')])
+        launch_robot_1 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')])
         sys.argv.append('robot_model:=tiago_steel')
         sys.argv.append('robot_name:=tiago1')
         sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_01'][0]))
@@ -200,7 +207,7 @@ class SimulationWidget(QWidget):
         del sys.argv[2:len(sys.argv)]
         print(sys.argv)
 
-        #launch_robot_2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'launch', 'robot.launch')])
+        #launch_robot_2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')])
         #sys.argv.append('robot_model:=tiago_steel')
         #sys.argv.append('robot_name:=tiago2')
         #sys.argv.append('initial_pose_x:=' + str(self.initial_pose['r02'][0]))
@@ -217,20 +224,57 @@ class SimulationWidget(QWidget):
         print('saved task')
         print(self.hard_task_input.text())
         print(self.soft_task_input.text())
-        task_file = os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'config', 'task', 'task.yaml')
+        task_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'task', 'task.yaml')
         data = dict(
                     hard_task = self.hard_task_input.text(),
                     soft_task = self.soft_task_input.text())
         with codecs.open(task_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
 
+        from ltl_tools.fts_loader import robot_model
+        [robot_motion, init_pose, robot_action, robot_task] = robot_model
+        full_model = MotActModel(robot_motion, robot_action)
+        planner = ltl_planner(full_model, robot_task[0], robot_task[1])
+        planner.optimal(10)
+        print '------------------------------'
+
+        self.textBrowser_prefix.insertPlainText('Prefix: ')
+        for n in planner.run.line:
+            for i in range(0, len(self.region_of_interest)):
+                if n[0] == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
+                    print(self.region_of_interest.keys()[i])
+                    self.textBrowser_prefix.insertPlainText(self.region_of_interest.keys()[i] + ' --> ')
+                    self.prefix_plan.append(self.region_of_interest.keys()[i])
+
+        self.textBrowser_sufix.insertPlainText('Sufix: ')
+        for n in planner.run.loop:
+            for i in range(0, len(self.region_of_interest)):
+                if n[0] == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
+                    print(self.region_of_interest.keys()[i])
+                    self.textBrowser_sufix.insertPlainText(self.region_of_interest.keys()[i] + ' --> ')
+                    self.sufix_plan.append(self.region_of_interest.keys()[i])
+        #print 'the prefix of plan **states1**:'
+        #print [n for n in planner.run.line]
+        #print 'the suffix of plan **states1**:'
+        #print [n for n in planner.run.loop]
+
+
+
+        #uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        #roslaunch.configure_logging(uuid)
+        #launch2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')])
+
+        #sys.argv.append('robot_name:=tiago1')
+        #launch2.start()
+
+    @Slot(bool)
+    def on_button_start_sim_pressed(self):
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
-        launch2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('sim_GUI'), 'launch', 'ltl_planner.launch')])
+        launch2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')])
 
         sys.argv.append('robot_name:=tiago1')
         launch2.start()
-
 
     @Slot(int)
     def publish_once(self, publisher_id):
