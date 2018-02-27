@@ -9,8 +9,9 @@ import yaml
 import codecs
 import roslaunch
 import numpy as np
-from geometry_msgs.msg import Point, Pose
+from geometry_msgs.msg import Point, Pose, PoseArray
 from visualization_msgs.msg import Marker, MarkerArray
+from std_msgs.msg import Bool
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem
@@ -20,6 +21,7 @@ from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, 
 from .map_dialog import Map_dialog
 from .initial_pose import Initial_pose
 from rqt_simulation.MapGraphicsScene import MapGraphicsScene
+from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 
 from ltl_tools.planner import ltl_planner
 
@@ -43,6 +45,15 @@ class SimulationWidget(QWidget):
         self.world_comboBox.currentIndexChanged.connect(self.initialization)
         self.comboBox_init_pose1.currentIndexChanged.connect(self.set_init_pose)
         self.button_start_sim.clicked.connect(self.on_button_start_sim_pressed)
+
+        #self.prefix_plan_subscriber = rospy.Subscriber('/tiago1/prefix_plan', PoseArray, self.prefix_callback)
+        self.prefix_plan_subscriber = ROS_Subscriber('/tiago1/prefix_plan', PoseArray, self.prefix_callback)
+        self.sufix_plan_subscriber = ROS_Subscriber('/tiago1/sufix_plan', PoseArray, self.sufix_callback)
+
+        self.prefix_plan_subscriber.received.connect(self.received_prefix)
+        self.sufix_plan_subscriber.received.connect(self.received_sufix)
+
+        self.start_publisher = rospy.Publisher('tiago1/planner_active', Bool, queue_size = 1)
 
         self.initialization()
 
@@ -70,9 +81,11 @@ class SimulationWidget(QWidget):
         self.region_of_interest = {}
         self.comboBox_init_pose1.clear()
         self.comboBox_init_pose2.clear()
-        self.prefix_plan = []
-        self.sufix_plan = []
         self.line_dict = {}
+        self.prefix_string = ''
+        self.textBrowser_prefix.insertPlainText('Prefix: ')
+        self.sufix_string = ''
+        self.textBrowser_sufix.insertPlainText('Sufix: ')
 
         self.scenario = self.world_comboBox.currentText()
         map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
@@ -109,6 +122,27 @@ class SimulationWidget(QWidget):
 
         self.marker_id_counter = 0
 
+    def prefix_callback(self, msg):
+        for n in msg.poses:
+            for i in range(0, len(self.region_of_interest)):
+                if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
+                    self.prefix_string =  self.prefix_string + self.region_of_interest.keys()[i] + ' --> '
+        self.prefix_plan_subscriber.received.emit(True)
+
+    @Slot(bool)
+    def received_prefix(self):
+        self.textBrowser_prefix.insertPlainText(self.prefix_string)
+
+    def sufix_callback(self, msg):
+        for n in msg.poses:
+            for i in range(0, len(self.region_of_interest)):
+                if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
+                    self.sufix_string = self.sufix_string + self.region_of_interest.keys()[i] + ' --> '
+        self.sufix_plan_subscriber.received.emit(True)
+
+    @Slot(bool)
+    def received_sufix(self):
+        self.textBrowser_sufix.insertPlainText(self.sufix_string)
 
     @Slot(bool)
     def on_button_RI_pressed(self):
@@ -231,50 +265,20 @@ class SimulationWidget(QWidget):
         with codecs.open(task_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
 
-        from ltl_tools.fts_loader import robot_model
-        [robot_motion, init_pose, robot_action, robot_task] = robot_model
-        full_model = MotActModel(robot_motion, robot_action)
-        planner = ltl_planner(full_model, robot_task[0], robot_task[1])
-        planner.optimal(10)
-        print '------------------------------'
 
-        self.textBrowser_prefix.insertPlainText('Prefix: ')
-        for n in planner.run.line:
-            for i in range(0, len(self.region_of_interest)):
-                if n[0] == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
-                    print(self.region_of_interest.keys()[i])
-                    self.textBrowser_prefix.insertPlainText(self.region_of_interest.keys()[i] + ' --> ')
-                    self.prefix_plan.append(self.region_of_interest.keys()[i])
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch.configure_logging(uuid)
+        launch_task = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')])
 
-        self.textBrowser_sufix.insertPlainText('Sufix: ')
-        for n in planner.run.loop:
-            for i in range(0, len(self.region_of_interest)):
-                if n[0] == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
-                    print(self.region_of_interest.keys()[i])
-                    self.textBrowser_sufix.insertPlainText(self.region_of_interest.keys()[i] + ' --> ')
-                    self.sufix_plan.append(self.region_of_interest.keys()[i])
-        #print 'the prefix of plan **states1**:'
-        #print [n for n in planner.run.line]
-        #print 'the suffix of plan **states1**:'
-        #print [n for n in planner.run.loop]
-
-
-
-        #uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        #roslaunch.configure_logging(uuid)
-        #launch2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')])
-
-        #sys.argv.append('robot_name:=tiago1')
-        #launch2.start()
+        sys.argv.append('robot_name:=tiago1')
+        launch_task.start()
+        self.textBrowser_prefix.insertPlainText(self.prefix_string)
 
     @Slot(bool)
     def on_button_start_sim_pressed(self):
-        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        roslaunch.configure_logging(uuid)
-        launch2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')])
-
-        sys.argv.append('robot_name:=tiago1')
-        launch2.start()
+        start_msg = Bool()
+        start_msg.data = True
+        self.start_publisher.publish(start_msg)
 
     @Slot(int)
     def publish_once(self, publisher_id):
@@ -297,6 +301,11 @@ class SimulationWidget(QWidget):
         publisher['timer'].timeout.connect(self._timeout_mapper.map)
         publisher['timer'].start(int(1000.0 / rate))
         self.id_counter += 1
+
+    def position_msg_to_tuple(self, position_msg):
+        position = (position_msg.x, position_msg.y, position_msg.z)
+        return position
+
 
 
     def add_region_marker(self, region, initial):

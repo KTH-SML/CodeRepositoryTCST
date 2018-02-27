@@ -8,7 +8,7 @@ import sys
 import time
 
 
-from geometry_msgs.msg import PoseWithCovarianceStamped, PoseStamped, PolygonStamped, Point32, PointStamped
+from geometry_msgs.msg import PoseWithCovarianceStamped, PoseStamped, PolygonStamped, Point32, PointStamped, PoseArray, Pose
 
 from std_msgs.msg import Bool, String
 
@@ -90,6 +90,11 @@ def NaviCallback(navidata):
     status = navidata.status
     print 'Navigation %s status: %d'%(ID, status)
     navi_result = (ID, status)
+
+def SetActiveCallback(state):
+    global active
+    active = state.data
+    print(active)
 
 def FormatGoal(goal, index, time_stamp):
     GoalMsg = MoveBaseGoal()
@@ -224,6 +229,18 @@ def determine_poly(goal_pose):
     # return loc_poly
     return target_poly
 
+def plan_msg_builder(plan, time_stamp):
+    plan_msg = PoseArray()
+    plan_msg.header.stamp = time_stamp
+    for n in plan:
+        pose = Pose()
+        pose.position.x = n[0][0]
+        pose.position.y = n[0][1]
+        pose.position.z = n[0][2]
+        plan_msg.poses.append(pose)
+    return plan_msg
+
+
 
 def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     global robot_pose
@@ -232,6 +249,8 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     global human_data
     global gesture_detected
     global human_detected
+    global active
+    active = False
     robot_pose = [None, init_pose]
     human_detected = False
     gesture_detected = 'None'
@@ -251,6 +270,10 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     InitialPosePublisher = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size = 100)
     # Interface to NTUA:
     ActionPublisher = rospy.Publisher('action/id', ActionSeq, queue_size = 100)
+    # Synthesised prefix plan Publisher
+    PrefixPlanPublisher = rospy.Publisher('prefix_plan', PoseArray, queue_size = 1)
+    # Synthesised sufix plan Publisher
+    SufixPlanPublisher = rospy.Publisher('sufix_plan', PoseArray, queue_size = 1)
     # Interface to FORTH
     RoiPublisher = rospy.Publisher('perception_focus_area', PolygonStamped, queue_size = 100)
     HumanDebugPublisher = rospy.Publisher('human_pose_debug', PoseStamped, queue_size = 100)
@@ -266,11 +289,21 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     rospy.Subscriber('tracked_humans', Humans, HumanCallback)
     # interface 2 to NTUA
     rospy.Subscriber('action/result', ActionSeq, ConfirmationCallback)
+    # trigger start from GUI
+    rospy.Subscriber('planner_active', Bool, SetActiveCallback)
     ####### robot information
     full_model = MotActModel(ts, act)
     planner = ltl_planner(full_model, robot_task[0], robot_task[1])
     ####### initial plan synthesis
     planner.optimal(10)
+    ## Give the publisher 1 sec to come up
+    usleep = lambda x: time.sleep(x)
+    usleep(1)
+    ### Publish plan for GUI
+    prefix_msg = plan_msg_builder(planner.run.line, rospy.Time.now())
+    PrefixPlanPublisher.publish(prefix_msg)
+    sufix_msg = plan_msg_builder(planner.run.loop, rospy.Time.now())
+    SufixPlanPublisher.publish(sufix_msg)
     ### start up move_base
     navigation = actionlib.SimpleActionClient("move_base", MoveBaseAction)
     rospy.loginfo("wait for the move_base action server to come up")
@@ -290,96 +323,97 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     #######
     t0 = rospy.Time.now()
     while not rospy.is_shutdown():
-        try:
-            t = rospy.Time.now()-t0
-            print '----------Time: %.2f----------' %t.to_sec()
-            next_move = planner.next_move
-            if isinstance(next_move, str):
-                if (str(next_move) == 'col_grasp'):
-                    if  grasp_done == False:
-                        next_move = 'grasp'
-                    else:
-                        next_move = 'col_grasp'
-                print 'Robot %s next move is action [%s]' %(str(robot_name), str(next_move))
-                SendAction(ActionPublisher, next_move, action_index)
-                print 'Next action message sent for [%s] with index %d' %(str(next_move), action_index)
-                # ------------------------------
-                # Interface 2 to NTUA
-                # rostopic pub /action/result roseus/StringStamped "header:
-                #   seq: 1
-                #   stamp:
-                #     secs: 0
-                #     nsecs: 0
-                #   frame_id: ''
-                # data: 'col_grasp'"
-                print 'Waiting for confirmation of action [%s] completion, with index %d' %(next_move, action_index)
-                while (not rospy.is_shutdown()) and ((action_confirmation[0] != action_index) or (action_confirmation[1] !=next_move)):
-                    try:
-                        rospy.sleep(1)
-                        print 'received action_confirmation', action_confirmation
-                        print 'Waiting for [action_index, next_move]', [action_index, next_move]
-                        if (next_move == 'col_grasp') and (gesture_detected == 'stop'):
-                            print 'Gesture %s received' %gesture_detected
-                            break
-                    except rospy.ROSInterruptException:
-                        pass
-                print 'Successful execution of action [%s] with index %d' %(next_move, action_index)
-                action_index += 1
-                if next_move == 'grasp':
-                    next_move = 'col_grasp'
-                    grasp_done = True
-                elif (next_move == 'col_grasp') and (grasp_done == True):
-                    planner.find_next_move()
-                    grasp_done = False
-            else:
-                print 'Robot %s next move is motion to %s' %(str(robot_name), str(next_move))
-                navi_goal = FormatGoal(next_move, planner.index, t)
-                navigation.send_goal(navi_goal)
-                print('Goal %s sent to %s.' %(str(next_move), str(robot_name)))
-                ############
-                #success = navigation.wait_for_result(rospy.Duration(60))
-                while (not rospy.is_shutdown()) and (navigation.get_state() != GoalStatus.SUCCEEDED):
-                    try:
-                        ###############  check for model update
-                        if roi in ts.node[next_move]['label']:
-                            print '----------going to the ROI next----------'
-                            if not target_poly:
-                                target_poly = determine_poly(next_move)
-                            print 'human_detected value', human_detected
-                            if ((human_detected) or (determine_human_detected(human_data, tf_listener, HumanDebugPublisher, target_poly))):
-                                print 'add hm to fts state label'
-                                if 'hm' not in ts.node[next_move]['label']:
-                                    planner.update_add('hm', roi)
-                                    print 'Agent %s: human detection incorporated in map!' %robot_name
-                                    planner.replan_simple(robot_pose[1])
-                                    human_detected = False
-                            # else:
-                            #     # interface 2 to FORTH
-                            #     # rostopic pub /human_detection std_msgs/Bool "data: false"
-                            #     new_update = planner.update_remove('hm', roi)
-                            #     if new_update:
-                            #         print 'Agent %s: human non-detection incorporated in map!' %robot_name
-                            #         planner.replan_simple(robot_pose[1])
-                        ############
-                        ############ send roi as focused area
-                        if roi in ts.node[next_move]['label']:
-                        #if True:
-                            # if not tf_listener.can_transform("/map", "/xiton_rgb_optical_frame", rospy.Time(0)):
-                            #     rospy.logwarn("transform from %s to %s is not available" % ("/map", "/xiton_rgb_optical_frame"))
-                            #     return None
-                            # transform = self._tf_listener.lookup_transform("/map", "/xiton_rgb_optical_frame", rospy.Time(0))
-                            target_poly = determine_poly(next_move)
-                            SendPolygon(RoiPublisher, target_poly)
+        if active == True:
+            try:
+                t = rospy.Time.now()-t0
+                print '----------Time: %.2f----------' %t.to_sec()
+                next_move = planner.next_move
+                if isinstance(next_move, str):
+                    if (str(next_move) == 'col_grasp'):
+                        if  grasp_done == False:
+                            next_move = 'grasp'
                         else:
-                            SendPolygon(RoiPublisher, 'None')
-                        rospy.sleep(2)
-                    except rospy.ROSInterruptException:
-                        pass
-                # ------------------------------
-                print('Goal %s reached by %s.' %(str(next_move),str(robot_name)))
-                planner.find_next_move()
-        except rospy.ROSInterruptException:
-            pass
+                            next_move = 'col_grasp'
+                    print 'Robot %s next move is action [%s]' %(str(robot_name), str(next_move))
+                    SendAction(ActionPublisher, next_move, action_index)
+                    print 'Next action message sent for [%s] with index %d' %(str(next_move), action_index)
+                    # ------------------------------
+                    # Interface 2 to NTUA
+                    # rostopic pub /action/result roseus/StringStamped "header:
+                    #   seq: 1
+                    #   stamp:
+                    #     secs: 0
+                    #     nsecs: 0
+                    #   frame_id: ''
+                    # data: 'col_grasp'"
+                    print 'Waiting for confirmation of action [%s] completion, with index %d' %(next_move, action_index)
+                    while (not rospy.is_shutdown()) and ((action_confirmation[0] != action_index) or (action_confirmation[1] !=next_move)):
+                        try:
+                            rospy.sleep(1)
+                            print 'received action_confirmation', action_confirmation
+                            print 'Waiting for [action_index, next_move]', [action_index, next_move]
+                            if (next_move == 'col_grasp') and (gesture_detected == 'stop'):
+                                print 'Gesture %s received' %gesture_detected
+                                break
+                        except rospy.ROSInterruptException:
+                            pass
+                    print 'Successful execution of action [%s] with index %d' %(next_move, action_index)
+                    action_index += 1
+                    if next_move == 'grasp':
+                        next_move = 'col_grasp'
+                        grasp_done = True
+                    elif (next_move == 'col_grasp') and (grasp_done == True):
+                        planner.find_next_move()
+                        grasp_done = False
+                else:
+                    print 'Robot %s next move is motion to %s' %(str(robot_name), str(next_move))
+                    navi_goal = FormatGoal(next_move, planner.index, t)
+                    navigation.send_goal(navi_goal)
+                    print('Goal %s sent to %s.' %(str(next_move), str(robot_name)))
+                    ############
+                    #success = navigation.wait_for_result(rospy.Duration(60))
+                    while (not rospy.is_shutdown()) and (navigation.get_state() != GoalStatus.SUCCEEDED):
+                        try:
+                            ###############  check for model update
+                            if roi in ts.node[next_move]['label']:
+                                print '----------going to the ROI next----------'
+                                if not target_poly:
+                                    target_poly = determine_poly(next_move)
+                                print 'human_detected value', human_detected
+                                if ((human_detected) or (determine_human_detected(human_data, tf_listener, HumanDebugPublisher, target_poly))):
+                                    print 'add hm to fts state label'
+                                    if 'hm' not in ts.node[next_move]['label']:
+                                        planner.update_add('hm', roi)
+                                        print 'Agent %s: human detection incorporated in map!' %robot_name
+                                        planner.replan_simple(robot_pose[1])
+                                        human_detected = False
+                                # else:
+                                #     # interface 2 to FORTH
+                                #     # rostopic pub /human_detection std_msgs/Bool "data: false"
+                                #     new_update = planner.update_remove('hm', roi)
+                                #     if new_update:
+                                #         print 'Agent %s: human non-detection incorporated in map!' %robot_name
+                                #         planner.replan_simple(robot_pose[1])
+                            ############
+                            ############ send roi as focused area
+                            if roi in ts.node[next_move]['label']:
+                            #if True:
+                                # if not tf_listener.can_transform("/map", "/xiton_rgb_optical_frame", rospy.Time(0)):
+                                #     rospy.logwarn("transform from %s to %s is not available" % ("/map", "/xiton_rgb_optical_frame"))
+                                #     return None
+                                # transform = self._tf_listener.lookup_transform("/map", "/xiton_rgb_optical_frame", rospy.Time(0))
+                                target_poly = determine_poly(next_move)
+                                SendPolygon(RoiPublisher, target_poly)
+                            else:
+                                SendPolygon(RoiPublisher, 'None')
+                            rospy.sleep(2)
+                        except rospy.ROSInterruptException:
+                            pass
+                    # ------------------------------
+                    print('Goal %s reached by %s.' %(str(next_move),str(robot_name)))
+                    planner.find_next_move()
+            except rospy.ROSInterruptException:
+                pass
 
 '''
 Useful commends here for testing:
