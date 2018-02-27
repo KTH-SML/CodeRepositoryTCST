@@ -8,13 +8,18 @@ from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QLineF
 from python_qt_binding.QtGui import QPen, QFont
 
 class MapGraphicsScene(QGraphicsScene):
-    signalMousePos = pyqtSignal(QPointF)
+    signalMousePressedPos = pyqtSignal(QPointF)
+    signalMouseReleasedPos = pyqtSignal(QPointF)
     def __init__(self):
         super(MapGraphicsScene, self).__init__()
 
     def mousePressEvent(self, event):
         pos = event.lastScenePos()
-        self.signalMousePos.emit(pos)
+        self.signalMousePressedPos.emit(pos)
+
+    def mouseReleaseEvent(self, event):
+        pos = event.lastScenePos()
+        self.signalMouseReleasedPos.emit(pos)
 
     def addArrow(self, startPoint = QPointF(), endPoint = QPointF(), pen = QPen()):
         alpha = pi/8

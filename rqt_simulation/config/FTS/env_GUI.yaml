@@ -6,9 +6,11 @@ r01:
     target: r02
   - cost: 1.0
     target: r03
+  - cost: 1.0
+    target: r04
   position:
-  - -8.25
-  - -2.25
+  - -8.4
+  - -2.85
   - 0.0
 r02:
   edges:
@@ -18,9 +20,11 @@ r02:
     target: r02
   - cost: 1.0
     target: r03
+  - cost: 1.0
+    target: r04
   position:
-  - -3.2
-  - -1.2000000000000002
+  - -6.550000000000001
+  - -8.0
   - 0.0
 r03:
   edges:
@@ -30,7 +34,23 @@ r03:
     target: r02
   - cost: 1.0
     target: r03
+  - cost: 1.0
+    target: r04
   position:
-  - -0.65
-  - -6.2
+  - -0.55
+  - -6.15
+  - 0.0
+r04:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  position:
+  - -3.0
+  - -1.4500000000000002
   - 0.0

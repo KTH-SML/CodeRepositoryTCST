@@ -61,6 +61,7 @@ class Map_dialog(QDialog):
         self.ellipse_items_labels = []
         self.pixel_coords_list = []
         self.line_dict = {}
+        self.quat_goal_pos_list = []
 
         self.graphicsScene = current_graphicsScene
         self.graphicsScene.signalMousePressedPos.connect(self.pointSelection)
@@ -191,6 +192,7 @@ class Map_dialog(QDialog):
         print(theta)
         quat_goal_pos = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
         print(quat_goal_pos)
+        self.quat_goal_pos
 
 
     def pixelToWorld(self, pixel_coords = QPointF()):
