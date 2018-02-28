@@ -39,6 +39,9 @@ class Map_dialog(QDialog):
         self.vbox_list = []
         self.vbox = QVBoxLayout()
 
+        self.clicked = False
+        self.arrow_list = []
+
         #self.grid.addWidget(self.graphicsView, 0, 0, 2, 1)
         #self.grid.addWidget(self.button_save_ROI, 0, 2)
         #self.grid.addWidget(self.button_reset, 1, 2)
@@ -65,6 +68,7 @@ class Map_dialog(QDialog):
         self.graphicsScene = current_graphicsScene
         self.graphicsScene.signalMousePressedPos.connect(self.pointSelection)
         self.graphicsScene.signalMouseReleasedPos.connect(self.pointRelease)
+        self.graphicsScene.signalMouseMovePos.connect(self.mouseMove)
 
         if self.scenario == 'pal_office':
             map = 'map.pgm'
@@ -101,6 +105,7 @@ class Map_dialog(QDialog):
             self.region_of_interest,
             #actions = 'TODO'
         )
+        print(data)
         env_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
@@ -118,6 +123,8 @@ class Map_dialog(QDialog):
             del self.groupBox_list[0]
         for i in range(0, len(self.line_dict)):
             self.graphicsScene.removeItem(self.line_dict[self.line_dict.keys()[i]])
+        for i in range(0, len(self.arrow_list)):
+            self.graphicsScene.removeArrow(self.arrow_list[i])
         self.vbox = QVBoxLayout()
         self.vbox_list = []
         self.FTS_matrix = []
@@ -129,6 +136,7 @@ class Map_dialog(QDialog):
         self.pixel_coords_list = []
         self.button_save_FTS.setEnabled(False)
         self.line_dict = {}
+        self.arrow_list = []
 
     @Slot(bool)
     def on_button_set_edges_pressed(self):
@@ -139,11 +147,14 @@ class Map_dialog(QDialog):
     def pointSelection(self, pos):
         print('scene')
         print(pos)
+        self.clicked = True
+        self.current_arrow = []
         self.regionCounter += 1
         self.pixel_coords_list.append(pos)
         position_of_interest = {'position' : self.pixelToWorld(pos)}
+        self.pose_of_interest = {'pose': position_of_interest}
         self.region_list.append('r' + str(self.regionCounter).zfill(2))
-        self.region_of_interest.update({'r' + str(self.regionCounter).zfill(2) : position_of_interest})
+        #self.region_of_interest.update({'r' + str(self.regionCounter).zfill(2) : position_of_interest})
         print(self.region_of_interest)
         markerSize = 13
 
@@ -183,14 +194,27 @@ class Map_dialog(QDialog):
             self.grid.addWidget(self.groupBox_list[i], 0, i+1, Qt.AlignRight)
 
     def pointRelease(self, pos):
+        self.clicked = False
         print('release')
         print(pos)
         deltay = -pos.y() + self.pixel_coords_list[self.regionCounter -1].y()
         deltax = pos.x() - self.pixel_coords_list[self.regionCounter -1].x()
         theta = atan2(deltay, deltax)
         print(theta)
-        quat_goal_pos = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
-        print(quat_goal_pos)
+        quat = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
+        print(quat)
+        self.pose_of_interest['pose'].update({'orientation' : (float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3]))})
+        self.region_of_interest['r' + str(self.regionCounter).zfill(2)] = self.pose_of_interest
+        self.arrow_list.append(self.current_arrow)
+
+    def mouseMove(self, pos):
+        arrow_length = 50
+        if self.clicked:
+            theta = atan2((pos.y() - self.pixel_coords_list[self.regionCounter - 1].y()) , (pos.x() - self.pixel_coords_list[self.regionCounter - 1].x()))
+            end_point = QPointF(self.pixel_coords_list[self.regionCounter - 1].x() + arrow_length * cos(theta), self.pixel_coords_list[self.regionCounter - 1].y() + arrow_length * sin(theta))
+            if len(self.current_arrow) > 0:
+                self.graphicsScene.removeArrow(self.current_arrow)
+            self.current_arrow = self.graphicsScene.addArrow(self.pixel_coords_list[self.regionCounter - 1], end_point)
 
 
     def pixelToWorld(self, pixel_coords = QPointF()):

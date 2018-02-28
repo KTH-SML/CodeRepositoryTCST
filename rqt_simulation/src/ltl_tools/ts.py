@@ -6,9 +6,10 @@ from math import sqrt
 from networkx.classes.digraph import DiGraph
 
 def distance(pose1, pose2):
+    print('pose')
     print(pose1)
     print(pose2)
-    return (sqrt((pose1[0]-pose2[0])**2+(pose1[1]-pose2[1])**2)+0.001)
+    return (sqrt((pose1[0][0]-pose2[0][0])**2+(pose1[0][1]-pose2[0][1])**2)+0.001)
 
 def reach_waypoint(pose, waypoint, margin):
     if distance(pose, waypoint)<=margin:

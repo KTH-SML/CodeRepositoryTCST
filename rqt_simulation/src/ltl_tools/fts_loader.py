@@ -62,13 +62,14 @@ test_ap = set()
 #print(data)
 for i in range(0, len(data)):
     test_ap.update({data.keys()[i]})
-    test.update( {tuple(data[data.keys()[i]]['position']): set([data.keys()[i]])})
+    #test.update( {tuple(data[data.keys()[i]]['position']): set([data.keys()[i]])})
+    test.update( {(tuple(data[data.keys()[i]]['pose']['position']), tuple(data[data.keys()[i]]['pose']['orientation'])): set([data.keys()[i]])})
 
 print('test')
 print(test)
 print(test_ap)
 
-init_pose = (7.77,  7.00, 0.0)
+init_pose = ((7.77,  7.00, 0.0), (0.0, 0.0, 0.0, 1.0))
 #robot_motion = MotionFts(regions, ap, 'pal_office' )
 robot_motion = MotionFts(test, test_ap, 'pal_office' )
 robot_motion.set_initial(init_pose)
@@ -77,7 +78,8 @@ robot_motion.set_initial(init_pose)
 for i in range(0, len(data)):
     for j in range(0, len(data[data.keys()[i]]['edges'])):
         print(data[data.keys()[i]]['edges'][j]['cost'])
-        robot_motion.add_un_edges([[tuple(data[data.keys()[i]]['position']), tuple(data[data[data.keys()[i]]['edges'][j]['target']]['position'])]], unit_cost = data[data.keys()[i]]['edges'][j]['cost'])
+        #robot_motion.add_un_edges([[tuple(data[data.keys()[i]]['position']), tuple(data[data[data.keys()[i]]['edges'][j]['target']]['position'])]], unit_cost = data[data.keys()[i]]['edges'][j]['cost'])
+        robot_motion.add_un_edges([[(tuple(data[data.keys()[i]]['pose']['position']), tuple(data[data.keys()[i]]['pose']['orientation'])), (tuple(data[data[data.keys()[i]]['edges'][j]['target']]['pose']['position']), tuple(data[data[data.keys()[i]]['edges'][j]['target']]['pose']['orientation']))]], unit_cost = data[data.keys()[i]]['edges'][j]['cost'])
 
 
 ##############################

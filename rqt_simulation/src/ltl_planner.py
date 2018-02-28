@@ -232,11 +232,12 @@ def determine_poly(goal_pose):
 def plan_msg_builder(plan, time_stamp):
     plan_msg = PoseArray()
     plan_msg.header.stamp = time_stamp
+    print(plan)
     for n in plan:
         pose = Pose()
-        pose.position.x = n[0][0]
-        pose.position.y = n[0][1]
-        pose.position.z = n[0][2]
+        pose.position.x = n[0][0][0]
+        pose.position.y = n[0][0][1]
+        pose.position.z = n[0][0][2]
         plan_msg.poses.append(pose)
     return plan_msg
 

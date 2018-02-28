@@ -16,7 +16,7 @@ from std_msgs.msg import Bool
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem
 from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
-from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QMatrix
+from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QTransform
 
 from .map_dialog import Map_dialog
 from .initial_pose import Initial_pose
@@ -110,8 +110,10 @@ class SimulationWidget(QWidget):
         else:
             scale = float(rectF.height())/mapSize.height()
 
-        matrix = QMatrix(scale, 0, 0.0, scale, 0, 0)
-        self.graphicsView_main.setMatrix(matrix)
+        #matrix = QMatrix(scale, 0, 0.0, scale, 0, 0)
+        transform = QTransform(scale, 0, 0.0, scale, 0, 0)
+        #self.graphicsView_main.setMatrix(matrix)
+        self.graphicsView_main.setTransform(transform)
 
         self.region_pose_marker_array_msg = MarkerArray()
 
@@ -124,9 +126,12 @@ class SimulationWidget(QWidget):
 
     def prefix_callback(self, msg):
         for n in msg.poses:
+            #print self.position_msg_to_tuple(n.position)
             for i in range(0, len(self.region_of_interest)):
-                if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
+                #print self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']
+                if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
                     self.prefix_string =  self.prefix_string + self.region_of_interest.keys()[i] + ' --> '
+                    #print self.prefix_string
         self.prefix_plan_subscriber.received.emit(True)
 
     @Slot(bool)
@@ -136,7 +141,7 @@ class SimulationWidget(QWidget):
     def sufix_callback(self, msg):
         for n in msg.poses:
             for i in range(0, len(self.region_of_interest)):
-                if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['position']:
+                if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
                     self.sufix_string = self.sufix_string + self.region_of_interest.keys()[i] + ' --> '
         self.sufix_plan_subscriber.received.emit(True)
 
@@ -196,7 +201,7 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def set_init_pose(self):
         if self.comboBox_init_pose1.count() > 0:
-            self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]['position']
+            self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]['pose']['position']
             print(self.region_list)
 
             index = self.region_list.index(self.comboBox_init_pose1.currentText())
@@ -333,10 +338,10 @@ class SimulationWidget(QWidget):
                 self.region_pose_marker.scale.x = 0.5
                 self.region_pose_marker.scale.y = 0.5
             else:
-                pose_marker.position.x = region[region.keys()[i]]['position'][0]
-                pose_marker.position.y = region[region.keys()[i]]['position'][1]
-                pose_text.position.x = region[region.keys()[i]]['position'][0]
-                pose_text.position.y = region[region.keys()[i]]['position'][1]
+                pose_marker.position.x = region[region.keys()[i]]['pose']['position'][0]
+                pose_marker.position.y = region[region.keys()[i]]['pose']['position'][1]
+                pose_text.position.x = region[region.keys()[i]]['pose']['position'][0]
+                pose_text.position.y = region[region.keys()[i]]['pose']['position'][1]
                 self.region_pose_marker_label.text = region.keys()[i]
                 self.region_pose_marker.color.r = 0.5
                 self.region_pose_marker.color.g = 0.0
