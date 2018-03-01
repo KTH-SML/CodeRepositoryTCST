@@ -54,8 +54,11 @@ class SimulationWidget(QWidget):
         self.sufix_plan_subscriber.received.connect(self.received_sufix)
 
         self.start_publisher = rospy.Publisher('tiago1/planner_active', Bool, queue_size = 1)
+        #self.init_pose_publisher = rospy.Publisher('tiago1/init_pose', Point, queue_size = 1)
 
         self.initialization()
+
+        self.add_publisher('/tiago1/init_pose', Pose, 1.0, self.init_pose_msg)
 
         #self.graphicsView_main.scale(0.5, 0.5)
 
@@ -86,6 +89,7 @@ class SimulationWidget(QWidget):
         self.textBrowser_prefix.insertPlainText('Prefix: ')
         self.sufix_string = ''
         self.textBrowser_sufix.insertPlainText('Sufix: ')
+        self.init_pose_msg = Pose()
 
         self.scenario = self.world_comboBox.currentText()
         map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
@@ -201,8 +205,16 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def set_init_pose(self):
         if self.comboBox_init_pose1.count() > 0:
-            self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]['pose']['position']
+            self.initial_pose['start_01'] = self.region_of_interest[self.comboBox_init_pose1.currentText()]
             print(self.region_list)
+            self.init_pose_msg.position.x = self.initial_pose['start_01']['pose']['position'][0]
+            self.init_pose_msg.position.y = self.initial_pose['start_01']['pose']['position'][1]
+            self.init_pose_msg.position.z = self.initial_pose['start_01']['pose']['position'][2]
+            self.init_pose_msg.orientation.x = self.initial_pose['start_01']['pose']['orientation'][0]
+            self.init_pose_msg.orientation.y = self.initial_pose['start_01']['pose']['orientation'][1]
+            self.init_pose_msg.orientation.z = self.initial_pose['start_01']['pose']['orientation'][2]
+            self.init_pose_msg.orientation.w = self.initial_pose['start_01']['pose']['orientation'][3]
+            #self.init_pose_publisher.publish(init)
 
             index = self.region_list.index(self.comboBox_init_pose1.currentText())
             for i in range(0, len(self.region_list)):
@@ -237,8 +249,8 @@ class SimulationWidget(QWidget):
         launch_robot_1 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')])
         sys.argv.append('robot_model:=tiago_steel')
         sys.argv.append('robot_name:=tiago1')
-        sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_01'][0]))
-        sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_01'][1]))
+        sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_01']['pose']['position'][0]))
+        sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_01']['pose']['position'][1]))
         sys.argv.append('initial_pose_a:=0.0')
         print(sys.argv)
         launch_robot_1.start()
@@ -324,11 +336,12 @@ class SimulationWidget(QWidget):
             self.region_pose_marker.pose = pose_marker
             self.region_pose_marker_label.pose = pose_text
 
+            pose_marker.position.x = region[region.keys()[i]]['pose']['position'][0]
+            pose_marker.position.y = region[region.keys()[i]]['pose']['position'][1]
+            pose_text.position.x = region[region.keys()[i]]['pose']['position'][0]
+            pose_text.position.y = region[region.keys()[i]]['pose']['position'][1]
+
             if initial:
-                pose_marker.position.x = region[region.keys()[i]][0]
-                pose_marker.position.y = region[region.keys()[i]][1]
-                pose_text.position.x = region[region.keys()[i]][0]
-                pose_text.position.y = region[region.keys()[i]][1]
                 self.region_pose_marker_label.text = region.keys()[0]
                 self.region_pose_marker.color.r = 0.0
                 self.region_pose_marker.color.g = 0.5
@@ -338,10 +351,6 @@ class SimulationWidget(QWidget):
                 self.region_pose_marker.scale.x = 0.5
                 self.region_pose_marker.scale.y = 0.5
             else:
-                pose_marker.position.x = region[region.keys()[i]]['pose']['position'][0]
-                pose_marker.position.y = region[region.keys()[i]]['pose']['position'][1]
-                pose_text.position.x = region[region.keys()[i]]['pose']['position'][0]
-                pose_text.position.y = region[region.keys()[i]]['pose']['position'][1]
                 self.region_pose_marker_label.text = region.keys()[i]
                 self.region_pose_marker.color.r = 0.5
                 self.region_pose_marker.color.g = 0.0

@@ -8,7 +8,7 @@ import sys
 import time
 
 
-from geometry_msgs.msg import PoseWithCovarianceStamped, PoseStamped, PolygonStamped, Point32, PointStamped, PoseArray, Pose
+from geometry_msgs.msg import PoseWithCovarianceStamped, PoseStamped, PolygonStamped, Point32, PointStamped, PoseArray, Pose, Point
 
 from std_msgs.msg import Bool, String
 
@@ -96,18 +96,23 @@ def SetActiveCallback(state):
     active = state.data
     print(active)
 
+def GetInitPoseCallback(pose):
+    global init_pose_GUI
+    init_pose_GUI = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w))
+
+
 def FormatGoal(goal, index, time_stamp):
     GoalMsg = MoveBaseGoal()
     GoalMsg.target_pose.header.seq = index
     GoalMsg.target_pose.header.stamp = time_stamp
     GoalMsg.target_pose.header.frame_id = 'map'
-    GoalMsg.target_pose.pose.position.x = goal[0]
-    GoalMsg.target_pose.pose.position.y = goal[1]
-    quaternion = quaternion_from_euler(0, 0, goal[2])
-    GoalMsg.target_pose.pose.orientation.x = quaternion[0]
-    GoalMsg.target_pose.pose.orientation.y = quaternion[1]
-    GoalMsg.target_pose.pose.orientation.z = quaternion[2]
-    GoalMsg.target_pose.pose.orientation.w = quaternion[3]
+    GoalMsg.target_pose.pose.position.x = goal[0][0]
+    GoalMsg.target_pose.pose.position.y = goal[0][1]
+    #quaternion = quaternion_from_euler(0, 0, goal[2])
+    GoalMsg.target_pose.pose.orientation.x = goal[1][1]
+    GoalMsg.target_pose.pose.orientation.y = goal[1][2]
+    GoalMsg.target_pose.pose.orientation.z = goal[1][3]
+    GoalMsg.target_pose.pose.orientation.w = goal[1][0]
     return GoalMsg
 
 def SendAction(ActionPublisher, action, index):
@@ -251,6 +256,7 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     global gesture_detected
     global human_detected
     global active
+    global init_pose_GUI
     active = False
     robot_pose = [None, init_pose]
     human_detected = False
@@ -292,14 +298,19 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     rospy.Subscriber('action/result', ActionSeq, ConfirmationCallback)
     # trigger start from GUI
     rospy.Subscriber('planner_active', Bool, SetActiveCallback)
+    # initial position from GUI
+    rospy.Subscriber('init_pose', Pose, GetInitPoseCallback)
+    ####### Wait 3 seconds to receive the initial position from the GUI
+    usleep = lambda x: time.sleep(x)
+    usleep(3)
+    print(init_pose_GUI)
+    robot_pose = [None, init_pose_GUI]
+    ts.set_initial(init_pose_GUI)
     ####### robot information
     full_model = MotActModel(ts, act)
     planner = ltl_planner(full_model, robot_task[0], robot_task[1])
     ####### initial plan synthesis
     planner.optimal(10)
-    ## Give the publisher 1 sec to come up
-    usleep = lambda x: time.sleep(x)
-    usleep(1)
     ### Publish plan for GUI
     prefix_msg = plan_msg_builder(planner.run.line, rospy.Time.now())
     PrefixPlanPublisher.publish(prefix_msg)
@@ -316,11 +327,11 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     action_index = 1
     grasp_done = False
 
-    markers = []
-    for n in full_model.graph["region"].nodes():
-        prop = full_model.graph["region"].node[n]["label"]
-        markers.extend(visualize_fts.create_marker(n, ','.join(prop)))
-    visualize_fts.send_markers(markers)
+    #markers = []
+    #for n in full_model.graph["region"].nodes():
+    #    prop = full_model.graph["region"].node[n]["label"]
+    #    markers.extend(visualize_fts.create_marker(n, ','.join(prop)))
+    #visualize_fts.send_markers(markers)
     #######
     t0 = rospy.Time.now()
     while not rospy.is_shutdown():

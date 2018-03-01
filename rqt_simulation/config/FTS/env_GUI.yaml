@@ -4,23 +4,15 @@ r01:
     target: r01
   - cost: 1.0
     target: r02
-  - cost: 1.0
-    target: r03
-  - cost: 1.0
-    target: r04
-  - cost: 1.0
-    target: r05
-  - cost: 1.0
-    target: r06
   pose:
     orientation:
-    - 0.63800796699381
+    - 0.5600668982935607
     - 0.0
     - 0.0
-    - 0.770029761796533
+    - 0.8284473848325132
     position:
-    - -6.4
-    - -7.9
+    - -5.3500000000000005
+    - -8.0
     - 0.0
 r02:
   edges:
@@ -28,117 +20,13 @@ r02:
     target: r01
   - cost: 1.0
     target: r02
-  - cost: 1.0
-    target: r03
-  - cost: 1.0
-    target: r04
-  - cost: 1.0
-    target: r05
-  - cost: 1.0
-    target: r06
   pose:
     orientation:
-    - 0.6267346747856669
+    - 0.5606288093051838
     - 0.0
     - 0.0
-    - 0.7792327299474172
+    - 0.8280672304692729
     position:
-    - -0.65
-    - -6.25
-    - 0.0
-r03:
-  edges:
-  - cost: 1.0
-    target: r01
-  - cost: 1.0
-    target: r02
-  - cost: 1.0
-    target: r03
-  - cost: 1.0
-    target: r04
-  - cost: 1.0
-    target: r05
-  - cost: 1.0
-    target: r06
-  pose:
-    orientation:
-    - 0.5495038164405002
-    - 0.0
-    - 0.0
-    - 0.8354912062477529
-    position:
-    - 4.2
-    - -5.4
-    - 0.0
-r04:
-  edges:
-  - cost: 1.0
-    target: r01
-  - cost: 1.0
-    target: r02
-  - cost: 1.0
-    target: r03
-  - cost: 1.0
-    target: r04
-  - cost: 1.0
-    target: r05
-  - cost: 1.0
-    target: r06
-  pose:
-    orientation:
-    - 0.9894003954974829
-    - 0.0
-    - 0.0
-    - 0.14521314468540478
-    position:
-    - -7.1000000000000005
-    - -3.1
-    - 0.0
-r05:
-  edges:
-  - cost: 1.0
-    target: r01
-  - cost: 1.0
-    target: r02
-  - cost: 1.0
-    target: r03
-  - cost: 1.0
-    target: r04
-  - cost: 1.0
-    target: r05
-  - cost: 1.0
-    target: r06
-  pose:
-    orientation:
-    - 0.13870121188940077
-    - -0.0
-    - -0.0
-    - -0.9903342737785114
-    position:
-    - -1.9500000000000002
-    - -1.4500000000000002
-    - 0.0
-r06:
-  edges:
-  - cost: 1.0
-    target: r01
-  - cost: 1.0
-    target: r02
-  - cost: 1.0
-    target: r03
-  - cost: 1.0
-    target: r04
-  - cost: 1.0
-    target: r05
-  - cost: 1.0
-    target: r06
-  pose:
-    orientation:
-    - 0.21815281089067587
-    - -0.0
-    - -0.0
-    - -0.9759146228541188
-    position:
-    - 3.0
-    - -0.15000000000000002
+    - -0.45
+    - -6.800000000000001
     - 0.0

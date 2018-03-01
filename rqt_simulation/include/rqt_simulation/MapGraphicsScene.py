@@ -59,7 +59,6 @@ class MapGraphicsScene(QGraphicsScene):
 
     def removeArrow(self, arrow):
         for n in arrow:
-            print(n)
             self.removeItem(n)
 
     def addCoordinateSystem(self, origin = QPointF(), angle = 0.0):
