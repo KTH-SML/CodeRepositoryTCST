@@ -5,6 +5,7 @@
   <group ns="$(arg robot_name)">
 
       <node name="ltl_planner" pkg="rqt_simulation" type="ltl_planner.py" output="screen"/>
+          <param name="robot_name" type="string" value="$(arg robot_name)" />
 
   </group>
 
