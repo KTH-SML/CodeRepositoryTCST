@@ -1,0 +1,52 @@
+Panels:
+- Class: rviz/Displays
+  Help Height: 78
+  Name: Displays
+  Porperty Tree Widget:
+    Expanded:
+    - /Global Options1
+    - /Robot1
+    - /Robot1/RobotModel1
+    - /Robot1/Dynamics1
+    - /Robot1/Footprint1
+    - /Robot1/Dynamic Footprint1
+    - /Robot1/Twist1
+    - /Robot1/Sensors1
+    - /Robot1/Sensors1/Laser1
+    - /Robot1/Sensors1/RGBD scan1
+    - /Robot1/Sensors1/Virtual Obstacles1
+    - /Robot1/Sensors1/Depth Cloud1
+    - /Robot1/Sensors1/Sonars1
+    - /Control1
+    - /Control1/Move1
+    - /Control1/Path1
+    - /Planning1
+    - /Planning1/Base1
+    - /Planning1/Base1/Global1
+    - /Planning1/Base1/Global1/Plan1
+    - /Planning1/Base1/Global1/Plan1/Navfn1
+    - /Planning1/Base1/Global1/Plan1/Global Planner1
+    - /Planning1/Base1/Global1/Potential1
+    - /Planning1/Base1/Global1/Costmap1
+    - /Planning1/Base1/Global1/Voxel Grid1
+    - /Planning1/Base1/Local1
+    - /Planning1/Base1/Local1/Plan1
+    - /Planning1/Base1/Local1/Plan1/Trajectory1
+    - /Planning1/Base1/Local1/Plan1/DWA1
+    - /Planning1/Base1/Local1/Plan1/Pal1
+    - /Planning1/Base1/Local1/Costmap1
+    - /Planning1/Base1/Local1/Cost1
+    - /Planning1/Base1/Local1/Trajectories1
+    - /Planning1/Base1/Goal1
+    - /Localization1
+    - /Localization1/Pose1
+    - /Localization1/Pose Graph1
+    - /Localization1/Localization Quality1
+    - /Mapping1
+    - /Mapping1/Map1
+    - /Mapping1/SLAM Graph Edges1
+    - /Mapping1/SLAM Graph Vertices1
+    - /Mapping1/Trajectory1
+    - /RGBD1
+    - /MarkerArray1/Marker1
+    Splitter Ratio: 0.458522

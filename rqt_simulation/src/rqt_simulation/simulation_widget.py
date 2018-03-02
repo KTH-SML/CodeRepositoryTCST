@@ -23,6 +23,7 @@ from .initial_pose import Initial_pose
 from rqt_simulation.MapGraphicsScene import MapGraphicsScene
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
+from rqt_simulation.RVIZFileGenerator import RVIZFileGenerator
 
 from ltl_tools.planner import ltl_planner
 
@@ -59,7 +60,7 @@ class SimulationWidget(QWidget):
 
         self.tab_list = [self.tab]
 
-        #self.tab_layout_list = []
+        self.robot_name_list = []
         self.robot_label_name_list = []
         self.robot_comboBox_list = []
 
@@ -77,7 +78,9 @@ class SimulationWidget(QWidget):
         self.robot_label_prefix_list = []
         self.robot_label_sufix_list = []
 
+        self.prefix_plan_topic_list = []
         self.prefix_plan_subscriber_list = []
+        self.sufix_plan_topic_list = []
         self.sufix_plan_subscriber_list = []
 
         self.init_pose_msg_list = []
@@ -223,35 +226,36 @@ class SimulationWidget(QWidget):
         self.region_pose_marker_array_msg = MarkerArray()
 
 
-    def prefix_callback(self, msg):
+    def prefix_callback(self, msg, source):
         for n in msg.poses:
             #print self.position_msg_to_tuple(n.position)
             for i in range(0, len(self.region_of_interest)):
                 #print self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']
                 if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
                     self.prefix_string =  self.prefix_string + self.region_of_interest.keys()[i] + ' --> '
-                    #print self.prefix_string
-        self.prefix_plan_subscriber_list[0].received.emit(True)
+        index = self.prefix_plan_topic_list.index(source)
+        self.prefix_plan_subscriber_list[index].received.emit(index)
 
-    @Slot(bool)
-    def received_prefix(self):
-        self.robot_prefix_textbox_list[0].clear()
-        self.robot_prefix_textbox_list[0].insertPlainText('Prefix: ')
-        self.robot_prefix_textbox_list[0].insertPlainText(self.prefix_string)
+    @pyqtSlot(int)
+    def received_prefix(self, index):
+        self.robot_prefix_textbox_list[index].clear()
+        self.robot_prefix_textbox_list[index].insertPlainText('Prefix: ')
+        self.robot_prefix_textbox_list[index].insertPlainText(self.prefix_string)
         self.prefix_string = ''
 
-    def sufix_callback(self, msg):
+    def sufix_callback(self, msg, source):
         for n in msg.poses:
             for i in range(0, len(self.region_of_interest)):
                 if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
                     self.sufix_string = self.sufix_string + self.region_of_interest.keys()[i] + ' --> '
-        self.sufix_plan_subscriber_list[0].received.emit(True)
+        index = self.sufix_plan_topic_list.index(source)
+        self.sufix_plan_subscriber_list[index].received.emit(index)
 
-    @Slot(bool)
-    def received_sufix(self):
-        self.robot_sufix_textbox_list[0].clear()
-        self.robot_sufix_textbox_list[0].insertPlainText('Sufix: ')
-        self.robot_sufix_textbox_list[0].insertPlainText(self.sufix_string)
+    @pyqtSlot(int)
+    def received_sufix(self, index):
+        self.robot_sufix_textbox_list[index].clear()
+        self.robot_sufix_textbox_list[index].insertPlainText('Sufix: ')
+        self.robot_sufix_textbox_list[index].insertPlainText(self.sufix_string)
         self.sufix_string = ''
 
     @Slot(bool)
@@ -373,9 +377,12 @@ class SimulationWidget(QWidget):
         scenario = self.world_comboBox.currentText()
         self.button_RI.setEnabled(False)
         self.button_setup.setEnabled(False)
-        self.comboBox_robot1.setEnabled(False)
-        self.comboBox_robot2.setEnabled(False)
+        #self.comboBox_robot1.setEnabled(False)
+        #self.comboBox_robot2.setEnabled(False)
         self.world_comboBox.setEnabled(False)
+
+        file = RVIZFileGenerator()
+
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
 
@@ -383,20 +390,21 @@ class SimulationWidget(QWidget):
         launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
         sys.argv.append('scenario:=' + scenario)
         print(sys.argv)
-        launch_world.start()
+        #launch_world.start()
 
+        launch_robot_list = []
+        for i in range(0, self.num_robots):
+            launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
+            sys.argv.append('robot_model:=tiago_steel')
+            sys.argv.append('robot_name:=' + self.robot_name_list[i])
+            sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
+            sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
+            sys.argv.append('initial_pose_a:=0.0')
+            sys.argv.append('scenario:=' + scenario)
+            #launch_robot_list[i].start()
+            del sys.argv[2:len(sys.argv)]
 
-        launch_robot_1 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')])
-        sys.argv.append('robot_model:=tiago_steel')
-        sys.argv.append('robot_name:=tiago1')
-        sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_01']['pose']['position'][0]))
-        sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_01']['pose']['position'][1]))
-        sys.argv.append('initial_pose_a:=0.0')
-        print(sys.argv)
-        launch_robot_1.start()
-
-        del sys.argv[2:len(sys.argv)]
-        print(sys.argv)
+        #print(sys.argv)
 
         #launch_robot_2 = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')])
         #sys.argv.append('robot_model:=tiago_steel')
@@ -424,14 +432,21 @@ class SimulationWidget(QWidget):
         #with codecs.open(task_file, 'w', encoding='utf-8') as outfile:
         #    yaml.safe_dump(data, outfile, default_flow_style=False)
 
-        self.soft_task_msg_list[0].data = self.robot_soft_task_input_list[0].text()
-        self.hard_task_msg_list[0].data = self.robot_hard_task_input_list[0].text()
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
-        launch_task = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')])
+        roslaunch_task_list = []
+        for i in range(0, self.num_robots):
+            self.soft_task_msg_list[i].data = self.robot_soft_task_input_list[i].text()
+            self.hard_task_msg_list[i].data = self.robot_hard_task_input_list[i].text()
+            roslaunch_task_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')]))
+            sys.argv.append('robot_name:=' + self.robot_name_list[i])
+            roslaunch_task_list[i].start()
+            del sys.argv[2:len(sys.argv)]
 
-        sys.argv.append('robot_name:=tiago1')
-        launch_task.start()
+
+
+
+
 
     @Slot(bool)
     def on_button_start_sim_pressed(self):
@@ -468,6 +483,7 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def add_robot(self):
         self.num_robots += 1
+        self.robot_name_list.append('robot' + str(self.num_robots))
         if self.num_robots > 1:
             self.tab_list.append(QWidget())
             self.tabWidget.addTab(self.tab_list[self.num_robots-1], ('Robot ' + str(self.num_robots)))
@@ -515,8 +531,10 @@ class SimulationWidget(QWidget):
 
         self.tab_list[self.num_robots-1].setLayout(self.tab_list[self.num_robots-1].layout)
 
-        self.prefix_plan_subscriber_list.append(ROS_Subscriber('/tiago1/prefix_plan', PoseArray, self.prefix_callback))
-        self.sufix_plan_subscriber_list.append(ROS_Subscriber('/tiago1/sufix_plan', PoseArray, self.sufix_callback))
+        self.prefix_plan_topic_list.append('/' + self.robot_name_list[self.num_robots-1] + '/prefix_plan')
+        self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[self.num_robots-1], PoseArray, self.prefix_callback))
+        self.sufix_plan_topic_list.append('/' + self.robot_name_list[self.num_robots-1] + '/sufix_plan')
+        self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[self.num_robots-1], PoseArray, self.sufix_callback))
 
         self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
         self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
@@ -526,9 +544,9 @@ class SimulationWidget(QWidget):
         self.init_pose_msg_list.append(Pose())
         self.soft_task_msg_list.append(String())
         self.hard_task_msg_list.append(String())
-        self.add_publisher('/tiago1/init_pose', Pose, 1.0, self.init_pose_msg_list[self.num_robots-1])
-        self.add_publisher('/tiago1/soft_task', String, 1.0, self.soft_task_msg_list[self.num_robots-1])
-        self.add_publisher('/tiago1/hard_task', String, 1.0, self.hard_task_msg_list[self.num_robots-1])
+        self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/init_pose', Pose, 1.0, self.init_pose_msg_list[self.num_robots-1])
+        self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/soft_task', String, 1.0, self.soft_task_msg_list[self.num_robots-1])
+        self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/hard_task', String, 1.0, self.hard_task_msg_list[self.num_robots-1])
 
 
 
@@ -568,7 +586,7 @@ class SimulationWidget(QWidget):
                 self.region_pose_marker.scale.x = 1.0
                 self.region_pose_marker.scale.y = 1.0
 
-            self.region_pose_marker.header.frame_id = 'tiago1/map'
+            self.region_pose_marker.header.frame_id = '/' + self.robot_name_list[0] + '/map'
 
             self.region_pose_marker.type = self.region_pose_marker.CYLINDER
             self.region_pose_marker.id = self.marker_id_counter
@@ -576,7 +594,7 @@ class SimulationWidget(QWidget):
             self.region_pose_marker.scale.z = 0.01
             self.region_pose_marker.color.a = 1.0
 
-            self.region_pose_marker_label.header.frame_id = 'tiago1/map'
+            self.region_pose_marker_label.header.frame_id = '/' + self.robot_name_list[0] + '/map'
 
             self.region_pose_marker_label.type = self.region_pose_marker.TEXT_VIEW_FACING
             self.region_pose_marker_label.id = self.marker_id_counter + 1

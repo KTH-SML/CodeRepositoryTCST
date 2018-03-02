@@ -307,7 +307,7 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     # interface 2 to NTUA
     rospy.Subscriber('action/result', ActionSeq, ConfirmationCallback)
     # trigger start from GUI
-    rospy.Subscriber('planner_active', Bool, SetActiveCallback)
+    rospy.Subscriber('/planner_active', Bool, SetActiveCallback)
     # initial position from GUI
     rospy.Subscriber('init_pose', Pose, GetInitPoseCallback)
     # task from GUI
@@ -318,6 +318,9 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     usleep(3)
     robot_pose = [None, init_pose_GUI]
     ts.set_initial(init_pose_GUI)
+    print(hard_task_GUI)
+    print(soft_task_GUI)
+
     ####### robot information
     full_model = MotActModel(ts, act)
     planner = ltl_planner(full_model, hard_task_GUI, soft_task_GUI)

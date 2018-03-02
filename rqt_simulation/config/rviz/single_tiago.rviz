@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Robot1
-        - /Robot1/TF1
+        - /Robot1/RobotModel1
         - /Robot1/Dynamics1
         - /Robot1/Footprint1
         - /Robot1/Dynamic Footprint1
@@ -14,6 +14,9 @@ Panels:
         - /Robot1/Sensors1
         - /Robot1/Sensors1/Laser1
         - /Robot1/Sensors1/RGBD scan1
+        - /Robot1/Sensors1/Virtual Obstacles1
+        - /Robot1/Sensors1/Depth Cloud1
+        - /Robot1/Sensors1/Sonars1
         - /Control1
         - /Control1/Move1
         - /Control1/Path1
@@ -45,6 +48,7 @@ Panels:
         - /Mapping1/SLAM Graph Vertices1
         - /Mapping1/Trajectory1
         - /RGBD1
+        - /MarkerArray1
         - /Marker1
       Splitter Ratio: 0.458522
     Tree Height: 470
@@ -306,8 +310,8 @@ Visualization Manager:
               Show Axes: false
               Show Trail: false
           Name: RobotModel
-          Robot Description: tiago1/robot_description
-          TF Prefix: tiago1
+          Robot Description: robot1/robot_description
+          TF Prefix: robot1
           Update Interval: 0
           Value: true
           Visual Enabled: true
@@ -351,7 +355,7 @@ Visualization Manager:
           Color: 25; 255; 0
           Enabled: true
           Name: Footprint
-          Topic: /tiago1/move_base/local_costmap/footprint
+          Topic: /robot1/move_base/local_costmap/footprint
           Unreliable: false
           Value: true
         - Alpha: 1
@@ -364,7 +368,7 @@ Visualization Manager:
           Value: true
         - Class: rviz/Marker
           Enabled: true
-          Marker Topic: /tiago1/twist_marker
+          Marker Topic: /robot1/twist_marker
           Name: Twist
           Namespaces:
             {}
@@ -397,7 +401,7 @@ Visualization Manager:
               Size (Pixels): 3
               Size (m): 0.01
               Style: Points
-              Topic: /tiago1/scan
+              Topic: /robot1/scan
               Unreliable: false
               Use Fixed Frame: true
               Use rainbow: true
@@ -427,7 +431,7 @@ Visualization Manager:
               Size (Pixels): 3
               Size (m): 0.05
               Style: Flat Squares
-              Topic: /tiago1/rgbd_scan
+              Topic: /robot1/rgbd_scan
               Unreliable: false
               Use Fixed Frame: true
               Use rainbow: true
@@ -474,7 +478,7 @@ Visualization Manager:
               Color: 255; 255; 255
               Color Transformer: Intensity
               Decay Time: 0
-              Enabled: true
+              Enabled: false
               Invert Rainbow: false
               Max Color: 255; 255; 255
               Max Intensity: 4096
@@ -487,21 +491,21 @@ Visualization Manager:
               Size (Pixels): 3
               Size (m): 0.01
               Style: Points
-              Topic: /xtion/depth/points
+              Topic: /robot1/xtion/depth_registered/points
               Unreliable: false
               Use Fixed Frame: true
               Use rainbow: true
-              Value: true
+              Value: false
             - Alpha: 0.5
               Buffer Length: 1
               Class: rviz/Range
               Color: 0; 0; 255
-              Enabled: true
+              Enabled: false
               Name: Sonars
               Queue Size: 100
               Topic: /sonar_base
               Unreliable: false
-              Value: true
+              Value: false
             - Alpha: 1
               Autocompute Intensity Bounds: true
               Autocompute Value Bounds:
@@ -600,7 +604,7 @@ Visualization Manager:
                       Radius: 0.03
                       Shaft Diameter: 0.1
                       Shaft Length: 0.1
-                      Topic: /tiago1/move_base/NavfnROS/plan
+                      Topic: /robot1/move_base/NavfnROS/plan
                       Unreliable: false
                       Value: true
                     - Alpha: 1
@@ -623,7 +627,7 @@ Visualization Manager:
                       Radius: 0.03
                       Shaft Diameter: 0.1
                       Shaft Length: 0.1
-                      Topic: /tiago1/move_base/EBandPlannerROS/global_plan
+                      Topic: /robot1/move_base/EBandPlannerROS/global_plan
                       Unreliable: false
                       Value: true
                   Enabled: true
@@ -632,20 +636,20 @@ Visualization Manager:
                   Class: rviz/Map
                   Color Scheme: costmap
                   Draw Behind: true
-                  Enabled: false
+                  Enabled: true
                   Name: Potential
-                  Topic: /tiago1/move_base/global_costmap/costmap
+                  Topic: /robot1/move_base/global_costmap/costmap
                   Unreliable: false
-                  Value: false
+                  Value: true
                 - Alpha: 0.7
                   Class: rviz/Map
                   Color Scheme: map
                   Draw Behind: true
-                  Enabled: true
+                  Enabled: false
                   Name: Costmap
-                  Topic: /tiago1/move_base/global_costmap/costmap
+                  Topic: /robot1/move_base/global_costmap/costmap
                   Unreliable: false
-                  Value: true
+                  Value: false
                 - Class: rviz/Marker
                   Enabled: true
                   Marker Topic: voxel_grid_global_marker
@@ -680,7 +684,7 @@ Visualization Manager:
                       Radius: 0.03
                       Shaft Diameter: 0.1
                       Shaft Length: 0.1
-                      Topic: /tiago1/move_base/EBandPlannerROS/local_plan
+                      Topic: /robot1/move_base/EBandPlannerROS/local_plan
                       Unreliable: false
                       Value: true
                     - Alpha: 1
@@ -737,7 +741,7 @@ Visualization Manager:
                   Draw Behind: false
                   Enabled: true
                   Name: Costmap
-                  Topic: /tiago1/move_base/local_costmap/costmap
+                  Topic: /robot1/move_base/local_costmap/costmap
                   Unreliable: false
                   Value: true
                 - Alpha: 0.2
@@ -792,7 +796,7 @@ Visualization Manager:
               Shaft Length: 1
               Shaft Radius: 0.05
               Shape: Arrow
-              Topic: /tiago1/move_base/current_goal
+              Topic: /robot1/move_base/current_goal
               Unreliable: false
               Value: true
           Enabled: true
@@ -806,7 +810,7 @@ Visualization Manager:
           Color: 255; 25; 0
           Enabled: true
           Name: Pose
-          Topic: /tiago1/particlecloud
+          Topic: /robot1/particlecloud
           Unreliable: false
           Value: true
         - Class: rviz/MarkerArray
@@ -835,7 +839,7 @@ Visualization Manager:
           Draw Behind: true
           Enabled: true
           Name: Map
-          Topic: /tiago1/map
+          Topic: /robot1/map
           Unreliable: false
           Value: true
         - Alpha: 0.7
@@ -876,7 +880,7 @@ Visualization Manager:
     - Class: rviz/Camera
       Enabled: true
       Image Rendering: background and overlay
-      Image Topic: /tiago1/xtion/rgb/image_raw
+      Image Topic: /robot1/xtion/rgb/image_raw
       Name: RGBD
       Overlay Alpha: 0.5
       Queue Size: 2
@@ -956,7 +960,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /tiago1/text_marker
+      Marker Topic: /robot1/text_marker
       Name: Marker
       Namespaces:
         {}
@@ -965,7 +969,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: tiago1/map
+    Fixed Frame: robot1/map
     Frame Rate: 30
   Name: root
   Tools:
@@ -976,9 +980,9 @@ Visualization Manager:
     - Class: rviz/FocusCamera
     - Class: rviz/Measure
     - Class: rviz/SetInitialPose
-      Topic: tiago1/initialpose
+      Topic: robot1/initialpose
     - Class: rviz/SetGoal
-      Topic: tiago1/move_base_simple/goal
+      Topic: robot1/move_base_simple/goal
     - Class: rviz/PublishPoint
       Single click: true
       Topic: clicked_point
@@ -986,7 +990,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 17.508
+      Distance: 28.0128
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -998,10 +1002,10 @@ Visualization Manager:
         Z: 0.569688
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.9698
+      Pitch: 0.8898
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.04415
+      Yaw: 4.91915
     Saved: ~
 Window Geometry:
   Displays:
