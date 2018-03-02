@@ -97,12 +97,15 @@ robot_action = ActionModel(action)
 ##############################
 # specify tasks
 
-task_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'task', 'task.yaml')
-stream = file(task_file, 'r')
-data = yaml.load(stream)
-stream.close()
-robot_hard_task = data['hard_task']
-robot_soft_task = data['soft_task']
+#task_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'task', 'task.yaml')
+#stream = file(task_file, 'r')
+#data = yaml.load(stream)
+#stream.close()
+#robot_hard_task = data['hard_task']
+#robot_soft_task = data['soft_task']
+
+robot_hard_task = ''
+robot_soft_task = ''
 
 #robot_hard_task = '([]<> R01) && ([]<> R02) && ([]<> R03)'
 

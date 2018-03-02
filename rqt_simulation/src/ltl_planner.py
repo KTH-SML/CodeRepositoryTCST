@@ -2,7 +2,6 @@
 import roslib
 import numpy
 import Queue
-#roslib.load_manifest('sim_GUI')
 import rospy
 import sys
 import time
@@ -99,6 +98,15 @@ def SetActiveCallback(state):
 def GetInitPoseCallback(pose):
     global init_pose_GUI
     init_pose_GUI = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w))
+
+def SoftTaskCallback(soft_task):
+    global soft_task_GUI
+    soft_task_GUI = soft_task.data
+
+def HardTaskCallback(hard_task):
+    global hard_task_GUI
+    hard_task_GUI = hard_task.data
+
 
 
 def FormatGoal(goal, index, time_stamp):
@@ -257,6 +265,8 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     global human_detected
     global active
     global init_pose_GUI
+    global soft_task_GUI
+    global hard_task_GUI
     active = False
     robot_pose = [None, init_pose]
     human_detected = False
@@ -300,15 +310,17 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     rospy.Subscriber('planner_active', Bool, SetActiveCallback)
     # initial position from GUI
     rospy.Subscriber('init_pose', Pose, GetInitPoseCallback)
+    # task from GUI
+    rospy.Subscriber('soft_task', String, SoftTaskCallback)
+    rospy.Subscriber('hard_task', String, HardTaskCallback)
     ####### Wait 3 seconds to receive the initial position from the GUI
     usleep = lambda x: time.sleep(x)
     usleep(3)
-    print(init_pose_GUI)
     robot_pose = [None, init_pose_GUI]
     ts.set_initial(init_pose_GUI)
     ####### robot information
     full_model = MotActModel(ts, act)
-    planner = ltl_planner(full_model, robot_task[0], robot_task[1])
+    planner = ltl_planner(full_model, hard_task_GUI, soft_task_GUI)
     ####### initial plan synthesis
     planner.optimal(10)
     ### Publish plan for GUI
