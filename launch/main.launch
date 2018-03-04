@@ -2,11 +2,7 @@
 
 	<!-- formulas: -->
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
-	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives.yaml" />
-
-
-	<rosparam param="u_max">[10.0, 6.28]</rosparam>
-	<param name="K" type="int" value="10"/>
+	<rosparam param="u_max">[10.0, 10.0, 6.28]</rosparam>
 
 
 	<rosparam param="u_max">[1.0, 6.28]</rosparam>
@@ -49,6 +45,12 @@
 	</node>
 	-->
 
+<<<<<<< HEAD
 	<node pkg="rviz" type="rviz" name="rviz" />
+=======
+	<!--
+	<node pkg="rviz" type="rviz" name="rviz" />
+	-->
+>>>>>>> Constrain control signal and detect critical events
 
 </launch>
