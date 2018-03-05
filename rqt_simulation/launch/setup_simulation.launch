@@ -20,6 +20,6 @@
 		<arg name="headless" value="$(arg headless)" />
 	</include>
 
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rqt_simulation)/config/rviz/multiple_tiago.rviz"/>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rqt_simulation)/config/rviz/triple_tiago.rviz"/>
 
 </launch>

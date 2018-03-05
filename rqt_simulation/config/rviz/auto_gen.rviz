@@ -2,7 +2,8 @@ Panels:
 - Class: rviz/Displays
   Help Height: 78
   Name: Displays
-  Porperty Tree Widget:
+  Porperty Tree Widget: 470
+  Tree Height:
     Expanded:
     - /Global Options1
     - /Robot1
@@ -50,3 +51,43 @@ Panels:
     - /RGBD1
     - /MarkerArray1/Marker1
     Splitter Ratio: 0.458522
+- Class: rviz/Selection
+  Name: Selection
+- Class: rviz/Tool Properties
+  Expanded:
+  - /2D Pose Estimate1
+  - /2D Nav Goal1
+  - /Publish Point1
+  Name: Tool Properties
+  Splitter Ratio: 0.600791
+- Class: rviz/Views
+  Expanded:
+  - /Current View1
+  Name: Views
+  Splitter Ratio: 0.5
+- Class: rviz/Time
+  Expanded: 'false'
+  Name: Time
+  SyncMode: 0
+  SyncSource: RGBD
+Visualization Manager:
+  Class: ''
+  Displays:
+  - Alpha: 0.5
+    Cell Size: 1
+    Class: rviz/Grid
+    Color: 160; 160; 164
+    Enabled: 'true'
+    Line Style:
+      Line Width: 0.03
+      Values: Lines
+    Name: Grid
+    Normal Cell Count: 0
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0
+    Plane: XY
+    Plane Cell Count: 10
+    Reference Frame: <Fixed Frame>
+    Value: 'true'

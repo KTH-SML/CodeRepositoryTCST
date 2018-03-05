@@ -1,0 +1,3003 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Robot11/RobotModel1
+        - /Robot11/Dynamics1
+        - /Robot11/Footprint1
+        - /Robot11/Dynamic Footprint1
+        - /Robot11/Twist1
+        - /Robot11/Sensors1
+        - /Robot11/Sensors1/Laser1
+        - /Robot11/Sensors1/RGBD scan1
+        - /Robot11/Sensors1/Virtual Obstacles1
+        - /Robot11/Sensors1/Depth Cloud1
+        - /Robot11/Sensors1/Sonars1
+        - /Control1/Move1
+        - /Control1/Path1
+        - /Planning1/Base1
+        - /Planning1/Base1/Global1
+        - /Planning1/Base1/Global1/Plan1
+        - /Planning1/Base1/Global1/Plan1/Navfn1
+        - /Planning1/Base1/Global1/Plan1/Global Planner1
+        - /Planning1/Base1/Global1/Potential1
+        - /Planning1/Base1/Global1/Costmap1
+        - /Planning1/Base1/Global1/Voxel Grid1
+        - /Planning1/Base1/Local1
+        - /Planning1/Base1/Local1/Plan1
+        - /Planning1/Base1/Local1/Plan1/Trajectory1
+        - /Planning1/Base1/Local1/Plan1/DWA1
+        - /Planning1/Base1/Local1/Plan1/Pal1
+        - /Planning1/Base1/Local1/Costmap1
+        - /Planning1/Base1/Local1/Cost1
+        - /Planning1/Base1/Local1/Trajectories1
+        - /Planning1/Base1/Goal1
+        - /Localization1/Pose1
+        - /Localization1/Pose Graph1
+        - /Localization1/Localization Quality1
+        - /Mapping1/Map1
+        - /Mapping1/SLAM Graph Edges1
+        - /Mapping1/SLAM Graph Vertices1
+        - /Mapping1/Trajectory1
+        - /Robot21/Twist1
+        - /Robot21/Sensors1
+        - /Planning21/Base1
+        - /Planning21/Base1/Global1
+        - /Planning21/Base1/Local1
+        - /Planning21/Base1/Local1/Plan1
+        - /Robot31/Twist1
+        - /Planning31/Base1/Global1/Potential1/Status1
+        - /Planning31/Base1/Local1/Plan1
+        - /RGBD31/Visibility1
+      Splitter Ratio: 0.458522
+    Tree Height: 240
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Expanded:
+      - /2D Pose Estimate1
+      - /2D Nav Goal1
+      - /Publish Point1
+    Name: Tool Properties
+    Splitter Ratio: 0.600791
+  - Class: rviz/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: RGBD
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 10
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Class: rviz/RobotModel
+          Collision Enabled: false
+          Enabled: true
+          Links:
+            All Links Enabled: true
+            Expand Joint Details: false
+            Expand Link Details: false
+            Expand Tree: false
+            Link Tree Style: Links in Alphabetic Order
+            arm_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_3_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_4_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_5_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_6_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_7_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            arm_tool_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_antenna_left_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_antenna_right_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_cover_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_footprint:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            base_imu_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            base_laser_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_01_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_02_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_03_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_left_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_left_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_right_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_right_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_left_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_left_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_right_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_right_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_grasping_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            gripper_left_finger_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_right_finger_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            head_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            head_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_fixed_column_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_fixed_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_lift_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            wheel_left_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            wheel_right_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            xtion_depth_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_depth_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_rgb_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_rgb_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+          Name: RobotModel
+          Robot Description: robot1/robot_description
+          TF Prefix: robot1
+          Update Interval: 0
+          Value: true
+          Visual Enabled: true
+        - Class: rviz/TF
+          Enabled: false
+          Frame Timeout: 15
+          Frames:
+            All Enabled: true
+          Marker Scale: 0.1
+          Name: TF
+          Show Arrows: true
+          Show Axes: true
+          Show Names: true
+          Tree:
+            {}
+          Update Interval: 0
+          Value: false
+        - 6DOF: false
+          Alpha: 1
+          Axis: false
+          Class: rviz_plugin_covariance/Odometry
+          Color: 204; 51; 204
+          Enabled: false
+          Name: Odometry
+          Orientation: false
+          Position: false
+          Scale: 1
+          Topic: /tiago1/mobile_base_controller/odom
+          Unreliable: false
+          Value: false
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: inertial_mass_markers
+          Name: Dynamics
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Alpha: 1
+          Class: rviz/Polygon
+          Color: 25; 255; 0
+          Enabled: true
+          Name: Footprint
+          Topic: /robot1/move_base/local_costmap/footprint
+          Unreliable: false
+          Value: true
+        - Alpha: 1
+          Class: rviz/Polygon
+          Color: 25; 255; 0
+          Enabled: true
+          Name: Dynamic Footprint
+          Topic: /dynamic_footprint_publisher/footprint_stamped
+          Unreliable: false
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /robot1/twist_marker
+          Name: Twist
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Group
+          Displays:
+            - Alpha: 0.5
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/LaserScan
+              Color: 0; 0; 255
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 0
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Laser
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.01
+              Style: Points
+              Topic: /robot1/scan
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/LaserScan
+              Color: 255; 0; 127
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: RGBD scan
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.05
+              Style: Flat Squares
+              Topic: /robot1/rgbd_scan
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/PointCloud
+              Color: 85; 0; 127
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Virtual Obstacles
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.1
+              Style: Spheres
+              Topic: vo_cloud
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/PointCloud2
+              Color: 255; 255; 255
+              Color Transformer: Intensity
+              Decay Time: 0
+              Enabled: false
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Depth Cloud
+              Position Transformer: XYZ
+              Queue Size: 1
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.01
+              Style: Points
+              Topic: /robot1/xtion/depth_registered/points
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: false
+            - Alpha: 0.5
+              Buffer Length: 1
+              Class: rviz/Range
+              Color: 0; 0; 255
+              Enabled: false
+              Name: Sonars
+              Queue Size: 100
+              Topic: /sonar_base
+              Unreliable: false
+              Value: false
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: -1.27299
+                Min Value: -1.67406
+                Value: true
+              Axis: X
+              Channel Name: intensity
+              Class: rviz/PointCloud2
+              Color: 255; 255; 255
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Sonar Cloud
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 10
+              Size (m): 0.01
+              Style: Points
+              Topic: /sonar_cloud
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+          Enabled: true
+          Name: Sensors
+      Enabled: true
+      Name: Robot1
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/InteractiveMarkers
+          Enable Transparency: true
+          Enabled: true
+          Name: Move
+          Show Axes: false
+          Show Descriptions: false
+          Show Visual Aids: false
+          Update Topic: marker_teleop_srv/update
+          Value: true
+        - Alpha: 1
+          Buffer Length: 1
+          Class: rviz/Path
+          Color: 0; 0; 255
+          Enabled: true
+          Head Diameter: 0.3
+          Head Length: 0.2
+          Length: 0.3
+          Line Style: Lines
+          Line Width: 0.03
+          Name: Path
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0
+          Pose Color: 255; 85; 255
+          Pose Style: None
+          Radius: 0.03
+          Shaft Diameter: 0.1
+          Shaft Length: 0.1
+          Topic: path
+          Unreliable: false
+          Value: true
+      Enabled: true
+      Name: Control
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Group
+          Displays:
+            - Class: rviz/Group
+              Displays:
+                - Class: rviz/Group
+                  Displays:
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 0; 0; 255
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Navfn
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot1/move_base/NavfnROS/plan
+                      Unreliable: false
+                      Value: true
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 0; 0; 255
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Global Planner
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot1/move_base/EBandPlannerROS/global_plan
+                      Unreliable: false
+                      Value: true
+                  Enabled: true
+                  Name: Plan
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: costmap
+                  Draw Behind: true
+                  Enabled: true
+                  Name: Potential
+                  Topic: /robot1/move_base/global_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: map
+                  Draw Behind: true
+                  Enabled: false
+                  Name: Costmap
+                  Topic: /robot1/move_base/global_costmap/costmap
+                  Unreliable: false
+                  Value: false
+                - Class: rviz/Marker
+                  Enabled: true
+                  Marker Topic: voxel_grid_global_marker
+                  Name: Voxel Grid
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: true
+              Enabled: true
+              Name: Global
+            - Class: rviz/Group
+              Displays:
+                - Class: rviz/Group
+                  Displays:
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Trajectory
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot1/move_base/EBandPlannerROS/local_plan
+                      Unreliable: false
+                      Value: true
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: false
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: DWA
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: move_base/DWAPlannerROS/local_plan
+                      Unreliable: false
+                      Value: false
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: false
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Pal
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: move_base/PalPlannerROS/local_plan
+                      Unreliable: false
+                      Value: false
+                  Enabled: true
+                  Name: Plan
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: costmap
+                  Draw Behind: false
+                  Enabled: true
+                  Name: Costmap
+                  Topic: /robot1/move_base/local_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Alpha: 0.2
+                  Autocompute Intensity Bounds: true
+                  Autocompute Value Bounds:
+                    Max Value: 0
+                    Min Value: 0
+                    Value: true
+                  Axis: Z
+                  Channel Name: total_cost
+                  Class: rviz/PointCloud2
+                  Color: 255; 255; 255
+                  Color Transformer: Intensity
+                  Decay Time: 0
+                  Enabled: true
+                  Invert Rainbow: false
+                  Max Color: 255; 255; 255
+                  Max Intensity: 7.06
+                  Min Color: 0; 0; 0
+                  Min Intensity: 0.56
+                  Name: Cost
+                  Position Transformer: XYZ
+                  Queue Size: 10
+                  Selectable: true
+                  Size (Pixels): 3
+                  Size (m): 0.07
+                  Style: Flat Squares
+                  Topic: move_base/TrajectoryPlannerROS/cost_cloud
+                  Unreliable: false
+                  Use Fixed Frame: true
+                  Use rainbow: true
+                  Value: true
+                - Class: rviz/MarkerArray
+                  Enabled: false
+                  Marker Topic: trajectories
+                  Name: Trajectories
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: false
+              Enabled: true
+              Name: Local
+            - Alpha: 1
+              Axes Length: 1
+              Axes Radius: 0.1
+              Class: rviz/Pose
+              Color: 255; 25; 0
+              Enabled: true
+              Head Length: 0.3
+              Head Radius: 0.1
+              Name: Goal
+              Shaft Length: 1
+              Shaft Radius: 0.05
+              Shape: Arrow
+              Topic: /robot1/move_base/current_goal
+              Unreliable: false
+              Value: true
+          Enabled: true
+          Name: Base
+      Enabled: true
+      Name: Planning
+    - Class: rviz/Group
+      Displays:
+        - Arrow Length: 0.3
+          Class: rviz/PoseArray
+          Color: 255; 25; 0
+          Enabled: true
+          Name: Pose
+          Topic: /robot1/particlecloud
+          Unreliable: false
+          Value: true
+        - Class: rviz/MarkerArray
+          Enabled: false
+          Marker Topic: slam_graph_marker_array
+          Name: Pose Graph
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: false
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /loc_measure/loc_status_marker
+          Name: Localization Quality
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+      Enabled: true
+      Name: Localization
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 0.2
+          Class: rviz/Map
+          Color Scheme: map
+          Draw Behind: true
+          Enabled: true
+          Name: Map
+          Topic: /robot1/map
+          Unreliable: false
+          Value: true
+        - Alpha: 0.7
+          Class: rviz/Map
+          Color Scheme: map
+          Draw Behind: false
+          Enabled: false
+          Name: Map (with Virtual Obstacles)
+          Topic: vo_map
+          Unreliable: false
+          Value: false
+        - Class: rviz/Marker
+          Enabled: false
+          Marker Topic: /slam_graph_edges
+          Name: SLAM Graph Edges
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: false
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /slam_graph_vertices
+          Name: SLAM Graph Vertices
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Arrow Length: 0.3
+          Class: rviz/PoseArray
+          Color: 255; 25; 0
+          Enabled: true
+          Name: Trajectory
+          Topic: slam_trajectory
+          Unreliable: false
+          Value: true
+      Enabled: true
+      Name: Mapping
+    - Class: rviz/Camera
+      Enabled: true
+      Image Rendering: background and overlay
+      Image Topic: /robot1/xtion/rgb/image_raw
+      Name: RGBD
+      Overlay Alpha: 0.5
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+      Visibility:
+        Control:
+          Move: true
+          Path: true
+          Value: true
+        Grid: true
+        Localization:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Localization2:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Localization3:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Mapping:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Mapping2:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Mapping3:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Marker: true
+        MarkerArray: true
+        Planning:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        Planning2:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        Planning3:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        RGBD2: true
+        RGBD3: true
+        Robot1:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Robot2:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Robot3:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Value: true
+      Zoom Factor: 1
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /region_of_interest
+      Name: MarkerArray
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /robot1/text_marker
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Class: rviz/RobotModel
+          Collision Enabled: false
+          Enabled: true
+          Links:
+            All Links Enabled: true
+            Expand Joint Details: false
+            Expand Link Details: false
+            Expand Tree: false
+            Link Tree Style: Links in Alphabetic Order
+            arm_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_3_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_4_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_5_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_6_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_7_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            arm_tool_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_antenna_left_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_antenna_right_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_cover_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_footprint:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            base_imu_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            base_laser_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_01_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_02_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_03_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_left_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_left_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_right_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_right_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_left_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_left_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_right_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_right_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_grasping_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            gripper_left_finger_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_right_finger_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            head_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            head_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_fixed_column_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_fixed_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_lift_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            wheel_left_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            wheel_right_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            xtion_depth_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_depth_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_rgb_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_rgb_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+          Name: RobotModel
+          Robot Description: robot2/robot_description
+          TF Prefix: robot2
+          Update Interval: 0
+          Value: true
+          Visual Enabled: true
+        - Class: rviz/TF
+          Enabled: false
+          Frame Timeout: 15
+          Frames:
+            All Enabled: true
+          Marker Scale: 0.1
+          Name: TF
+          Show Arrows: true
+          Show Axes: true
+          Show Names: true
+          Tree:
+            {}
+          Update Interval: 0
+          Value: false
+        - 6DOF: false
+          Alpha: 1
+          Axis: false
+          Class: rviz_plugin_covariance/Odometry
+          Color: 204; 51; 204
+          Enabled: false
+          Name: Odometry
+          Orientation: false
+          Position: false
+          Scale: 1
+          Topic: /robot2/mobile_base_controller/odom
+          Unreliable: false
+          Value: false
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: inertial_mass_markers
+          Name: Dynamics
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Alpha: 1
+          Class: rviz/Polygon
+          Color: 25; 255; 0
+          Enabled: true
+          Name: Footprint
+          Topic: /robot2/move_base/local_costmap/footprint
+          Unreliable: false
+          Value: true
+        - Alpha: 1
+          Class: rviz/Polygon
+          Color: 25; 255; 0
+          Enabled: true
+          Name: Dynamic Footprint
+          Topic: /dynamic_footprint_publisher/footprint_stamped
+          Unreliable: false
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /robot2/twist_marker
+          Name: Twist
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Group
+          Displays:
+            - Alpha: 0.5
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/LaserScan
+              Color: 0; 0; 255
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 0
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Laser
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.01
+              Style: Points
+              Topic: /robot2/scan
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/LaserScan
+              Color: 255; 0; 127
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: RGBD scan
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.05
+              Style: Flat Squares
+              Topic: /robot2/rgbd_scan
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/PointCloud
+              Color: 85; 0; 127
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Virtual Obstacles
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.1
+              Style: Spheres
+              Topic: vo_cloud
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/PointCloud2
+              Color: 255; 255; 255
+              Color Transformer: Intensity
+              Decay Time: 0
+              Enabled: false
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Depth Cloud
+              Position Transformer: XYZ
+              Queue Size: 1
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.01
+              Style: Points
+              Topic: /robot2/xtion/depth_registered/points
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: false
+            - Alpha: 0.5
+              Buffer Length: 1
+              Class: rviz/Range
+              Color: 0; 0; 255
+              Enabled: false
+              Name: Sonars
+              Queue Size: 100
+              Topic: /sonar_base
+              Unreliable: false
+              Value: false
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: -1.27299
+                Min Value: -1.67406
+                Value: true
+              Axis: X
+              Channel Name: intensity
+              Class: rviz/PointCloud2
+              Color: 255; 255; 255
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Sonar Cloud
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 10
+              Size (m): 0.01
+              Style: Points
+              Topic: /sonar_cloud
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+          Enabled: true
+          Name: Sensors
+      Enabled: true
+      Name: Robot2
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Group
+          Displays:
+            - Class: rviz/Group
+              Displays:
+                - Class: rviz/Group
+                  Displays:
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 0; 0; 255
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Navfn
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot2/move_base/NavfnROS/plan
+                      Unreliable: false
+                      Value: true
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 0; 0; 255
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Global Planner
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot2/move_base/EBandPlannerROS/global_plan
+                      Unreliable: false
+                      Value: true
+                  Enabled: true
+                  Name: Plan
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: costmap
+                  Draw Behind: true
+                  Enabled: true
+                  Name: Potential
+                  Topic: /robot2/move_base/global_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: map
+                  Draw Behind: true
+                  Enabled: true
+                  Name: Costmap
+                  Topic: /robot2/move_base/global_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Class: rviz/Marker
+                  Enabled: true
+                  Marker Topic: voxel_grid_global_marker
+                  Name: Voxel Grid
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: true
+              Enabled: true
+              Name: Global
+            - Class: rviz/Group
+              Displays:
+                - Class: rviz/Group
+                  Displays:
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Trajectory
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot2/move_base/EBandPlannerROS/local_plan
+                      Unreliable: false
+                      Value: true
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: false
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: DWA
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: move_base/DWAPlannerROS/local_plan
+                      Unreliable: false
+                      Value: false
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: false
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Pal
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: move_base/PalPlannerROS/local_plan
+                      Unreliable: false
+                      Value: false
+                  Enabled: true
+                  Name: Plan
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: costmap
+                  Draw Behind: false
+                  Enabled: true
+                  Name: Costmap
+                  Topic: /robot2/move_base/local_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Alpha: 0.2
+                  Autocompute Intensity Bounds: true
+                  Autocompute Value Bounds:
+                    Max Value: 0
+                    Min Value: 0
+                    Value: true
+                  Axis: Z
+                  Channel Name: total_cost
+                  Class: rviz/PointCloud2
+                  Color: 255; 255; 255
+                  Color Transformer: Intensity
+                  Decay Time: 0
+                  Enabled: true
+                  Invert Rainbow: false
+                  Max Color: 255; 255; 255
+                  Max Intensity: 7.06
+                  Min Color: 0; 0; 0
+                  Min Intensity: 0.56
+                  Name: Cost
+                  Position Transformer: XYZ
+                  Queue Size: 10
+                  Selectable: true
+                  Size (Pixels): 3
+                  Size (m): 0.07
+                  Style: Flat Squares
+                  Topic: move_base/TrajectoryPlannerROS/cost_cloud
+                  Unreliable: false
+                  Use Fixed Frame: true
+                  Use rainbow: true
+                  Value: true
+                - Class: rviz/MarkerArray
+                  Enabled: false
+                  Marker Topic: trajectories
+                  Name: Trajectories
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: false
+              Enabled: true
+              Name: Local
+            - Alpha: 1
+              Axes Length: 1
+              Axes Radius: 0.1
+              Class: rviz/Pose
+              Color: 255; 25; 0
+              Enabled: true
+              Head Length: 0.3
+              Head Radius: 0.1
+              Name: Goal
+              Shaft Length: 1
+              Shaft Radius: 0.05
+              Shape: Arrow
+              Topic: /robot2/move_base/current_goal
+              Unreliable: false
+              Value: true
+          Enabled: true
+          Name: Base
+      Enabled: true
+      Name: Planning2
+    - Class: rviz/Group
+      Displays:
+        - Arrow Length: 0.3
+          Class: rviz/PoseArray
+          Color: 255; 25; 0
+          Enabled: true
+          Name: Pose
+          Topic: /robot2/particlecloud
+          Unreliable: false
+          Value: true
+        - Class: rviz/MarkerArray
+          Enabled: false
+          Marker Topic: slam_graph_marker_array
+          Name: Pose Graph
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: false
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /loc_measure/loc_status_marker
+          Name: Localization Quality
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+      Enabled: true
+      Name: Localization2
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 0.2
+          Class: rviz/Map
+          Color Scheme: map
+          Draw Behind: true
+          Enabled: true
+          Name: Map
+          Topic: /robot2/map
+          Unreliable: false
+          Value: true
+        - Alpha: 0.7
+          Class: rviz/Map
+          Color Scheme: map
+          Draw Behind: false
+          Enabled: false
+          Name: Map (with Virtual Obstacles)
+          Topic: vo_map
+          Unreliable: false
+          Value: false
+        - Class: rviz/Marker
+          Enabled: false
+          Marker Topic: /slam_graph_edges
+          Name: SLAM Graph Edges
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: false
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /slam_graph_vertices
+          Name: SLAM Graph Vertices
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Arrow Length: 0.3
+          Class: rviz/PoseArray
+          Color: 255; 25; 0
+          Enabled: true
+          Name: Trajectory
+          Topic: slam_trajectory
+          Unreliable: false
+          Value: true
+      Enabled: true
+      Name: Mapping2
+    - Class: rviz/Camera
+      Enabled: true
+      Image Rendering: background and overlay
+      Image Topic: /robot2/xtion/rgb/image_raw
+      Name: RGBD2
+      Overlay Alpha: 0.5
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+      Visibility:
+        Control:
+          Move: true
+          Path: true
+          Value: true
+        Grid: true
+        Localization:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Localization2:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Localization3:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Mapping:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Mapping2:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Mapping3:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Marker: true
+        MarkerArray: true
+        Planning:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        Planning2:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        Planning3:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        RGBD: true
+        RGBD3: true
+        Robot1:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Robot2:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Robot3:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Value: true
+      Zoom Factor: 1
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 1
+          Class: rviz/RobotModel
+          Collision Enabled: false
+          Enabled: true
+          Links:
+            All Links Enabled: true
+            Expand Joint Details: false
+            Expand Link Details: false
+            Expand Tree: false
+            Link Tree Style: Links in Alphabetic Order
+            arm_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_3_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_4_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_5_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_6_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            arm_7_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            arm_tool_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_antenna_left_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_antenna_right_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_cover_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_footprint:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            base_imu_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            base_laser_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_01_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_02_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            base_sonar_03_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_left_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_left_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_right_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_back_right_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_left_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_left_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_right_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            caster_front_right_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_grasping_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            gripper_left_finger_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            gripper_right_finger_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            head_1_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            head_2_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_fixed_column_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_fixed_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            torso_lift_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            wheel_left_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            wheel_right_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+              Value: true
+            xtion_depth_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_depth_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_rgb_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            xtion_rgb_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+          Name: RobotModel
+          Robot Description: robot3/robot_description
+          TF Prefix: robot3
+          Update Interval: 0
+          Value: true
+          Visual Enabled: true
+        - Class: rviz/TF
+          Enabled: false
+          Frame Timeout: 15
+          Frames:
+            All Enabled: true
+          Marker Scale: 0.1
+          Name: TF
+          Show Arrows: true
+          Show Axes: true
+          Show Names: true
+          Tree:
+            {}
+          Update Interval: 0
+          Value: false
+        - 6DOF: false
+          Alpha: 1
+          Axis: false
+          Class: rviz_plugin_covariance/Odometry
+          Color: 204; 51; 204
+          Enabled: false
+          Name: Odometry
+          Orientation: false
+          Position: false
+          Scale: 1
+          Topic: /robot2/mobile_base_controller/odom
+          Unreliable: false
+          Value: false
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: inertial_mass_markers
+          Name: Dynamics
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Alpha: 1
+          Class: rviz/Polygon
+          Color: 25; 255; 0
+          Enabled: true
+          Name: Footprint
+          Topic: /robot3/move_base/local_costmap/footprint
+          Unreliable: false
+          Value: true
+        - Alpha: 1
+          Class: rviz/Polygon
+          Color: 25; 255; 0
+          Enabled: true
+          Name: Dynamic Footprint
+          Topic: /dynamic_footprint_publisher/footprint_stamped
+          Unreliable: false
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /robot3/twist_marker
+          Name: Twist
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Group
+          Displays:
+            - Alpha: 0.5
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/LaserScan
+              Color: 0; 0; 255
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 0
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Laser
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.01
+              Style: Points
+              Topic: /robot3/scan
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/LaserScan
+              Color: 255; 0; 127
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: RGBD scan
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.05
+              Style: Flat Squares
+              Topic: /robot3/rgbd_scan
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/PointCloud
+              Color: 85; 0; 127
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Virtual Obstacles
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.1
+              Style: Spheres
+              Topic: vo_cloud
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: 10
+                Min Value: -10
+                Value: true
+              Axis: Z
+              Channel Name: intensity
+              Class: rviz/PointCloud2
+              Color: 255; 255; 255
+              Color Transformer: Intensity
+              Decay Time: 0
+              Enabled: false
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Depth Cloud
+              Position Transformer: XYZ
+              Queue Size: 1
+              Selectable: true
+              Size (Pixels): 3
+              Size (m): 0.01
+              Style: Points
+              Topic: /robot3/xtion/depth_registered/points
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: false
+            - Alpha: 0.5
+              Buffer Length: 1
+              Class: rviz/Range
+              Color: 0; 0; 255
+              Enabled: false
+              Name: Sonars
+              Queue Size: 100
+              Topic: /sonar_base
+              Unreliable: false
+              Value: false
+            - Alpha: 1
+              Autocompute Intensity Bounds: true
+              Autocompute Value Bounds:
+                Max Value: -1.27299
+                Min Value: -1.67406
+                Value: true
+              Axis: X
+              Channel Name: intensity
+              Class: rviz/PointCloud2
+              Color: 255; 255; 255
+              Color Transformer: FlatColor
+              Decay Time: 0
+              Enabled: true
+              Invert Rainbow: false
+              Max Color: 255; 255; 255
+              Max Intensity: 4096
+              Min Color: 0; 0; 0
+              Min Intensity: 0
+              Name: Sonar Cloud
+              Position Transformer: XYZ
+              Queue Size: 10
+              Selectable: true
+              Size (Pixels): 10
+              Size (m): 0.01
+              Style: Points
+              Topic: /sonar_cloud
+              Unreliable: false
+              Use Fixed Frame: true
+              Use rainbow: true
+              Value: true
+          Enabled: true
+          Name: Sensors
+      Enabled: true
+      Name: Robot3
+    - Class: rviz/Group
+      Displays:
+        - Class: rviz/Group
+          Displays:
+            - Class: rviz/Group
+              Displays:
+                - Class: rviz/Group
+                  Displays:
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 0; 0; 255
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Navfn
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot3/move_base/NavfnROS/plan
+                      Unreliable: false
+                      Value: true
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 0; 0; 255
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Global Planner
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot3/move_base/EBandPlannerROS/global_plan
+                      Unreliable: false
+                      Value: true
+                  Enabled: true
+                  Name: Plan
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: costmap
+                  Draw Behind: true
+                  Enabled: true
+                  Name: Potential
+                  Topic: /robot3/move_base/global_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: map
+                  Draw Behind: true
+                  Enabled: true
+                  Name: Costmap
+                  Topic: /robot3/move_base/global_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Class: rviz/Marker
+                  Enabled: true
+                  Marker Topic: voxel_grid_global_marker
+                  Name: Voxel Grid
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: true
+              Enabled: true
+              Name: Global
+            - Class: rviz/Group
+              Displays:
+                - Class: rviz/Group
+                  Displays:
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: true
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Trajectory
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: /robot3/move_base/EBandPlannerROS/local_plan
+                      Unreliable: false
+                      Value: true
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: false
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: DWA
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: move_base/DWAPlannerROS/local_plan
+                      Unreliable: false
+                      Value: false
+                    - Alpha: 1
+                      Buffer Length: 1
+                      Class: rviz/Path
+                      Color: 25; 255; 0
+                      Enabled: false
+                      Head Diameter: 0.3
+                      Head Length: 0.2
+                      Length: 0.3
+                      Line Style: Lines
+                      Line Width: 0.03
+                      Name: Pal
+                      Offset:
+                        X: 0
+                        Y: 0
+                        Z: 0
+                      Pose Color: 255; 85; 255
+                      Pose Style: None
+                      Radius: 0.03
+                      Shaft Diameter: 0.1
+                      Shaft Length: 0.1
+                      Topic: move_base/PalPlannerROS/local_plan
+                      Unreliable: false
+                      Value: false
+                  Enabled: true
+                  Name: Plan
+                - Alpha: 0.7
+                  Class: rviz/Map
+                  Color Scheme: costmap
+                  Draw Behind: false
+                  Enabled: true
+                  Name: Costmap
+                  Topic: /robot3/move_base/local_costmap/costmap
+                  Unreliable: false
+                  Value: true
+                - Alpha: 0.2
+                  Autocompute Intensity Bounds: true
+                  Autocompute Value Bounds:
+                    Max Value: 0
+                    Min Value: 0
+                    Value: true
+                  Axis: Z
+                  Channel Name: total_cost
+                  Class: rviz/PointCloud2
+                  Color: 255; 255; 255
+                  Color Transformer: Intensity
+                  Decay Time: 0
+                  Enabled: true
+                  Invert Rainbow: false
+                  Max Color: 255; 255; 255
+                  Max Intensity: 7.06
+                  Min Color: 0; 0; 0
+                  Min Intensity: 0.56
+                  Name: Cost
+                  Position Transformer: XYZ
+                  Queue Size: 10
+                  Selectable: true
+                  Size (Pixels): 3
+                  Size (m): 0.07
+                  Style: Flat Squares
+                  Topic: move_base/TrajectoryPlannerROS/cost_cloud
+                  Unreliable: false
+                  Use Fixed Frame: true
+                  Use rainbow: true
+                  Value: true
+                - Class: rviz/MarkerArray
+                  Enabled: false
+                  Marker Topic: trajectories
+                  Name: Trajectories
+                  Namespaces:
+                    {}
+                  Queue Size: 100
+                  Value: false
+              Enabled: true
+              Name: Local
+            - Alpha: 1
+              Axes Length: 1
+              Axes Radius: 0.1
+              Class: rviz/Pose
+              Color: 255; 25; 0
+              Enabled: true
+              Head Length: 0.3
+              Head Radius: 0.1
+              Name: Goal
+              Shaft Length: 1
+              Shaft Radius: 0.05
+              Shape: Arrow
+              Topic: /robot3/move_base/current_goal
+              Unreliable: false
+              Value: true
+          Enabled: true
+          Name: Base
+      Enabled: true
+      Name: Planning3
+    - Class: rviz/Group
+      Displays:
+        - Arrow Length: 0.3
+          Class: rviz/PoseArray
+          Color: 255; 25; 0
+          Enabled: true
+          Name: Pose
+          Topic: /robot3/particlecloud
+          Unreliable: false
+          Value: true
+        - Class: rviz/MarkerArray
+          Enabled: false
+          Marker Topic: slam_graph_marker_array
+          Name: Pose Graph
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: false
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /loc_measure/loc_status_marker
+          Name: Localization Quality
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+      Enabled: true
+      Name: Localization3
+    - Class: rviz/Group
+      Displays:
+        - Alpha: 0.2
+          Class: rviz/Map
+          Color Scheme: map
+          Draw Behind: true
+          Enabled: true
+          Name: Map
+          Topic: /robot3/map
+          Unreliable: false
+          Value: true
+        - Alpha: 0.7
+          Class: rviz/Map
+          Color Scheme: map
+          Draw Behind: false
+          Enabled: false
+          Name: Map (with Virtual Obstacles)
+          Topic: vo_map
+          Unreliable: false
+          Value: false
+        - Class: rviz/Marker
+          Enabled: false
+          Marker Topic: /slam_graph_edges
+          Name: SLAM Graph Edges
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: false
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /slam_graph_vertices
+          Name: SLAM Graph Vertices
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: true
+        - Arrow Length: 0.3
+          Class: rviz/PoseArray
+          Color: 255; 25; 0
+          Enabled: true
+          Name: Trajectory
+          Topic: slam_trajectory
+          Unreliable: false
+          Value: true
+      Enabled: true
+      Name: Mapping3
+    - Class: rviz/Camera
+      Enabled: true
+      Image Rendering: background and overlay
+      Image Topic: /robot3/xtion/depth_registered/image_raw
+      Name: RGBD3
+      Overlay Alpha: 0.5
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+      Visibility:
+        Control:
+          Move: true
+          Path: true
+          Value: true
+        Grid: true
+        Localization:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Localization2:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Localization3:
+          Localization Quality: true
+          Pose: true
+          Pose Graph: true
+          Value: true
+        Mapping:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Mapping2:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Mapping3:
+          Map: true
+          Map (with Virtual Obstacles): true
+          SLAM Graph Edges: true
+          SLAM Graph Vertices: true
+          Trajectory: true
+          Value: true
+        Marker: true
+        MarkerArray: true
+        Planning:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        Planning2:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        Planning3:
+          Base:
+            Global:
+              Costmap: true
+              Plan:
+                Global Planner: true
+                Navfn: true
+                Value: true
+              Potential: true
+              Value: true
+              Voxel Grid: true
+            Goal: true
+            Local:
+              Cost: true
+              Costmap: true
+              Plan:
+                DWA: true
+                Pal: true
+                Trajectory: true
+                Value: true
+              Trajectories: true
+              Value: true
+            Value: true
+          Value: true
+        RGBD: true
+        RGBD2: true
+        Robot1:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Robot2:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Robot3:
+          Dynamic Footprint: true
+          Dynamics: true
+          Footprint: true
+          Odometry: true
+          RobotModel: true
+          Sensors:
+            Depth Cloud: true
+            Laser: true
+            RGBD scan: true
+            Sonar Cloud: true
+            Sonars: true
+            Value: true
+            Virtual Obstacles: true
+          TF: true
+          Twist: true
+          Value: true
+        Value: true
+      Zoom Factor: 1
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+    - Class: rviz/SetInitialPose
+      Topic: robot1/initialpose
+    - Class: rviz/SetGoal
+      Topic: robot1/move_base_simple/goal
+    - Class: rviz/PublishPoint
+      Single click: true
+      Topic: clicked_point
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 16.4868
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: -1.59949
+        Y: -6.17607
+        Z: 2.12282
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.9498
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 5.00915
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 1028
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd00000004000000000000017f000003a2fc020000000bfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000000000017f000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001c0043006f006d00700072006500730073006500640020004d0061007001000002f5000000c90000000000000000fb0000000800520047004200440100000185000000aa0000001600fffffffb0000000a0052004700420044003201000002350000009d0000001600fffffffb0000000a0052004700420044003301000002d8000000ca0000001600ffffff000000010000010f000003a2fc0200000004fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730000000000000000ac0000006400fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730000000028000000a30000000000000000fb0000000a005600690065007700730000000000000003a2000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073f0000003efc0100000002fb0000000800540069006d006501000000000000073f000002f600fffffffb0000000800540069006d00650100000000000004500000000000000000000005ba000003a200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
+  RGBD:
+    collapsed: false
+  RGBD2:
+    collapsed: false
+  RGBD3:
+    collapsed: false
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1855
+  X: 55
+  Y: 14

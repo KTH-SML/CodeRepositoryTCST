@@ -381,7 +381,7 @@ class SimulationWidget(QWidget):
         #self.comboBox_robot2.setEnabled(False)
         self.world_comboBox.setEnabled(False)
 
-        file = RVIZFileGenerator()
+        #file = RVIZFileGenerator()
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
@@ -390,7 +390,7 @@ class SimulationWidget(QWidget):
         launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
         sys.argv.append('scenario:=' + scenario)
         print(sys.argv)
-        #launch_world.start()
+        launch_world.start()
 
         launch_robot_list = []
         for i in range(0, self.num_robots):
@@ -401,7 +401,7 @@ class SimulationWidget(QWidget):
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
             sys.argv.append('initial_pose_a:=0.0')
             sys.argv.append('scenario:=' + scenario)
-            #launch_robot_list[i].start()
+            launch_robot_list[i].start()
             del sys.argv[2:len(sys.argv)]
 
         #print(sys.argv)
@@ -568,7 +568,7 @@ class SimulationWidget(QWidget):
             pose_text.position.y = region[region.keys()[i]]['pose']['position'][1]
 
             if initial:
-                self.region_pose_marker_label.text = region.keys()[0]
+                self.region_pose_marker_label.text = region.keys()[i]
                 self.region_pose_marker.color.r = 0.0
                 self.region_pose_marker.color.g = 0.5
                 self.region_pose_marker.color.b = 0.0
