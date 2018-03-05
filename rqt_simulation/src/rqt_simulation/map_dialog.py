@@ -55,6 +55,7 @@ class Map_dialog(QDialog):
         self.button_reset.pressed.connect(self.on_button_reset_pressed)
         self.button_set_edges.pressed.connect(self.on_button_set_edges_pressed)
         self.button_cancel.clicked.connect(self.on_button_cancel_pressed)
+        self.button_ROI.clicked.connect(self.remove_last_ROI)
         #self.button_set_edges.setEnabled(False)
 
         self.regionCounter = 0
@@ -137,6 +138,35 @@ class Map_dialog(QDialog):
         self.button_save_FTS.setEnabled(False)
         self.line_dict = {}
         self.arrow_list = []
+
+    @Slot(bool)
+    def remove_last_ROI(self):
+        self.graphicsScene.removeItem(self.ellipse_items[self.regionCounter-1])
+        self.graphicsScene.removeItem(self.ellipse_items_labels[self.regionCounter-1])
+        self.graphicsScene.removeArrow(self.arrow_list[self.regionCounter-1])
+        del self.arrow_list[self.regionCounter-1]
+        del self.FTS_matrix[self.regionCounter-1]
+        del self.ellipse_items[self.regionCounter-1]
+        del self.ellipse_items_labels[self.regionCounter-1]
+        del self.region_of_interest['r' + str(self.regionCounter).zfill(2)]
+        del self.region_list[self.regionCounter-1]
+        del self.pixel_coords_list[self.regionCounter-1]
+        del self.vbox_list[self.regionCounter-1]
+
+        self.grid.removeWidget(self.groupBox_list[self.regionCounter-1])
+        self.groupBox_list[self.regionCounter-1].deleteLater()
+        del self.groupBox_list[self.regionCounter-1]
+
+        for i in range(0, self.regionCounter-1):
+            self.vbox_list[i].removeWidget(self.FTS_matrix[i][self.regionCounter-1])
+            self.FTS_matrix[i][self.regionCounter-1].deleteLater()
+            del self.FTS_matrix[i][self.regionCounter-1]
+            if str((self.regionCounter)*(i+1)) in self.line_dict.keys():
+                self.graphicsScene.removeItem(self.line_dict[str((self.regionCounter)*(i+1))])
+                del self.line_dict[str((self.regionCounter)*(i+1))]
+
+
+        self.regionCounter = self.regionCounter - 1
 
     @Slot(bool)
     def on_button_set_edges_pressed(self):

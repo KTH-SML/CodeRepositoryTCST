@@ -35,14 +35,7 @@
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="1">
-     <widget class="QPushButton" name="button_save_FTS">
-      <property name="text">
-       <string>Save Finite Transition System</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0" colspan="3">
      <widget class="QGraphicsView" name="graphicsView">
       <property name="enabled">
        <bool>true</bool>
@@ -73,6 +66,20 @@
      <widget class="QPushButton" name="button_reset">
       <property name="text">
        <string>Reset</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="button_ROI">
+      <property name="text">
+       <string>Delete last ROI</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QPushButton" name="button_save_FTS">
+      <property name="text">
+       <string>Save Finite Transition System</string>
       </property>
      </widget>
     </item>

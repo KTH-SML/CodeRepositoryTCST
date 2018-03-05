@@ -137,6 +137,8 @@ class SimulationWidget(QWidget):
         self.initial_pose = {}
         self.region_of_interest = {}
 
+        self.green_ellipse_list = []
+
     #    self.comboBox_init_pose2.clear()
         self.line_dict = {}
         self.prefix_string = ''
@@ -165,12 +167,12 @@ class SimulationWidget(QWidget):
 
         if (float(rectF.width())/mapSize.width() < float(rectF.height())/mapSize.height()):
             scale = float(rectF.width())/mapSize.width()
+        elif self.scenario == 'pal_office':
+            scale = 0.7
         else:
             scale = float(rectF.height())/mapSize.height()
 
-        #matrix = QMatrix(scale, 0, 0.0, scale, 0, 0)
         transform = QTransform(scale, 0, 0.0, scale, 0, 0)
-        #self.graphicsView_main.setMatrix(matrix)
         self.graphicsView_main.setTransform(transform)
 
         self.region_pose_marker_array_msg = MarkerArray()
@@ -361,8 +363,9 @@ class SimulationWidget(QWidget):
             #self.init_pose_publisher.publish(init)
 
             index = self.region_list.index(self.robot_comboBox_init_list[id-1].currentText())
+            self.green_ellipse_list[id-1] = index
             for i in range(0, len(self.region_list)):
-                if index == i:
+                if i in self.green_ellipse_list:
                     self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
                     rect = self.ellipse_items_RI[i].rect()
                     point = rect.topLeft()
@@ -539,8 +542,6 @@ class SimulationWidget(QWidget):
         self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
         self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
 
-        #self.start_publisher = rospy.Publisher('tiago1/planner_active', Bool, queue_size = 1)
-
         self.init_pose_msg_list.append(Pose())
         self.soft_task_msg_list.append(String())
         self.hard_task_msg_list.append(String())
@@ -548,7 +549,7 @@ class SimulationWidget(QWidget):
         self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/soft_task', String, 1.0, self.soft_task_msg_list[self.num_robots-1])
         self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/hard_task', String, 1.0, self.hard_task_msg_list[self.num_robots-1])
 
-
+        self.green_ellipse_list.append(0)
 
 
     def add_region_marker(self, region, initial):
