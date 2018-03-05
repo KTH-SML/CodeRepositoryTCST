@@ -56,6 +56,8 @@ class Map_dialog(QDialog):
         self.button_set_edges.pressed.connect(self.on_button_set_edges_pressed)
         self.button_cancel.clicked.connect(self.on_button_cancel_pressed)
         self.button_ROI.clicked.connect(self.remove_last_ROI)
+        self.button_ROI.setEnabled(False)
+        self.button_delete_edges.clicked.connect(self.delete_edges)
         #self.button_set_edges.setEnabled(False)
 
         self.regionCounter = 0
@@ -167,12 +169,21 @@ class Map_dialog(QDialog):
 
 
         self.regionCounter = self.regionCounter - 1
+        if self.regionCounter < 1:
+            self.button_ROI.setEnabled(False)
 
     @Slot(bool)
     def on_button_set_edges_pressed(self):
         for i in range(0, len(self.FTS_matrix)):
             for j in range(0, len(self.FTS_matrix[0])):
                 self.FTS_matrix[i][j].setCheckState(Qt.Checked)
+
+    @Slot(bool)
+    def delete_edges(self):
+        for i in range(0, len(self.FTS_matrix)):
+            for j in range(0, len(self.FTS_matrix[0])):
+                self.FTS_matrix[i][j].setCheckState(Qt.Unchecked)
+
 
     def pointSelection(self, pos):
         print('scene')
@@ -236,6 +247,7 @@ class Map_dialog(QDialog):
         self.pose_of_interest['pose'].update({'orientation' : (float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3]))})
         self.region_of_interest['r' + str(self.regionCounter).zfill(2)] = self.pose_of_interest
         self.arrow_list.append(self.current_arrow)
+        self.button_ROI.setEnabled(True)
 
     def mouseMove(self, pos):
         arrow_length = 50
