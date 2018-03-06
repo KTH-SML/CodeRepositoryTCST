@@ -316,7 +316,7 @@ class SimulationWidget(QWidget):
             self.init_pose_msg_list[id-1].orientation.z = self.initial_pose['start_' + str(id)]['pose']['orientation'][2]
             self.init_pose_msg_list[id-1].orientation.w = self.initial_pose['start_' + str(id)]['pose']['orientation'][3]
             #self.init_pose_publisher.publish(init)
-
+            print(self.robot_comboBox_init_list[id-1].currentText())
             index = self.region_list.index(self.robot_comboBox_init_list[id-1].currentText())
             self.green_ellipse_list[id-1] = index
             for i in range(0, len(self.region_list)):
@@ -342,7 +342,7 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
 
-        #file = RVIZFileGenerator()
+        file = RVIZFileGenerator()
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
@@ -351,7 +351,7 @@ class SimulationWidget(QWidget):
         launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
         sys.argv.append('scenario:=' + scenario)
         print(sys.argv)
-        launch_world.start()
+        #launch_world.start()
 
         launch_robot_list = []
         for i in range(0, self.num_robots):
@@ -362,7 +362,7 @@ class SimulationWidget(QWidget):
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
             sys.argv.append('initial_pose_a:=0.0')
             sys.argv.append('scenario:=' + scenario)
-            launch_robot_list[i].start()
+            #launch_robot_list[i].start()
             del sys.argv[2:len(sys.argv)]
 
         self.add_region_marker(self.initial_pose, True)
@@ -465,6 +465,11 @@ class SimulationWidget(QWidget):
            for i in range(0, len(self.region_of_interest)):
                self.robot_comboBox_init_list[self.num_robots-1].addItem(self.region_of_interest.keys()[i])
            self.robot_comboBox_init_list[self.num_robots-1].model().sort(0)
+        if len(self.ellipse_items_RI) > 0:
+           self.ellipse_items_RI[0].setBrush(QBrush(QColor('green')))
+           rect = self.ellipse_items_RI[0].rect()
+           point = rect.topLeft()
+           self.initial_pose_textItem_list[self.num_robots-1].setPos(point.x() - 11, point.y() - 22)
         self.robot_comboBox_init_list[self.num_robots-1].signalIndexChanged.connect(self.set_init_pose_id)
 
         self.robot_label_task_title_list.append(QLabel('Task robot ' + str(self.num_robots)))
@@ -513,7 +518,7 @@ class SimulationWidget(QWidget):
     def remove_robot(self):
         if self.num_robots > 1:
             self.num_robots = self.num_robots - 1
-            del self.green_ellipse_list[self.num_robots]
+            #del self.green_ellipse_list[self.num_robots]
             #del self.publisher_dict[
             del self.hard_task_msg_list[self.num_robots]
             del self.soft_task_msg_list[self.num_robots]
@@ -531,6 +536,7 @@ class SimulationWidget(QWidget):
             del self.robot_hard_task_input_list[self.num_robots]
             del self.robot_label_hard_task_list[self.num_robots]
             del self.robot_label_task_title_list[self.num_robots]
+            self.current_graphicsScene.removeItem(self.initial_pose_textItem_list[self.num_robots])
             del self.initial_pose_textItem_list[self.num_robots]
             del self.initial_pose_label_list[self.num_robots]
             del self.robot_comboBox_init_list[self.num_robots]
@@ -538,8 +544,12 @@ class SimulationWidget(QWidget):
             del self.robot_comboBox_list[self.num_robots]
             del self.robot_label_name_list[self.num_robots]
 
+            self.ellipse_items_RI[self.green_ellipse_list[self.num_robots]].setBrush(QBrush(QColor('red')))
+            del self.green_ellipse_list[self.num_robots]
+
             del self.robot_name_list[self.num_robots]
             self.tabWidget.removeTab(self.num_robots)
+            del self.tab_list[self.num_robots]
 
             if self.num_robots == 1:
                 self.button_remove_robot.setEnabled(False)

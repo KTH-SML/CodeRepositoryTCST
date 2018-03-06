@@ -86,7 +86,7 @@ class RVIZFileGenerator:
         Panels.append(dict_class_rviz_views)
 
         dict_class_rviz_time = {'Class' : 'rviz/Time'}
-        dict_class_rviz_time.update({'Expanded' : 'false'})
+        dict_class_rviz_time.update({'Expanded' : 'False'})
         dict_class_rviz_time.update({'Name' : 'Time'})
         dict_class_rviz_time.update({'SyncMode' : 0})
         dict_class_rviz_time.update({'SyncSource' : 'RGBD'})
@@ -96,64 +96,242 @@ class RVIZFileGenerator:
         dict_class = {'Class' : ""}
         vis_manager_displays = []
         dict_displays = {'Alpha' : 0.5, 'Cell Size' : 1, 'Class' : 'rviz/Grid', 'Color' : '160; 160; 164',
-                         'Enabled' : 'true', 'Line Style' : {'Line Width' : 0.03, 'Values': 'Lines'},
+                         'Enabled' : 'True', 'Line Style' : {'Line Width' : 0.03, 'Values': 'Lines'},
                          'Name' : 'Grid', 'Normal Cell Count' : 0, 'Offset' : {'X' : 0, 'Y' : 0, 'Z' : 0},
                          'Plane' : 'XY', 'Plane Cell Count' : 10, 'Reference Frame': '<Fixed Frame>',
-                         'Value' : 'true'}
+                         'Value' : 'True'}
+
+        vis_manager_displays.append(dict_displays)
 
         dict_class_rviz_group = {'Class' : 'rviz/Group'}
         displays_group = [{ 'Alpha': 1,
-                            'Class' :' rviz/RobotModel',
-                            'Collision Enabled' : 'false',
-                            'Enabled': 'true',
+                            'Class' : 'rviz/RobotModel',
+                            'Collision Enabled' : False,
+                            'Enabled': True,
                             'Links' :
-                              {'All Links Enabled' : 'true',
-                               'Expand Joint Details' : 'false',
-                               'Expand Link Details' : 'false',
-                               'Expand Tree' : 'false',
+                              {'All Links Enabled' : True,
+                               'Expand Joint Details' : False,
+                               'Expand Link Details' : False,
+                               'Expand Tree' : False,
                               'Link Tree Style' : 'Links in Alphabetic Order',
                               'arm_1_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail': 'false',
-                                 'Value' : 'true'},
+                                 'Show Axes' : False,
+                                 'Show Trail': False,
+                                 'Value' : True},
                               'arm_2_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail': 'false',
-                                 'Value' : 'true'},
+                                 'Show Axes' : False,
+                                 'Show Trail': False,
+                                 'Value' : True},
                               'arm_3_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail': 'false',
-                                 'Value' : 'true'},
+                                 'Show Axes' : False,
+                                 'Show Trail': False,
+                                 'Value' : True},
                               'arm_4_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail': 'false',
-                                 'Value' : 'true'},
+                                 'Show Axes' : False,
+                                 'Show Trail': False,
+                                 'Value' : True},
                               'arm_5_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail': 'false',
-                                 'Value' : 'true'},
+                                 'Show Axes' : False,
+                                 'Show Trail': False,
+                                 'Value' : True},
                               'arm_6_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail': 'false',
-                                 'Value' : 'true'},
+                                 'Show Axes' : False,
+                                 'Show Trail': False,
+                                 'Value' : True},
                               'arm_7_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail': 'false',
-                                 'Value' : 'true'},
+                                 'Show Axes' : False,
+                                 'Show Trail': False,
+                                 'Value' : True},
                               'arm_tool_link' :
                                 {'Alpha' : 1,
-                                 'Show Axes' : 'false',
-                                 'Show Trail' : 'false',
-                                 'Value' : 'true'}}}]
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'base_antenna_left_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'base_antenna_right_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'base_cover_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'base_footprint' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False},
+                              'base_imu_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False},
+                              'base_laser_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'base_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'base_sonar_01_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'base_sonar_02_link' :
+                                {'Alpha' : 1,
+                                   'Show Axes' : False,
+                                   'Show Trail' : False,
+                                   'Value' : True},
+                              'base_sonar_03_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_back_left_1_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_back_left_2_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_back_right_1_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_back_right_2_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_front_left_1_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_front_left_2_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_front_right_1_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'caster_front_right_2_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'gripper_grasping_frame' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False},
+                              'gripper_left_finger_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'gripper_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'gripper_right_finger_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'head_1_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'head_2_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'torso_fixed_column_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'torso_fixed_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'torso_lift_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'wheel_left_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'wheel_right_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False,
+                                 'Value' : True},
+                              'xtion_depth_frame' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False},
+                              'xtion_depth_optical_frame' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False},
+                              'xtion_link' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False},
+                              'xtion_optical_frame' :
+                                {'Alpha' : 1,
+                                   'Show Axes' : False,
+                                   'Show Trail' : False},
+                              'xtion_rgb_frame' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False},
+                              'xtion_rgb_optical_frame' :
+                                {'Alpha' : 1,
+                                 'Show Axes' : False,
+                                 'Show Trail' : False}
+                                 },
+                           'Name' : 'RobotModel',
+                           'Robot Description' : 'robot1/robot_description',
+                           'TF Prefix' : 'robot1',
+                           'Update Interval' : 0,
+                           'Value' : True,
+                           'Visual Enabled' : True
+                                                    }]
 
-        vis_manager_displays.append(dict_displays)
+        dict_class_rviz_group.update({'Displays' : displays_group})
+
+        vis_manager_displays.append(dict_class_rviz_group)
         dict_class.update({'Displays' : vis_manager_displays})
 
         #Visualization_manager.update({'Visualization Manager' : dict_class})
