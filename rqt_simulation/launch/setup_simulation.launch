@@ -20,6 +20,10 @@
 		<arg name="headless" value="$(arg headless)" />
 	</include>
 
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rqt_simulation)/config/rviz/triple_tiago.rviz"/>
+<!-- Set up World-->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rqt_simulation)/config/rviz/turtlebot.rviz"/>
 
+<!-- Set up World
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot_rviz_launchers)/rviz/navigation.rviz"/>
+-->
 </launch>

@@ -242,7 +242,7 @@ class SimulationWidget(QWidget):
     def on_button_RI_pressed(self):
         self.button_RI.setEnabled(True)
         graphicScene_item = self.current_graphicsScene.items()
-        print(len(graphicScene_item))
+        #print(len(graphicScene_item))
         if len(graphicScene_item) > 9:
             for i in range(0, len(self.ellipse_items_RI)):
                 self.current_graphicsScene.removeItem(self.ellipse_items_RI[i])
@@ -294,7 +294,7 @@ class SimulationWidget(QWidget):
 
     @Slot(int)
     def on_comboBox_robot1_indexChanged(self):
-        print(self.comboBox_robot1.currentIndex())
+        #print(self.comboBox_robot1.currentIndex())
         if self.comboBox_robot1.currentIndex() == 0:
             self.comboBox_robot2.setCurrentIndex(0)
             self.comboBox_robot2.setEnabled(False)
@@ -303,11 +303,11 @@ class SimulationWidget(QWidget):
 
     @pyqtSlot(int, int)
     def set_init_pose_id(self, index, id):
-        print('-----------------')
-        print(id)
+        #print('-----------------')
+        #print(id)
         if self.robot_comboBox_init_list[id-1].count() > 0:
             self.initial_pose['start_' + str(id)] = self.region_of_interest[self.robot_comboBox_init_list[id-1].currentText()]
-            print(self.region_list)
+            #print(self.region_list)
             self.init_pose_msg_list[id-1].position.x = self.initial_pose['start_' + str(id)]['pose']['position'][0]
             self.init_pose_msg_list[id-1].position.y = self.initial_pose['start_' + str(id)]['pose']['position'][1]
             self.init_pose_msg_list[id-1].position.z = self.initial_pose['start_' + str(id)]['pose']['position'][2]
@@ -316,7 +316,7 @@ class SimulationWidget(QWidget):
             self.init_pose_msg_list[id-1].orientation.z = self.initial_pose['start_' + str(id)]['pose']['orientation'][2]
             self.init_pose_msg_list[id-1].orientation.w = self.initial_pose['start_' + str(id)]['pose']['orientation'][3]
             #self.init_pose_publisher.publish(init)
-            print(self.robot_comboBox_init_list[id-1].currentText())
+            #print(self.robot_comboBox_init_list[id-1].currentText())
             index = self.region_list.index(self.robot_comboBox_init_list[id-1].currentText())
             self.green_ellipse_list[id-1] = index
             for i in range(0, len(self.region_list)):
@@ -327,8 +327,8 @@ class SimulationWidget(QWidget):
                 if i == index:
                     rect = self.ellipse_items_RI[i].rect()
                     point = rect.topLeft()
-                    print(id-1)
-                    print(len(self.initial_pose_textItem_list))
+                    #print(id-1)
+                    #print(len(self.initial_pose_textItem_list))
                     self.initial_pose_textItem_list[id-1].setPos(point.x() - 11, point.y() - 22)
 
 
@@ -350,19 +350,20 @@ class SimulationWidget(QWidget):
 
         launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
         sys.argv.append('scenario:=' + scenario)
-        print(sys.argv)
-        #launch_world.start()
+        #print(sys.argv)
+        launch_world.start()
 
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
-            sys.argv.append('robot_model:=tiago_steel')
+            #sys.argv.append('robot_model:=tiago_steel')
+            sys.argv.append('robot_model:=turtlebot')
             sys.argv.append('robot_name:=' + self.robot_name_list[i])
             sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
             sys.argv.append('initial_pose_a:=0.0')
             sys.argv.append('scenario:=' + scenario)
-            #launch_robot_list[i].start()
+            launch_robot_list[i].start()
             del sys.argv[2:len(sys.argv)]
 
         self.add_region_marker(self.initial_pose, True)
@@ -420,7 +421,7 @@ class SimulationWidget(QWidget):
         publisher['publisher'] = rospy.Publisher(topic, type, queue_size=1)
         self.publisher_dict[publisher['publisher_id']] = publisher
         #self.publisher_dict['publisher_id'].update({'publisher_id' : self.id_counter})
-        print(self.publisher_dict)
+        #print(self.publisher_dict)
         #self.publisher_dict.update({'publisher' : rospy.Publisher(topic, type, queue_size=1)})
         publisher['timer'] = QTimer(self)
         self._timeout_mapper.setMapping(publisher['timer'], publisher['publisher_id'])
