@@ -2,7 +2,7 @@
 
 	<!-- formulas: -->
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
-	<rosparam param="u_max">[10.0, 10.0, 6.28]</rosparam>
+	<rosparam param="u_max">[1.0, 6.28]</rosparam>
 
 
 	<rosparam param="u_max">[1.0, 6.28]</rosparam>
