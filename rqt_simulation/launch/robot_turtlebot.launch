@@ -120,7 +120,7 @@
      <rosparam file="$(arg custom_param_file)" command="load" />
 
      <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
-     <param name="base_local_planner" value="eband_local_planner/EBandPlannerROS"/>
+     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/>
 
      <!-- reset frame_id parameters using user input data -->
      <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>

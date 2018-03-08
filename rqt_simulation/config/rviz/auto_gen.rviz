@@ -8,19 +8,12 @@ Panels:
     - /Global Options1
     - /Robot1
     - /Robot1/RobotModel1
-    - /Robot1/Dynamics1
     - /Robot1/Footprint1
     - /Robot1/Dynamic Footprint1
     - /Robot1/Twist1
     - /Robot1/Sensors1
     - /Robot1/Sensors1/Laser1
     - /Robot1/Sensors1/RGBD scan1
-    - /Robot1/Sensors1/Virtual Obstacles1
-    - /Robot1/Sensors1/Depth Cloud1
-    - /Robot1/Sensors1/Sonars1
-    - /Control1
-    - /Control1/Move1
-    - /Control1/Path1
     - /Planning1
     - /Planning1/Base1
     - /Planning1/Base1/Global1
@@ -29,7 +22,7 @@ Panels:
     - /Planning1/Base1/Global1/Plan1/Global Planner1
     - /Planning1/Base1/Global1/Potential1
     - /Planning1/Base1/Global1/Costmap1
-    - /Planning1/Base1/Global1/Voxel Grid1
+    - /Planning1/Base1/Global1/Costmap1/Status1
     - /Planning1/Base1/Local1
     - /Planning1/Base1/Local1/Plan1
     - /Planning1/Base1/Local1/Plan1/Trajectory1
@@ -41,15 +34,11 @@ Panels:
     - /Planning1/Base1/Goal1
     - /Localization1
     - /Localization1/Pose1
-    - /Localization1/Pose Graph1
-    - /Localization1/Localization Quality1
     - /Mapping1
     - /Mapping1/Map1
-    - /Mapping1/SLAM Graph Edges1
-    - /Mapping1/SLAM Graph Vertices1
     - /Mapping1/Trajectory1
     - /RGBD1
-    - /MarkerArray1/Marker1
+    - /MarkerArray1
     Splitter Ratio: 0.458522
 - Class: rviz/Selection
   Name: Selection
@@ -315,3 +304,161 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/TF
+      Enabled: false
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+      Marker Scale: 0.1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree: {}
+      Update Interval: 0
+      Value: false
+    - 6DOF: false
+      Alpha: 1
+      Axis: false
+      Class: rviz_plugin_covariance/Odometry
+      Color: 204; 51; 204
+      Enabled: false
+      Name: Odometry
+      Orientation: false
+      Position: false
+      Scale: 1
+      Topic: /tiago1/mobile_base_controller/odom
+      Unreliable: false
+      Value: false
+    - Alpha: 1
+      Class: rviz/Polygon
+      Color: 255; 255; 0
+      Enabled: true
+      Name: Footprint
+      Topic: /robot1/move_base/local_costmap/footprint
+      Unreliable: false
+      Value: true
+    - Class: rviz/Group
+      Displays:
+      - Alpha: 0.5
+        Autocompute Intensity Bounds: true
+        Autocompute Value Bounds:
+          Max Value: 10
+          Min Value: -10
+          Value: true
+        Axis: Z
+        Channel Name: intensity
+        Class: rviz/LaserScan
+        Color: 0; 0; 255
+        Color Transformer: FlatColor
+        Decay Time: 0
+        Enabled: true
+        Invert Rainbow: false
+        Max Color: 255; 255; 255
+        Max Intensity: 0
+        Min Color: 0; 0; 0
+        Min Intensity: 0
+        Name: Laser
+        Position Transformer: XYZ
+        Queue Size: 10
+        Selectable: true
+        Size (Pixels): 3
+        Size (m): 0.01
+        Style: Points
+        Topic: /robot1/scan
+        Unreliable: false
+        Use Fixed Frame: true
+        Use rainbow: true
+        Value: true
+      - Alpha: 1
+        Autocompute Intensity Bounds: true
+        Autocompute Value Bounds:
+          Max Value: 10
+          Min Value: -10
+          Value: true
+        Axis: Z
+        Channel Name: intensity
+        Class: rviz/LaserScan
+        Color: 255; 0; 127
+        Color Transformer: FlatColor
+        Decay Time: 0
+        Enabled: true
+        Invert Rainbow: false
+        Max Color: 255; 255; 255
+        Max Intensity: 4096
+        Min Color: 0; 0; 0
+        Min Intensity: 0
+        Name: RGBD scan
+        Position Transformer: XYZ
+        Queue Size: 10
+        Selectable: true
+        Size (Pixels): 3
+        Size (m): 0.05
+        Style: Flat Squares
+        Topic: /robot1/rgbd_scan
+        Unreliable: false
+        Use Fixed Frame: true
+        Use rainbow: true
+        Value: true
+      - Alpha: 1
+        Autocompute Intensity Bounds: true
+        Autocompute Value Bounds:
+          Max Value: 10
+          Min Value: -10
+          Value: true
+        Axis: Z
+        Channel Name: intensity
+        Class: rviz/PointCloud2
+        Color: 255; 255; 255
+        Color Transformer: Intensity
+        Decay Time: 0
+        Enabled: false
+        Invert Rainbow: false
+        Max Color: 255; 255; 255
+        Max Intensity: 4096
+        Min Color: 0; 0; 0
+        Min Intensity: 0
+        Name: Depth Cloud
+        Position Transformer: XYZ
+        Queue Size: 1
+        Selectable: true
+        Size (Pixels): 3
+        Size (m): 0.01
+        Style: Points
+        Topic: /robot1/xtion/depth_registered/points
+        Unreliable: false
+        Use Fixed Frame: true
+        Use rainbow: true
+        Value: false
+      - Alpha: 1
+        Autocompute Intensity Bounds: true
+        Autocompute Value Bounds:
+          Max Value: -1.27299
+          Min Value: -1.67406
+          Value: true
+        Axis: X
+        Channel Name: intensity
+        Class: rviz/PointCloud2
+        Color: 255; 255; 255
+        Color Transformer: FlatColor
+        Decay Time: 0
+        Enabled: true
+        Invert Rainbow: false
+        Max Color: 255; 255; 255
+        Max Intensity: 4096
+        Min Color: 0; 0; 0
+        Min Intensity: 0
+        Name: Sonar Cloud
+        Position Transformer: XYZ
+        Queue Size: 10
+        Selectable: true
+        Size (Pixels): 10
+        Size (m): 0.01
+        Style: Points
+        Topic: /sonar_cloud
+        Unreliable: false
+        Use Fixed Frame: true
+        Use rainbow: true
+        Value: true
+      Enabled: true
+      Name: Robot
