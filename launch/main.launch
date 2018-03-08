@@ -4,6 +4,10 @@
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
 
 
+	<rosparam param="u_max">[1.0, 6.28]</rosparam>
+	<param name="K" type="int" value="10"/>
+
+
 	<!-- controllers: -->
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
 		<remap from="/control_input" to="/control_input_robot0" />

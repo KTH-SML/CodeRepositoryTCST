@@ -3,7 +3,7 @@ project(hybrid_controller)
 
 add_compile_options(-std=c++11)
 
-find_package(catkin REQUIRED roscpp message_generation)
+find_package(catkin REQUIRED roscpp message_generation formula_parser)
 find_package(Boost REQUIRED)
 find_package(Armadillo REQUIRED)
 
@@ -11,6 +11,7 @@ add_message_files(
   FILES
   HybridState.msg
   ControlInput.msg
+  CriticalEvent.msg
 )
 
 generate_messages(
@@ -21,7 +22,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES PPC
-  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS message_runtime formula_parser
 #  DEPENDS 
 )
 
@@ -30,6 +31,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${ARMADILLO_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${formula_parser_INCLUDE_DIRS}
 )
 
 add_library(PPC src/PPC.cpp)
@@ -46,5 +48,8 @@ target_link_libraries(${PROJECT_NAME}_node
   -llapack
   ${ARMADILLO_LIBRARIES}
   PPC
+  ${formula_parser_LIBRARIES}
 )
 add_dependencies(${PROJECT_NAME}_node hybrid_controller generate_message_cpp)
+
+
