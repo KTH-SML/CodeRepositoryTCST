@@ -356,8 +356,10 @@ class SimulationWidget(QWidget):
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
-            #sys.argv.append('robot_model:=tiago_steel')
-            sys.argv.append('robot_model:=turtlebot')
+            if self.robot_comboBox_list[i].currentText() == 'TiaGo':
+                sys.argv.append('robot_model:=tiago_steel')
+            elif self.robot_comboBox_list[i].currentText() == 'Turtlebot':
+                sys.argv.append('robot_model:=turtlebot')
             sys.argv.append('robot_name:=' + self.robot_name_list[i])
             sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
