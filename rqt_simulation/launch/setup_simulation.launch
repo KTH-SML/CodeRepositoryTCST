@@ -6,7 +6,7 @@
 	<arg name="scenario_path" default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
 
 	<arg name="headless" default="false" />
-	<arg name="rviz" default="single_tiago" /> <!-- see config folder -->
+	<arg name="rviz" default="turtlebot" /> <!-- see config folder -->
 	<arg name="simulator" default="gazebo" /> <!-- gazebo, stage -->
 
 <!--
