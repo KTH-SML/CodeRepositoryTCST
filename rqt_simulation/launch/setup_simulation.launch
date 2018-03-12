@@ -9,10 +9,10 @@
 	<arg name="rviz" default="auto_gen" /> <!-- see config folder -->
 	<arg name="simulator" default="gazebo" /> <!-- gazebo, stage -->
 
-
+<!--
 	<env name="GAZEBO_MODEL_PATH" value="$(find tiago_gazebo)/models:$(optenv GAZEBO_MODEL_PATH)"/>
 
-	<env name="LC_NUMERIC" value="C" />
+	<env name="LC_NUMERIC" value="C" />-->
 
 
 	<!-- Set up World -->

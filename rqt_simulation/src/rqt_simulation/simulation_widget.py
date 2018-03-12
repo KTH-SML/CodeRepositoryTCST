@@ -24,6 +24,7 @@ from rqt_simulation.MapGraphicsScene import MapGraphicsScene
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
 from rqt_simulation.RVIZFileGenerator import RVIZFileGenerator
+from rqt_simulation.ROS_Publisher import ROS_Publisher
 
 from ltl_tools.planner import ltl_planner
 
@@ -38,92 +39,89 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 class SimulationWidget(QWidget):
 
     def __init__(self):
-        print('constructor')
         super(SimulationWidget, self).__init__()
         self.setObjectName('SimulationWidget')
 
+        # Load ui file
         ui_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'resource', 'SimulationPlugin.ui')
         loadUi(ui_file, self)
 
-        self.button_RI.pressed.connect(self.on_button_RI_pressed)
-        self.button_setup.clicked.connect(self.on_button_setup_pressed)
-        self.button_execute_task.clicked.connect(self.on_button_execute_task_pressed)
-        self.button_addRobot.clicked.connect(self.add_robot)
-        self.button_remove_robot.clicked.connect(self.remove_robot)
+        # Connect buttons from ui file with functions
+        self.button_RI.pressed.connect(self.on_button_RI_pressed)                       # Select ROI and FTS button
+        self.button_setup.clicked.connect(self.on_button_setup_pressed)                 # Setup Simulation button
+        self.button_execute_task.clicked.connect(self.on_button_execute_task_pressed)   # Synthesize task button
+        self.button_addRobot.clicked.connect(self.add_robot)                            # Add robot tab button
+        self.button_remove_robot.clicked.connect(self.remove_robot)                     # Remove robot button
+        self.button_start_sim.clicked.connect(self.on_button_start_sim_pressed)         # Start simulation button
+        self.world_comboBox.currentIndexChanged.connect(self.reset)                     # World combobox
 
-        self.world_comboBox.currentIndexChanged.connect(self.reset)
-        self.button_start_sim.clicked.connect(self.on_button_start_sim_pressed)
+        # Disable buttons
+        self.button_setup.setEnabled(False)
+        self.button_remove_robot.setEnabled(False)
+        self.button_start_sim.setEnabled(False)
+        self.button_execute_task.setEnabled(False)
 
+        # Variables for ROS Publisher
+        self.ros_publisher = ROS_Publisher()
+
+        # Robot tab variables
+        # Robot initialization
         self.num_robots = 0
-
-        self.id_counter = 0
-        self.publisher_dict = {}
-        self._timeout_mapper = QSignalMapper(self)
-        self._timeout_mapper.mapped[int].connect(self.publish_once)
-
         self.tab_list = [self.tab]
-
         self.robot_name_list = []
         self.robot_label_name_list = []
         self.robot_comboBox_list = []
 
+        # Initialpose
         self.robot_label_init_list = []
         self.robot_comboBox_init_list = []
 
+        # Task
         self.robot_label_task_title_list = []
         self.robot_label_hard_task_list = []
         self.robot_label_soft_task_list = []
         self.robot_hard_task_input_list = []
         self.robot_soft_task_input_list = []
 
+        # Prefix and sufix textbox
         self.robot_prefix_textbox_list = []
         self.robot_sufix_textbox_list = []
         self.robot_label_prefix_list = []
         self.robot_label_sufix_list = []
 
+        # Subscriber for prefix and sufix
         self.prefix_plan_topic_list = []
         self.prefix_plan_subscriber_list = []
         self.sufix_plan_topic_list = []
         self.sufix_plan_subscriber_list = []
 
+        # Msgs for ltl_planner
         self.init_pose_msg_list = []
         self.soft_task_msg_list = []
         self.hard_task_msg_list = []
 
+        # Initialpose labels
         self.initial_pose_label_list = []
-        self.initialization()
-        self.add_robot()
 
-        self.start_publisher = rospy.Publisher('/planner_active', Bool, queue_size = 1)
-
-        self.marker_id_counter = 0
-
-        print('constructor loaded')
-
-    def initialization(self):
-        self.button_setup.setEnabled(False)
-        self.button_remove_robot.setEnabled(False)
-        self.button_start_sim.setEnabled(False)
-        self.button_execute_task.setEnabled(False)
-
+        # Initialize GraphicsScene
         self.current_graphicsScene = MapGraphicsScene()
         self.graphicsView_main.setScene(self.current_graphicsScene)
+
+        # Items for displaying ROIs
         self.ellipse_items_RI = []
         self.ellipse_items_labels_RI = []
         self.initial_pose_textItem_list = []
-
         self.initial_pose = {}
         self.region_of_interest = {}
-
         self.green_ellipse_list = []
 
+        # Items for displaying FTS
         self.line_dict = {}
         self.prefix_string = ''
         self.sufix_string = ''
         self.arrow_list = []
-        #self.robot_sufix_textbox_list[0].clear()
-        #self.robot_prefix_textbox_list[0].clear()
 
+        # Load map image
         self.scenario = self.world_comboBox.currentText()
         map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
         self.loadConfig(map_yaml)
@@ -137,29 +135,42 @@ class SimulationWidget(QWidget):
         mapSize = pixmap.size()
         self.current_graphicsScene.addPixmap(pixmap)
 
+        # Add world origin
         self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
         self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
 
+        # Scale map
         rectF = self.graphicsView_main.geometry()
-
         if (float(rectF.width())/mapSize.width() < float(rectF.height())/mapSize.height()):
             scale = float(rectF.width())/mapSize.width()
         elif self.scenario == 'pal_office':
             scale = 0.7
         else:
             scale = float(rectF.height())/mapSize.height()
-
         transform = QTransform(scale, 0, 0.0, scale, 0, 0)
         self.graphicsView_main.setTransform(transform)
 
+        # ROI marker msg
         self.region_pose_marker_array_msg = MarkerArray()
 
+        # Add robot tab
+        self.add_robot()
+
+        # Publisher to set ltl_planner active
+        self.start_publisher = rospy.Publisher('/planner_active', Bool, queue_size = 1)
+
+        # Counter for marker id counter
+        self.marker_id_counter = 0
+
+    # Reset is called if new map selected
     def reset(self):
 
+        # Disable buttons
         self.button_setup.setEnabled(False)
         self.button_start_sim.setEnabled(False)
         self.button_execute_task.setEnabled(False)
 
+        # Reinitialize map and clear all item lists
         self.current_graphicsScene = MapGraphicsScene()
         self.graphicsView_main.setScene(self.current_graphicsScene)
         self.ellipse_items_RI = []
@@ -169,10 +180,8 @@ class SimulationWidget(QWidget):
             self.robot_comboBox_init_list[i].clear()
             self.initial_pose_textItem_list.append(QGraphicsTextItem(self.initial_pose_label_list[i]))
 
-
         self.initial_pose = {}
         self.region_of_interest = {}
-
 
         self.line_dict = {}
         self.prefix_string = ''
@@ -198,28 +207,28 @@ class SimulationWidget(QWidget):
         self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
 
         rectF = self.graphicsView_main.geometry()
-
         if (float(rectF.width())/mapSize.width() < float(rectF.height())/mapSize.height()):
            scale = float(rectF.width())/mapSize.width()
         else:
            scale = float(rectF.height())/mapSize.height()
-
         transform = QTransform(scale, 0, 0.0, scale, 0, 0)
         self.graphicsView_main.setTransform(transform)
 
+        # Reinitialize ROI marker msg
         self.region_pose_marker_array_msg = MarkerArray()
 
 
+    # Callback for prefix from ltl_planner
     def prefix_callback(self, msg, source):
         for n in msg.poses:
-            #print self.position_msg_to_tuple(n.position)
             for i in range(0, len(self.region_of_interest)):
-                #print self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']
                 if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
                     self.prefix_string =  self.prefix_string + self.region_of_interest.keys()[i] + ' --> '
         index = self.prefix_plan_topic_list.index(source)
+        # Send signal for received msg
         self.prefix_plan_subscriber_list[index].received.emit(index)
 
+    # Fill prefix in textbox
     @pyqtSlot(int)
     def received_prefix(self, index):
         self.robot_prefix_textbox_list[index].clear()
@@ -228,14 +237,17 @@ class SimulationWidget(QWidget):
         self.prefix_string = ''
         self.button_setup.setEnabled(True)
 
+    # Callback for sufix from ltl_planner
     def sufix_callback(self, msg, source):
         for n in msg.poses:
             for i in range(0, len(self.region_of_interest)):
                 if self.position_msg_to_tuple(n.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
                     self.sufix_string = self.sufix_string + self.region_of_interest.keys()[i] + ' --> '
         index = self.sufix_plan_topic_list.index(source)
+        # Send signal for recieved msg
         self.sufix_plan_subscriber_list[index].received.emit(index)
 
+    # Fill sufix in textbox
     @pyqtSlot(int)
     def received_sufix(self, index):
         self.robot_sufix_textbox_list[index].clear()
@@ -245,9 +257,8 @@ class SimulationWidget(QWidget):
 
     @Slot(bool)
     def on_button_RI_pressed(self):
-        self.button_RI.setEnabled(True)
+        # Check if map is empty and remove items
         graphicScene_item = self.current_graphicsScene.items()
-        #print(len(graphicScene_item))
         if len(graphicScene_item) > 9:
             for i in range(0, len(self.ellipse_items_RI)):
                 self.current_graphicsScene.removeItem(self.ellipse_items_RI[i])
@@ -263,56 +274,34 @@ class SimulationWidget(QWidget):
                 self.robot_prefix_textbox_list[i].clear()
                 self.robot_comboBox_init_list[i].clear()
 
+        # Start map dialog
         map_dialog = Map_dialog(self.world_comboBox.currentText(), self.current_graphicsScene)
         map_dialog.exec_()
+
+        # Copy selected ROIs and FTS
         self.ellipse_items_RI = map_dialog.ellipse_items
         self.ellipse_items_labels_RI = map_dialog.ellipse_items_labels
         self.region_of_interest = map_dialog.region_of_interest
         self.pixel_coords = map_dialog.pixel_coords_list
         self.region_list = map_dialog.region_list
-        self.add_region_marker(self.region_of_interest, False)
+        #self.add_region_marker(self.region_of_interest, False)
         self.line_dict = map_dialog.line_dict
         self.arrow_list = map_dialog.arrow_list
+
+        # Add initial poses
         if len(self.ellipse_items_RI) > 0:
             for i in range(0, self.num_robots):
-   #             self.comboBox_init_pose1.addItem(self.region_of_interest.keys()[i])
-   #             self.comboBox_init_pose2.addItem(self.region_of_interest.keys()[i])
                 self.current_graphicsScene.addItem(self.initial_pose_textItem_list[i])
-
                 for j in range(0, len(self.region_of_interest)):
                     self.robot_comboBox_init_list[i].addItem(self.region_of_interest.keys()[j])
-
                 self.robot_comboBox_init_list[i].model().sort(0)
-                self.button_execute_task.setEnabled(True)
 
-   #         self.comboBox_init_pose1.model().sort(0)
-   #         self.comboBox_init_pose2.model().sort(0)
-
-
-    #        self.hard_task_input.setEnabled(True)
-    #        self.soft_task_input.setEnabled(True)
-
-     #       self.comboBox_init_pose1.setEnabled(True)
-
-
-        print('works')
-
-    @Slot(int)
-    def on_comboBox_robot1_indexChanged(self):
-        #print(self.comboBox_robot1.currentIndex())
-        if self.comboBox_robot1.currentIndex() == 0:
-            self.comboBox_robot2.setCurrentIndex(0)
-            self.comboBox_robot2.setEnabled(False)
-        else:
-            self.comboBox_robot2.setEnabled(True)
+            self.button_execute_task.setEnabled(True)
 
     @pyqtSlot(int, int)
     def set_init_pose_id(self, index, id):
-        #print('-----------------')
-        #print(id)
         if self.robot_comboBox_init_list[id-1].count() > 0:
             self.initial_pose['start_' + str(id)] = self.region_of_interest[self.robot_comboBox_init_list[id-1].currentText()]
-            #print(self.region_list)
             self.init_pose_msg_list[id-1].position.x = self.initial_pose['start_' + str(id)]['pose']['position'][0]
             self.init_pose_msg_list[id-1].position.y = self.initial_pose['start_' + str(id)]['pose']['position'][1]
             self.init_pose_msg_list[id-1].position.z = self.initial_pose['start_' + str(id)]['pose']['position'][2]
@@ -320,8 +309,6 @@ class SimulationWidget(QWidget):
             self.init_pose_msg_list[id-1].orientation.y = self.initial_pose['start_' + str(id)]['pose']['orientation'][1]
             self.init_pose_msg_list[id-1].orientation.z = self.initial_pose['start_' + str(id)]['pose']['orientation'][2]
             self.init_pose_msg_list[id-1].orientation.w = self.initial_pose['start_' + str(id)]['pose']['orientation'][3]
-            #self.init_pose_publisher.publish(init)
-            #print(self.robot_comboBox_init_list[id-1].currentText())
             index = self.region_list.index(self.robot_comboBox_init_list[id-1].currentText())
             self.green_ellipse_list[id-1] = index
             for i in range(0, len(self.region_list)):
@@ -332,14 +319,14 @@ class SimulationWidget(QWidget):
                 if i == index:
                     rect = self.ellipse_items_RI[i].rect()
                     point = rect.topLeft()
-                    #print(id-1)
-                    #print(len(self.initial_pose_textItem_list))
                     self.initial_pose_textItem_list[id-1].setPos(point.x() - 11, point.y() - 22)
 
 
     @Slot(bool)
     def on_button_setup_pressed(self):
         scenario = self.world_comboBox.currentText()
+
+        # Disable buttons
         self.button_RI.setEnabled(False)
         self.button_setup.setEnabled(False)
         self.button_remove_robot.setEnabled(False)
@@ -347,6 +334,7 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
 
+        # Get robot types to generate RVIZ file
         robot_list = []
         for i in range(0, self.num_robots):
             if self.robot_comboBox_list[i].currentText() == 'TiaGo':
@@ -358,12 +346,12 @@ class SimulationWidget(QWidget):
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
 
-
+        # Launch gazebo world
         launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
         sys.argv.append('scenario:=' + scenario)
-        #print(sys.argv)
         launch_world.start()
 
+        # Launch robots
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
@@ -388,8 +376,10 @@ class SimulationWidget(QWidget):
 
             rospy.loginfo("server up")
 
+        # Publish region marker
+        self.add_region_marker(self.region_of_interest, False)
         self.add_region_marker(self.initial_pose, True)
-        self.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
+        self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
 
     @Slot(bool)
     def on_button_execute_task_pressed(self):
@@ -405,6 +395,7 @@ class SimulationWidget(QWidget):
         #with codecs.open(task_file, 'w', encoding='utf-8') as outfile:
         #    yaml.safe_dump(data, outfile, default_flow_style=False)
 
+        # Launch ltl_planner
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
         roslaunch_task_list = []
@@ -415,13 +406,6 @@ class SimulationWidget(QWidget):
             sys.argv.append('robot_name:=' + self.robot_name_list[i])
             roslaunch_task_list[i].start()
             del sys.argv[2:len(sys.argv)]
-
-
-
-
-
-
-
 
     @Slot(bool)
     def on_button_start_sim_pressed(self):
@@ -529,9 +513,9 @@ class SimulationWidget(QWidget):
         self.init_pose_msg_list.append(Pose())
         self.soft_task_msg_list.append(String())
         self.hard_task_msg_list.append(String())
-        self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/init_pose', Pose, 1.0, self.init_pose_msg_list[self.num_robots-1])
-        self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/soft_task', String, 1.0, self.soft_task_msg_list[self.num_robots-1])
-        self.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/hard_task', String, 1.0, self.hard_task_msg_list[self.num_robots-1])
+        self.ros_publisher.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/init_pose', Pose, 1.0, self.init_pose_msg_list[self.num_robots-1])
+        self.ros_publisher.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/soft_task', String, 1.0, self.soft_task_msg_list[self.num_robots-1])
+        self.ros_publisher.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/hard_task', String, 1.0, self.hard_task_msg_list[self.num_robots-1])
 
         self.green_ellipse_list.append(0)
 
@@ -541,8 +525,6 @@ class SimulationWidget(QWidget):
     def remove_robot(self):
         if self.num_robots > 1:
             self.num_robots = self.num_robots - 1
-            #del self.green_ellipse_list[self.num_robots]
-            #del self.publisher_dict[
             del self.hard_task_msg_list[self.num_robots]
             del self.soft_task_msg_list[self.num_robots]
             del self.init_pose_msg_list[self.num_robots]
