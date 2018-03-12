@@ -342,7 +342,13 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
 
-        file = RVIZFileGenerator()
+        robot_list = []
+        for i in range(0, self.num_robots):
+            if self.robot_comboBox_list[i].currentText() == 'TiaGo':
+                robot_list.append('tiago')
+            elif self.robot_comboBox_list[i].currentText() == 'Turtlebot':
+                robot_list.append('turtlebot')
+        file = RVIZFileGenerator(robot_list)
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
