@@ -64,7 +64,7 @@ class RVIZFileGenerator:
         dict_visualization_manager.update({ 'Enabled' : True,
                                             'Global Options' : {
                                               'Background Color' : '48; 48; 48',
-                                              'Fixed Frame' : 'robot1/map',
+                                              'Fixed Frame' : '/map',
                                               'Frame Rate' : 30 },
                                             'Name' : 'root',
                                             'Tools': [

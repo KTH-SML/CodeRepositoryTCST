@@ -29,6 +29,11 @@ from ltl_tools.planner import ltl_planner
 
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
 
+import actionlib
+from actionlib import SimpleActionClient
+from actionlib_msgs.msg import GoalStatus
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+
 
 class SimulationWidget(QWidget):
 
@@ -371,8 +376,17 @@ class SimulationWidget(QWidget):
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
             sys.argv.append('initial_pose_a:=0.0')
             sys.argv.append('scenario:=' + scenario)
+
             launch_robot_list[i].start()
+            navigation = actionlib.SimpleActionClient('/' + self.robot_name_list[i] + '/move_base', MoveBaseAction)
+            rospy.loginfo("wait for the move_base action server to come up")
+            #allow up to 5 seconds for the action server to come up
+            #navigation.wait_for_server(rospy.Duration(5))
+            #wait for the action server to come up
+            navigation.wait_for_server()
             del sys.argv[2:len(sys.argv)]
+
+            rospy.loginfo("server up")
 
         self.add_region_marker(self.initial_pose, True)
         self.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)

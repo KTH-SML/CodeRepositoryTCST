@@ -9,10 +9,10 @@
 	<arg name="rviz" default="auto_gen" /> <!-- see config folder -->
 	<arg name="simulator" default="gazebo" /> <!-- gazebo, stage -->
 
-<!--
+
 	<env name="GAZEBO_MODEL_PATH" value="$(find tiago_gazebo)/models:$(optenv GAZEBO_MODEL_PATH)"/>
 
-	<env name="LC_NUMERIC" value="C" />-->
+	<env name="LC_NUMERIC" value="C" />
 
 
 	<!-- Set up World -->
@@ -22,7 +22,7 @@
 	</include>
 
 <!-- Set up World-->
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rqt_simulation)/config/rviz/$(arg rviz).rviz"/>
+	<node name="rviz" pkg="rviz" type="rviz" clear_params="true" args="-d $(find rqt_simulation)/config/rviz/$(arg rviz).rviz"/>
 
 <!-- Set up World
 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot_rviz_launchers)/rviz/navigation.rviz"/>
