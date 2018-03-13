@@ -3,7 +3,7 @@ project(robot)
 
 add_compile_options(-std=c++11)
 
-find_package(catkin REQUIRED roscpp geometry_msgs)
+find_package(catkin REQUIRED roscpp geometry_msgs hybrid_controller)
 
 catkin_package(
 #  INCLUDE_DIRS include
@@ -27,3 +27,5 @@ add_executable(${PROJECT_NAME}_node src/robot_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
+
+add_dependencies(${PROJECT_NAME}_node hybrid_controller_generate_messages_cpp)
