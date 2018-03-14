@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="simulator"      default="gazebo" />
+    <arg name="robot_name"     default="robot" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+    <arg name="color"          default="orange" /> <!-- color arg is ignored -->
+
+    <arg name="scenario"       default="pal_office" />
+    <arg name="scenario_path"  default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+
+    <arg name="public_sim"     value="true" />
+    <arg name="robot"          value="steel" />
+
+    <arg name="planner"        value="base"/>
+    <arg name="global_planner" value="navfn"/>
+    <arg name="local_planner"  value="eband"/>
+    <arg name="localization"   value="amcl"/>
+
+
+    <arg name="gzpose" value="-x $(arg initial_pose_x) -y $(arg initial_pose_y) -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
+    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 map $(arg robot_name)/map 100"/>
+
+    <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki)"/> <!-- create, roomba -->
+    <arg name="battery"   value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>  <!-- /proc/acpi/battery/BAT0 -->
+    <arg name="stacks"    value="$(optenv TURTLEBOT_STACKS hexagons)"/>  <!-- circles, hexagons -->
+    <arg name="3d_sensor" value="$(optenv TURTLEBOT_3D_SENSOR astra)"/>  <!-- kinect, asus_xtion_pro -->
+
+    <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find turtlebot_description)/robots/$(arg base)_$(arg stacks)_$(arg 3d_sensor).urdf.xacro'" />
+    <param name="robot_description" command="$(arg urdf_file)" />
+
+    <!-- Gazebo model spawner -->
+    <node name="spawn_turtlebot_model" pkg="gazebo_ros" type="spawn_model"
+          args="$(arg gzpose) -unpause -urdf -param robot_description -model $(arg robot_name)"/>
+
+    <!-- Velocity muxer -->
+    <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
+    <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
+          args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+      <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
+      <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity"/>
+    </node>
+
+    <!-- Bumper/cliff to pointcloud (not working, as it needs sensors/core messages) -->
+    <include file="$(find turtlebot_bringup)/launch/includes/kobuki/bumper2pc.launch.xml"/>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="30.0" />
+      <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
+    </node>
+
+    <!-- TF lookup
+    <node pkg="tf_lookup" type="tf_lookup" name="tf_lookup" output="screen"/>-->
+
+    <!-- Fake laser -->
+    <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
+    <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan"
+          args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
+      <param name="scan_height" value="10"/>
+      <param name="output_frame_id" value="$(arg robot_name)/camera_depth_frame"/>
+      <param name="range_min" value="0.45"/>
+      <remap from="image" to="camera/depth/image_raw"/>
+      <remap from="scan" to="scan"/>
+    </node>
+
+
+    <!-- Map server-->
+    <arg name="map_file" default="$(find c4r_simulation)/scenarios/$(arg scenario)/map.yaml"/>
+
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+    <!--  <param name="frame_id" value="/$(arg robot_name)/map"/>-->
+    </node>
+
+    <!-- Localization -->
+    <arg name="custom_amcl_launch_file" default="$(find turtlebot_navigation)/launch/includes/amcl/$(arg 3d_sensor)_amcl.launch.xml"/>
+
+    <include file="$(arg custom_amcl_launch_file)">
+      <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+      <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+      <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+      <arg name="odom_frame_id"   value="$(arg robot_name)/odom"/>
+      <arg name="base_frame_id"   value="$(arg robot_name)/base_footprint"/>
+      <arg name="scan_topic"      default="scan"/>
+      <arg name="global_frame_id" value="$(arg robot_name)/map"/>
+    </include>
+
+    <!-- Move base
+   <include file="$(find turtlebot_navigation)/launch/includes/move_base.launch.xml">
+     <arg name="odom_frame_id"   value="$(arg robot_name)/odom"/>
+     <arg name="base_frame_id"   value="$(arg robot_name)/base_footprint"/>
+     <arg name="global_frame_id" value="$(arg robot_name)/map"/>
+     <arg name="odom_topic" value="$(arg robot_name)/odom" />
+     <arg name="laser_topic" value="$(arg robot_name)/scan" />
+   </include>
+   -->
+
+   <include file="$(find turtlebot_navigation)/launch/includes/velocity_smoother.launch.xml"/>
+   <include file="$(find turtlebot_navigation)/launch/includes/safety_controller.launch.xml"/>
+
+   <arg name="odom_frame_id"   default="$(arg robot_name)/odom"/>
+   <arg name="base_frame_id"   default="$(arg robot_name)/base_footprint"/>
+   <arg name="global_frame_id" default="$(arg robot_name)/map"/>
+   <arg name="odom_topic" default="odom" />
+   <arg name="laser_topic" default="scan" />
+   <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/dummy.yaml"/>
+
+   <node pkg="move_base" type="move_base" respawn="false" name="move_base" clear_params="true" output="screen">
+     <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+     <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+     <rosparam file="$(find rqt_simulation)/config/planner/local_costmap_params.yaml" command="load" />
+     <rosparam file="$(find turtlebot_navigation)/param/global_costmap_params.yaml" command="load" />
+     <rosparam file="$(find rqt_simulation)/config/planner/dwa_local_planner_params.yaml" command="load" />
+     <rosparam file="$(find rqt_simulation)/config/planner/move_base_params.yaml" command="load" />
+     <rosparam file="$(find turtlebot_navigation)/param/global_planner_params.yaml" command="load" />
+     <rosparam file="$(find turtlebot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
+     <!-- external params file that could be loaded into the move_base namespace -->
+     <rosparam file="$(arg custom_param_file)" command="load" />
+
+     <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
+     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/>
+
+     <!-- reset frame_id parameters using user input data -->
+     <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>
+     <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+     <param name="local_costmap/global_frame" value="$(arg odom_frame_id)"/>
+     <param name="local_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+     <param name="DWAPlannerROS/global_frame_id" value="$(arg odom_frame_id)"/>
+
+     <remap from="cmd_vel" to="navigation_velocity_smoother/raw_cmd_vel"/>
+     <remap from="odom" to="$(arg odom_topic)"/>
+     <remap from="scan" to="$(arg laser_topic)"/>
+   </node>
+
+<!--
+    <group if="$(arg public_sim)">
+        <node name="relay_map" pkg="topic_tools" type="relay" args="map vo_map"/>
+    </group>
+-->
+</launch>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<arg name="scenario" default="pal_office" />
+	<arg name="scenario_path" default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+
+	<arg name="headless" default="false" />
+	<arg name="rviz" default="auto_gen" /> <!-- see config folder -->
+	<arg name="simulator" default="gazebo" /> <!-- gazebo, stage -->
+
+<!--
+	<env name="GAZEBO_MODEL_PATH" value="$(find tiago_gazebo)/models:$(optenv GAZEBO_MODEL_PATH)"/>
+
+	<env name="LC_NUMERIC" value="C" />-->
+
+
+	<!-- Set up World -->
+	<include file="$(find c4r_simulation)/launch/$(arg simulator)_world.launch">
+		<arg name="world" value="$(arg scenario)" />
+		<arg name="headless" value="$(arg headless)" />
+	</include>
+
+<!-- Set up World-->
+	<node name="rviz" pkg="rviz" type="rviz" clear_params="true" args="-d $(find rqt_simulation)/config/rviz/$(arg rviz).rviz"/>
+
+<!-- Set up World
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot_rviz_launchers)/rviz/navigation.rviz"/>
+-->
+</launch>

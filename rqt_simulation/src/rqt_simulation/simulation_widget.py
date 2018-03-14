@@ -18,7 +18,7 @@ from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphics
 from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
 from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QTransform, QFont
 
-from .map_dialog import Map_dialog
+from rqt_simulation.map_dialog import Map_dialog
 from .initial_pose import Initial_pose
 from rqt_simulation.MapGraphicsScene import MapGraphicsScene
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
@@ -541,6 +541,3 @@ class SimulationWidget(QWidget):
         rospy.loginfo('rqt_simulation map negate : %s' % (self.map_negate))
         rospy.loginfo('rqt_simulation map occupied threshold : %s' % (self.map_occupied_thresh))
         rospy.loginfo('rqt_simulation map free threshold : %s' % (self.map_free_thresh))
-
-
-
