@@ -6,19 +6,29 @@
 
 template <class T>
 class FormulaParser{
+	std::string formula;
+	std::string param_name;
+	std::vector<T> var_vec;
+	
+	exprtk::expression<T> expr;
 public:
-	static exprtk::expression<T> expression(std::string formula, std::vector<T>& param, std::string param_name){
+	FormulaParser(std::string formula, std::string param_name, std::vector<T> param)
+			:formula(formula), param_name(param_name), var_vec(param){
 
 		exprtk::symbol_table<T> symbol_table;
-		symbol_table.add_vector(param_name, param);
+		symbol_table.add_vector(param_name, var_vec);
 
-		exprtk::expression<T> expression;
-		expression.register_symbol_table(symbol_table);
+		expr.register_symbol_table(symbol_table);
 
 		exprtk::parser<T> parser;
-		parser.compile(formula, expression);
+		parser.compile(formula, expr);
+	}
 
-		return expression;
+	FormulaParser(){}
+
+	T value(std::vector<T>& param){
+		var_vec = param;
+		return expr.value();
 	}
 };
 
