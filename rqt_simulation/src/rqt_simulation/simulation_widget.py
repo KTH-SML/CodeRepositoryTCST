@@ -25,6 +25,7 @@ from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
 from rqt_simulation.RVIZFileGenerator import RVIZFileGenerator
 from rqt_simulation.ROS_Publisher import ROS_Publisher
+from rqt_simulation.RobotTab import RobotTab
 
 from ltl_tools.planner import ltl_planner
 
@@ -65,43 +66,14 @@ class SimulationWidget(QWidget):
         self.ros_publisher = ROS_Publisher()
 
         # Robot tab variables
-        # Robot initialization
         self.num_robots = 0
-        self.tab_list = [self.tab]
-        self.robot_name_list = []
-        self.robot_label_name_list = []
-        self.robot_comboBox_list = []
-
-        # Initialpose
-        self.robot_label_init_list = []
-        self.robot_comboBox_init_list = []
-
-        # Task
-        self.robot_label_task_title_list = []
-        self.robot_label_hard_task_list = []
-        self.robot_label_soft_task_list = []
-        self.robot_hard_task_input_list = []
-        self.robot_soft_task_input_list = []
-
-        # Prefix and sufix textbox
-        self.robot_prefix_textbox_list = []
-        self.robot_sufix_textbox_list = []
-        self.robot_label_prefix_list = []
-        self.robot_label_sufix_list = []
+        self.tab_list = []
 
         # Subscriber for prefix and sufix
         self.prefix_plan_topic_list = []
         self.prefix_plan_subscriber_list = []
         self.sufix_plan_topic_list = []
         self.sufix_plan_subscriber_list = []
-
-        # Msgs for ltl_planner
-        self.init_pose_msg_list = []
-        self.soft_task_msg_list = []
-        self.hard_task_msg_list = []
-
-        # Initialpose labels
-        self.initial_pose_label_list = []
 
         # Initialize GraphicsScene
         self.current_graphicsScene = MapGraphicsScene()
@@ -177,8 +149,10 @@ class SimulationWidget(QWidget):
         self.ellipse_items_labels_RI = []
         self.initial_pose_textItem_list = []
         for i in range(0, self.num_robots):
-            self.robot_comboBox_init_list[i].clear()
-            self.initial_pose_textItem_list.append(QGraphicsTextItem(self.initial_pose_label_list[i]))
+            self.tab_list[i].robot_comboBox_init.clear()
+            self.tab_list[i].initial_pose_textItem = QGraphicsTextItem(self.tab_list[i].initial_pose_label)
+            self.tab_list[i].robot_sufix_textbox.clear()
+            self.tab_list[i].robot_prefix_textbox.clear()
 
         self.initial_pose = {}
         self.region_of_interest = {}
@@ -187,8 +161,6 @@ class SimulationWidget(QWidget):
         self.prefix_string = ''
         self.sufix_string = ''
         self.arrow_list = []
-        self.robot_sufix_textbox_list[0].clear()
-        self.robot_prefix_textbox_list[0].clear()
 
         self.scenario = self.world_comboBox.currentText()
         map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
@@ -231,9 +203,9 @@ class SimulationWidget(QWidget):
     # Fill prefix in textbox
     @pyqtSlot(int)
     def received_prefix(self, index):
-        self.robot_prefix_textbox_list[index].clear()
-        self.robot_prefix_textbox_list[index].insertPlainText('Prefix: ')
-        self.robot_prefix_textbox_list[index].insertPlainText(self.prefix_string)
+        self.tab_list[index].robot_prefix_textbox.clear()
+        self.tab_list[index].robot_prefix_textbox.insertPlainText('Prefix: ')
+        self.tab_list[index].robot_prefix_textbox.insertPlainText(self.prefix_string)
         self.prefix_string = ''
         self.button_setup.setEnabled(True)
 
@@ -250,9 +222,9 @@ class SimulationWidget(QWidget):
     # Fill sufix in textbox
     @pyqtSlot(int)
     def received_sufix(self, index):
-        self.robot_sufix_textbox_list[index].clear()
-        self.robot_sufix_textbox_list[index].insertPlainText('Sufix: ')
-        self.robot_sufix_textbox_list[index].insertPlainText(self.sufix_string)
+        self.tab_list[index].robot_sufix_textbox.clear()
+        self.tab_list[index].robot_sufix_textbox.insertPlainText('Sufix: ')
+        self.tab_list[index].robot_sufix_textbox.insertPlainText(self.sufix_string)
         self.sufix_string = ''
 
     @Slot(bool)
@@ -270,9 +242,9 @@ class SimulationWidget(QWidget):
             for i in range(0, len(self.arrow_list)):
                 self.current_graphicsScene.removeArrow(self.arrow_list[i])
             for i in range(0, self.num_robots):
-                self.robot_sufix_textbox_list[i].clear()
-                self.robot_prefix_textbox_list[i].clear()
-                self.robot_comboBox_init_list[i].clear()
+                self.tab_list[i].robot_sufix_textbox.clear()
+                self.tab_list[i].robot_prefix_textbox.clear()
+                self.tab_list[i].robot_comboBox_init.clear()
 
         # Start map dialog
         map_dialog = Map_dialog(self.world_comboBox.currentText(), self.current_graphicsScene)
@@ -291,25 +263,25 @@ class SimulationWidget(QWidget):
         # Add initial poses
         if len(self.ellipse_items_RI) > 0:
             for i in range(0, self.num_robots):
-                self.current_graphicsScene.addItem(self.initial_pose_textItem_list[i])
+                self.current_graphicsScene.addItem(self.tab_list[i].initial_pose_textItem)
                 for j in range(0, len(self.region_of_interest)):
-                    self.robot_comboBox_init_list[i].addItem(self.region_of_interest.keys()[j])
-                self.robot_comboBox_init_list[i].model().sort(0)
+                    self.tab_list[i].robot_comboBox_init.addItem(self.region_of_interest.keys()[j])
+                self.tab_list[i].robot_comboBox_init.model().sort(0)
 
             self.button_execute_task.setEnabled(True)
 
     @pyqtSlot(int, int)
     def set_init_pose_id(self, index, id):
-        if self.robot_comboBox_init_list[id-1].count() > 0:
-            self.initial_pose['start_' + str(id)] = self.region_of_interest[self.robot_comboBox_init_list[id-1].currentText()]
-            self.init_pose_msg_list[id-1].position.x = self.initial_pose['start_' + str(id)]['pose']['position'][0]
-            self.init_pose_msg_list[id-1].position.y = self.initial_pose['start_' + str(id)]['pose']['position'][1]
-            self.init_pose_msg_list[id-1].position.z = self.initial_pose['start_' + str(id)]['pose']['position'][2]
-            self.init_pose_msg_list[id-1].orientation.x = self.initial_pose['start_' + str(id)]['pose']['orientation'][0]
-            self.init_pose_msg_list[id-1].orientation.y = self.initial_pose['start_' + str(id)]['pose']['orientation'][1]
-            self.init_pose_msg_list[id-1].orientation.z = self.initial_pose['start_' + str(id)]['pose']['orientation'][2]
-            self.init_pose_msg_list[id-1].orientation.w = self.initial_pose['start_' + str(id)]['pose']['orientation'][3]
-            index = self.region_list.index(self.robot_comboBox_init_list[id-1].currentText())
+        if self.tab_list[id -1].robot_comboBox_init.count() > 0:
+            self.initial_pose['start_' + str(id)] = self.region_of_interest[self.tab_list[id -1].robot_comboBox_init.currentText()]
+            self.tab_list[id -1].init_pose_msg.position.x = self.initial_pose['start_' + str(id)]['pose']['position'][0]
+            self.tab_list[id -1].init_pose_msg.position.y = self.initial_pose['start_' + str(id)]['pose']['position'][1]
+            self.tab_list[id -1].init_pose_msg.position.z = self.initial_pose['start_' + str(id)]['pose']['position'][2]
+            self.tab_list[id -1].init_pose_msg.orientation.x = self.initial_pose['start_' + str(id)]['pose']['orientation'][0]
+            self.tab_list[id -1].init_pose_msg.orientation.y = self.initial_pose['start_' + str(id)]['pose']['orientation'][1]
+            self.tab_list[id -1].init_pose_msg.orientation.z = self.initial_pose['start_' + str(id)]['pose']['orientation'][2]
+            self.tab_list[id -1].init_pose_msg.orientation.w = self.initial_pose['start_' + str(id)]['pose']['orientation'][3]
+            index = self.region_list.index(self.tab_list[id -1].robot_comboBox_init.currentText())
             self.green_ellipse_list[id-1] = index
             for i in range(0, len(self.region_list)):
                 if i in self.green_ellipse_list:
@@ -319,7 +291,7 @@ class SimulationWidget(QWidget):
                 if i == index:
                     rect = self.ellipse_items_RI[i].rect()
                     point = rect.topLeft()
-                    self.initial_pose_textItem_list[id-1].setPos(point.x() - 11, point.y() - 22)
+                    self.tab_list[id -1].initial_pose_textItem.setPos(point.x() - 11, point.y() - 22)
 
 
     @Slot(bool)
@@ -337,9 +309,9 @@ class SimulationWidget(QWidget):
         # Get robot types to generate RVIZ file
         robot_list = []
         for i in range(0, self.num_robots):
-            if self.robot_comboBox_list[i].currentText() == 'TiaGo':
+            if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
                 robot_list.append('tiago')
-            elif self.robot_comboBox_list[i].currentText() == 'Turtlebot':
+            elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
                 robot_list.append('turtlebot')
         file = RVIZFileGenerator(robot_list)
 
@@ -355,18 +327,18 @@ class SimulationWidget(QWidget):
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
-            if self.robot_comboBox_list[i].currentText() == 'TiaGo':
+            if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
                 sys.argv.append('robot_model:=tiago_steel')
-            elif self.robot_comboBox_list[i].currentText() == 'Turtlebot':
+            elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
                 sys.argv.append('robot_model:=turtlebot')
-            sys.argv.append('robot_name:=' + self.robot_name_list[i])
+            sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
             sys.argv.append('initial_pose_a:=0.0')
             sys.argv.append('scenario:=' + scenario)
 
             launch_robot_list[i].start()
-            navigation = actionlib.SimpleActionClient('/' + self.robot_name_list[i] + '/move_base', MoveBaseAction)
+            navigation = actionlib.SimpleActionClient('/' + self.tab_list[i].robot_name + '/move_base', MoveBaseAction)
             rospy.loginfo("wait for the move_base action server to come up")
             #allow up to 5 seconds for the action server to come up
             #navigation.wait_for_server(rospy.Duration(5))
@@ -400,10 +372,10 @@ class SimulationWidget(QWidget):
         roslaunch.configure_logging(uuid)
         roslaunch_task_list = []
         for i in range(0, self.num_robots):
-            self.soft_task_msg_list[i].data = self.robot_soft_task_input_list[i].text()
-            self.hard_task_msg_list[i].data = self.robot_hard_task_input_list[i].text()
+            self.tab_list[i].soft_task_msg.data = self.tab_list[i].robot_soft_task_input.text()
+            self.tab_list[i].hard_task_msg.data = self.tab_list[i].robot_hard_task_input.text()
             roslaunch_task_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')]))
-            sys.argv.append('robot_name:=' + self.robot_name_list[i])
+            sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             roslaunch_task_list[i].start()
             del sys.argv[2:len(sys.argv)]
 
@@ -442,80 +414,30 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def add_robot(self):
         self.num_robots += 1
-        self.robot_name_list.append('robot' + str(self.num_robots))
-        if self.num_robots > 1:
-            self.tab_list.append(QWidget())
-            self.tabWidget.addTab(self.tab_list[self.num_robots-1], ('Robot ' + str(self.num_robots)))
-            self.button_remove_robot.setEnabled(True)
+        self.tab_list.append(RobotTab(self.num_robots))
+        self.tabWidget.addTab(self.tab_list[self.num_robots-1], ('Robot ' + str(self.num_robots)))
+        self.button_remove_robot.setEnabled(True)
 
-        self.tab_list[self.num_robots-1].layout = QVBoxLayout()
-        self.robot_label_name_list.append(QLabel(('Robot ' + str(self.num_robots))))
-        font = QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        self.robot_label_name_list[self.num_robots-1].setFont(font)
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_label_name_list[self.num_robots-1])
-        self.robot_comboBox_list.append(CustomComboBox(self.num_robots-1))
-        self.robot_comboBox_list[self.num_robots-1].addItems(['None', 'TiaGo', 'Turtlebot'])
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_comboBox_list[self.num_robots-1])
-
-        self.robot_label_init_list.append(QLabel('Initial pose'))
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_label_init_list[self.num_robots-1])
-        self.robot_comboBox_init_list.append(CustomComboBox(self.num_robots))
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_comboBox_init_list[self.num_robots-1])
-
-        self.initial_pose_label_list.append('start_' + str(self.num_robots).zfill(2))
-        self.initial_pose_textItem_list.append(QGraphicsTextItem(self.initial_pose_label_list[self.num_robots-1]))
-        self.current_graphicsScene.addItem(self.initial_pose_textItem_list[self.num_robots-1])
+        self.current_graphicsScene.addItem(self.tab_list[self.num_robots-1].initial_pose_textItem)
 
         if self.num_robots > 1:
            for i in range(0, len(self.region_of_interest)):
-               self.robot_comboBox_init_list[self.num_robots-1].addItem(self.region_of_interest.keys()[i])
-           self.robot_comboBox_init_list[self.num_robots-1].model().sort(0)
+               self.tab_list[self.num_robots-1].robot_comboBox_init.addItem(self.region_of_interest.keys()[i])
+           self.tab_list[self.num_robots-1].robot_comboBox_init.model().sort(0)
         if len(self.ellipse_items_RI) > 0:
            self.ellipse_items_RI[0].setBrush(QBrush(QColor('green')))
            rect = self.ellipse_items_RI[0].rect()
            point = rect.topLeft()
-           self.initial_pose_textItem_list[self.num_robots-1].setPos(point.x() - 11, point.y() - 22)
-        self.robot_comboBox_init_list[self.num_robots-1].signalIndexChanged.connect(self.set_init_pose_id)
+           self.tab_list[self.num_robots-1].initial_pose_textItem.setPos(point.x() - 11, point.y() - 22)
+        self.tab_list[self.num_robots-1].robot_comboBox_init.signalIndexChanged.connect(self.set_init_pose_id)
 
-        self.robot_label_task_title_list.append(QLabel('Task robot ' + str(self.num_robots)))
-        self.robot_label_task_title_list[self.num_robots-1].setFont(font)
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_label_task_title_list[self.num_robots-1])
-        self.robot_label_hard_task_list.append(QLabel('Hard tasks'))
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_label_hard_task_list[self.num_robots-1])
-        self.robot_hard_task_input_list.append(QLineEdit('([]<> r01) && ([]<> r02)'))
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_hard_task_input_list[self.num_robots-1])
-        self.robot_label_soft_task_list.append(QLabel('Soft tasks'))
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_label_soft_task_list[self.num_robots-1])
-        self.robot_soft_task_input_list.append(QLineEdit())
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_soft_task_input_list[self.num_robots-1])
-
-        self.robot_label_prefix_list.append(QLabel('Planner prefix robot ' + str(self.num_robots)))
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_label_prefix_list[self.num_robots-1])
-        self.robot_prefix_textbox_list.append(QTextBrowser())
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_prefix_textbox_list[self.num_robots-1])
-        self.robot_label_sufix_list.append(QLabel('Planner sufix robot ' + str(self.num_robots)))
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_label_sufix_list[self.num_robots-1])
-        self.robot_sufix_textbox_list.append(QTextBrowser())
-        self.tab_list[self.num_robots-1].layout.addWidget(self.robot_sufix_textbox_list[self.num_robots-1])
-
-        self.tab_list[self.num_robots-1].setLayout(self.tab_list[self.num_robots-1].layout)
-
-        self.prefix_plan_topic_list.append('/' + self.robot_name_list[self.num_robots-1] + '/prefix_plan')
+        self.prefix_plan_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/prefix_plan')
         self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[self.num_robots-1], PoseArray, self.prefix_callback))
-        self.sufix_plan_topic_list.append('/' + self.robot_name_list[self.num_robots-1] + '/sufix_plan')
+        self.sufix_plan_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/sufix_plan')
         self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[self.num_robots-1], PoseArray, self.sufix_callback))
 
         self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
         self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
-
-        self.init_pose_msg_list.append(Pose())
-        self.soft_task_msg_list.append(String())
-        self.hard_task_msg_list.append(String())
-        self.ros_publisher.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/init_pose', Pose, 1.0, self.init_pose_msg_list[self.num_robots-1])
-        self.ros_publisher.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/soft_task', String, 1.0, self.soft_task_msg_list[self.num_robots-1])
-        self.ros_publisher.add_publisher('/' + self.robot_name_list[self.num_robots-1] + '/hard_task', String, 1.0, self.hard_task_msg_list[self.num_robots-1])
 
         self.green_ellipse_list.append(0)
 
@@ -525,34 +447,18 @@ class SimulationWidget(QWidget):
     def remove_robot(self):
         if self.num_robots > 1:
             self.num_robots = self.num_robots - 1
-            del self.hard_task_msg_list[self.num_robots]
-            del self.soft_task_msg_list[self.num_robots]
-            del self.init_pose_msg_list[self.num_robots]
+
             del self.prefix_plan_subscriber_list[self.num_robots]
             del self.sufix_plan_subscriber_list[self.num_robots]
             del self.prefix_plan_topic_list[self.num_robots]
             del self.sufix_plan_topic_list[self.num_robots]
-            del self.robot_sufix_textbox_list[self.num_robots]
-            del self.robot_label_sufix_list[self.num_robots]
-            del self.robot_prefix_textbox_list[self.num_robots]
-            del self.robot_label_prefix_list[self.num_robots]
-            del self.robot_soft_task_input_list[self.num_robots]
-            del self.robot_label_soft_task_list[self.num_robots]
-            del self.robot_hard_task_input_list[self.num_robots]
-            del self.robot_label_hard_task_list[self.num_robots]
-            del self.robot_label_task_title_list[self.num_robots]
-            self.current_graphicsScene.removeItem(self.initial_pose_textItem_list[self.num_robots])
-            del self.initial_pose_textItem_list[self.num_robots]
-            del self.initial_pose_label_list[self.num_robots]
-            del self.robot_comboBox_init_list[self.num_robots]
-            del self.robot_label_init_list[self.num_robots]
-            del self.robot_comboBox_list[self.num_robots]
-            del self.robot_label_name_list[self.num_robots]
 
-            self.ellipse_items_RI[self.green_ellipse_list[self.num_robots]].setBrush(QBrush(QColor('red')))
-            del self.green_ellipse_list[self.num_robots]
+            self.current_graphicsScene.removeItem(self.tab_list[self.num_robots].initial_pose_textItem)
 
-            del self.robot_name_list[self.num_robots]
+            if len(self.region_of_interest) > 1:
+                self.ellipse_items_RI[self.green_ellipse_list[self.num_robots]].setBrush(QBrush(QColor('red')))
+                del self.green_ellipse_list[self.num_robots]
+
             self.tabWidget.removeTab(self.num_robots)
             del self.tab_list[self.num_robots]
 
@@ -595,7 +501,7 @@ class SimulationWidget(QWidget):
                 self.region_pose_marker.scale.x = 1.0
                 self.region_pose_marker.scale.y = 1.0
 
-            self.region_pose_marker.header.frame_id = '/' + self.robot_name_list[0] + '/map'
+            self.region_pose_marker.header.frame_id = '/map'
 
             self.region_pose_marker.type = self.region_pose_marker.CYLINDER
             self.region_pose_marker.id = self.marker_id_counter
@@ -603,7 +509,7 @@ class SimulationWidget(QWidget):
             self.region_pose_marker.scale.z = 0.01
             self.region_pose_marker.color.a = 1.0
 
-            self.region_pose_marker_label.header.frame_id = '/' + self.robot_name_list[0] + '/map'
+            self.region_pose_marker_label.header.frame_id = '/map'
 
             self.region_pose_marker_label.type = self.region_pose_marker.TEXT_VIEW_FACING
             self.region_pose_marker_label.id = self.marker_id_counter + 1
