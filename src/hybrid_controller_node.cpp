@@ -5,33 +5,32 @@
 #include <boost/bind.hpp>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "PPC.hpp"
 #include <armadillo>
-#include "arma_ros_conversions.h"
-#include "exprtk.hpp"
+#include "arma_ros_std_conversions.h"
+#include <iostream>
 
 class ControllerNode{
 	ros::Publisher control_input_pub, critical_event_pub;
 	std::vector<ros::Subscriber> pose_subs;
 
 	std::vector<geometry_msgs::PoseStamped> poses;
-
-	int n_robots, robot_id, K;
-	std::string formula, formula_type;
-	double a, b, rho_opt;
-	arma::vec u_max;
+	arma::vec X;
 
 	PPC prescribed_performance_controller;
+	int robot_id;
 
-	bool state_was_read = false;
+	std::vector<bool> state_was_read;
 
 public:
-	ControllerNode(ros::NodeHandle nh, ros::NodeHandle priv_nh){
-		readParameters(nh, priv_nh);
-		prescribed_performance_controller.setUmax(u_max);
+	ControllerNode(ros::NodeHandle nh, ros::NodeHandle priv_nh, PPC ppc, int n_robots, int robot_id, arma::vec u_max): prescribed_performance_controller(ppc), robot_id(robot_id){
+		state_was_read = std::vector<bool>(n_robots, false);
+		X = arma::vec(3*n_robots);
 
-		control_input_pub = nh.advertise<hybrid_controller::ControlInput>("/control_input_robot"+std::to_string(robot_id), 100);
-		critical_event_pub = nh.advertise<hybrid_controller::CriticalEvent>("/critical_event"+std::to_string(robot_id), 100);
+		std::string robot_id_str = std::to_string(robot_id);
+		control_input_pub = nh.advertise<hybrid_controller::ControlInput>("/control_input_robot"+robot_id_str, 100);
+		critical_event_pub = nh.advertise<hybrid_controller::CriticalEvent>("/critical_event"+robot_id_str, 100);
 
 		poses = std::vector<geometry_msgs::PoseStamped>(n_robots);
 
@@ -45,35 +44,25 @@ public:
 		}
 	}
 
-	void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh){
-		nh.param("n_robots", n_robots, 1);
-		priv_nh.getParam("robot_id", robot_id);
-		std::string robot_id_str = std::to_string(robot_id);
-		nh.getParam("formula"+robot_id_str, formula);
-		nh.getParam("formula_type"+robot_id_str, formula_type);
-		nh.getParam("a"+robot_id_str, a);
-		nh.getParam("b"+robot_id_str, b);
-		nh.getParam("rho_opt"+robot_id_str, rho_opt);
-		nh.getParam("K", K);
-		std::vector<double> u_max_stdvec;
-		nh.getParam("u_max", u_max_stdvec);
-		u_max = arma::vec(u_max_stdvec);
-	}
-
 	void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg, int i){
 		poses[i] = *msg;
-		if(!state_was_read && i == robot_id){
-			arma::vec x = pose_to_vec(poses[robot_id]);
-			prescribed_performance_controller.init(
-				a, b, formula_type, formula, rho_opt, 
-				ros::Time::now().toSec(), K, x);
-			state_was_read = true;
+		X(arma::span(3*i, 3*i+2)) = pose_to_vec(poses[i]);
+
+		if(!state_was_read[i]){
+			arma::vec x;
+			if(i == robot_id){
+				x = pose_to_vec(poses[robot_id]);
+			}
+			state_was_read[i] = true;
+			if(std::all_of(state_was_read.cbegin(), state_was_read.cend(), [](bool v){return v;})){
+				prescribed_performance_controller.init(ros::Time::now().toSec(), x, X);
+			}
 		}
 	}
 
 	void update(){
-		if(!state_was_read) return;
-		arma::vec u = prescribed_performance_controller.u(pose_to_vec(poses[robot_id]), ros::Time::now().toSec());
+		if(std::any_of(state_was_read.cbegin(), state_was_read.cend(), [](bool v){return !v;})) return;
+		arma::vec u = prescribed_performance_controller.u(arma::conv_to<std::vector<double>>::from(X), pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
 
 		hybrid_controller::ControlInput u_msg = vec_to_control_input(u);
 		control_input_pub.publish(u_msg);
@@ -98,16 +87,69 @@ public:
 };
 ControllerNode* CriticalEvent::controller_node;
 
+void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, int& robot_id, int& K, int& freq,
+		std::vector<std::string>& formula, std::vector<std::string>& formula_type,
+		std::vector<std::vector<std::string>>& dformula,
+		std::vector<int>& cluster,
+		std::vector<double>& a, std::vector<double>& b, std::vector<double>& rho_opt,
+		arma::vec& u_max){
+	nh.param<int>("control_freq", freq, 100);
+	nh.param("n_robots", n_robots, 1);
+	priv_nh.getParam("robot_id", robot_id);
+
+	formula = std::vector<std::string>(n_robots);
+	formula_type = std::vector<std::string>(n_robots);
+	cluster = std::vector<int>(n_robots);
+	a = std::vector<double>(n_robots);
+	b = std::vector<double>(n_robots);
+	rho_opt = std::vector<double>(n_robots);
+
+	for(int i=0; i<n_robots; i++){
+		std::string i_str = std::to_string(i);
+		nh.getParam("formula"+i_str, formula[i]);
+		nh.getParam("formula_type"+i_str, formula_type[i]);
+		nh.getParam("cluster"+i_str, cluster[i]);
+		
+		std::vector<std::string> df;
+		nh.getParam("dformula"+i_str, df);
+		dformula.push_back(df);
+
+		nh.getParam("a"+i_str, a[i]);
+		nh.getParam("b"+i_str, b[i]);
+		nh.getParam("rho_opt"+i_str, rho_opt[i]);
+	}
+
+	nh.getParam("K", K);
+
+	std::vector<double> u_max_stdvec;
+	nh.getParam("u_max", u_max_stdvec);
+	u_max = arma::vec(u_max_stdvec);
+}
+
 int main(int argc, char* argv[]){
 	ros::init(argc, argv, "hybrid_controller_node");
 	ros::NodeHandle nh;
 	ros::NodeHandle priv_nh("~");
 
-	ControllerNode controller_node(nh, priv_nh);
+	int n_robots, robot_id, K, freq;
+	std::vector<std::string> formula, formula_type;
+	std::vector<std::vector<std::string>> dformula;
+	std::vector<int> cluster;
+	std::vector<double> a, b, rho_opt;
+	arma::vec u_max;
+
+	readParameters(nh, priv_nh, n_robots, robot_id, K, freq, formula, formula_type, dformula, cluster, a, b, rho_opt, u_max);
+
+	PPC ppc(robot_id, a[robot_id], b[robot_id], 
+			formula_type[robot_id], formula[robot_id],
+			dformula[robot_id], rho_opt[robot_id], K, u_max);
+
+	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, u_max);
+
 	CriticalEvent::controller_node = &controller_node;
 	controller_node.setCriticalEventCallback(CriticalEvent::criticalEventCallback);
 
-	ros::Rate rate(100);
+	ros::Rate rate(freq);
 	while(ros::ok()){
 		ros::spinOnce();
 		controller_node.update();

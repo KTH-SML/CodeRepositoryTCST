@@ -16,6 +16,14 @@ arma::vec pose_to_vec(geometry_msgs::PoseStamped ps){
 	return v;
 }
 
+std::vector<double> pose_to_std_vec(geometry_msgs::PoseStamped ps){
+	std::vector<double> v;
+	v.push_back(ps.pose.position.x);
+	v.push_back(ps.pose.position.y);
+	v.push_back(atan2(ps.pose.orientation.z, ps.pose.orientation.w));
+	return v;
+}
+
 geometry_msgs::PoseStamped vec_to_pose(arma::vec v){
 	check_vec_valid(v);
 	geometry_msgs::PoseStamped ps;

@@ -2,6 +2,11 @@
 
 	<!-- formulas: -->
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives.yaml" />
+
+
+	<rosparam param="u_max">[10.0, 6.28]</rosparam>
+	<param name="K" type="int" value="10"/>
 
 
 	<rosparam param="u_max">[1.0, 6.28]</rosparam>
@@ -9,17 +14,17 @@
 
 
 	<!-- controllers: -->
-	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0">
 		<remap from="/control_input" to="/control_input_robot0" />
         <remap from="/pose" to ="/pose_robot0" />
 		<param name="~robot_id" type="int" value="0"/>
-		<!--<param name="~formula" type="string" value="1-sqrt((x-10)^2+(y-10)^2)"/>-->
 	</node>
-	<!-->
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
 		<remap from="/control_input" to="/control_input_robot1" />
         <remap from="/pose" to ="/pose_robot1" />
+		<param name="~robot_id" type="int" value="1"/>
 	</node>
+	<!--
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller2" output="screen">
 		<remap from="/control_input" to="/control_input_robot2" />
         <remap from="/pose" to ="/pose_robot2" />
@@ -27,25 +32,23 @@
 	-->
 
 	<!-- virtual robots -->
-	<param name="n_robots" type="int" value="1"/>
+	<param name="n_robots" type="int" value="2"/>
 
 	<node pkg="robot" type="robot_node" name="robot0" output="screen" >
 		<remap from="/control_input" to="/control_input_robot0" />
 		<remap from="/pose" to="/pose_robot0" />
 	</node>
-	<!--
 	<node pkg="robot" type="robot_node" name="robot1" output="screen" >
 		<remap from="/control_input" to="/control_input_robot1" />
 		<remap from="/pose" to="/pose_robot1" />
 	</node>
+	<!--
 	<node pkg="robot" type="robot_node" name="robot2" output="screen" >
 		<remap from="/control_input" to="/control_input_robot2" />
 		<remap from="/pose" to="/pose_robot2" />
 	</node>
 	-->
 
-	
 	<node pkg="rviz" type="rviz" name="rviz" />
-	
 
 </launch>
