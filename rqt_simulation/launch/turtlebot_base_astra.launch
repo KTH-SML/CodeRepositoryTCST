@@ -3,7 +3,7 @@
 <launch>
 
 
-    <arg name="robot_name" default="turtlebot" />
+    <arg name="robot_name" default="" />
 
     <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
 
