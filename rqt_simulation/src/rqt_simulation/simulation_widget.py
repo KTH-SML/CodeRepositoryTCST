@@ -235,8 +235,8 @@ class SimulationWidget(QWidget):
             for i in range(0, len(self.ellipse_items_RI)):
                 self.current_graphicsScene.removeItem(self.ellipse_items_RI[i])
                 self.current_graphicsScene.removeItem(self.ellipse_items_labels_RI[i])
-            for i in range(0, len(self.initial_pose_textItem_list)):
-                self.current_graphicsScene.removeItem(self.initial_pose_textItem_list[i])
+            for i in range(0, self.num_robots):
+                self.current_graphicsScene.removeItem(self.tab_list[i].initial_pose_textItem)
             for i in range(0, len(self.line_dict)):
                 self.current_graphicsScene.removeItem(self.line_dict[self.line_dict.keys()[i]])
             for i in range(0, len(self.arrow_list)):
@@ -455,9 +455,15 @@ class SimulationWidget(QWidget):
 
             self.current_graphicsScene.removeItem(self.tab_list[self.num_robots].initial_pose_textItem)
 
-            if len(self.region_of_interest) > 1:
-                self.ellipse_items_RI[self.green_ellipse_list[self.num_robots]].setBrush(QBrush(QColor('red')))
-                del self.green_ellipse_list[self.num_robots]
+            #if len(self.region_of_interest) > 1:
+                #self.ellipse_items_RI[self.green_ellipse_list[self.num_robots]].setBrush(QBrush(QColor('red')))
+            del self.green_ellipse_list[self.num_robots]
+
+            for i in range(0, len(self.region_list)):
+                if i in self.green_ellipse_list:
+                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
+                else:
+                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
 
             self.tabWidget.removeTab(self.num_robots)
             del self.tab_list[self.num_robots]

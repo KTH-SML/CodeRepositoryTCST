@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="simulator" default="gazebo" />
+
+    <arg name="scenario" default="" /> <!-- Empty scenario to make sure it is consistent if required -->
+    <arg name="scenario_path" default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+
+    <arg name="robot_name" default="robot" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+
+    <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
+
+    <group ns="$(arg robot_name)">
+
+        <include file="$(find turtlebot_bringup)/launch/minimal.launch">
+        </include>
+
+
+        <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
+          <arg name="rgb_processing" value="false" />
+          <arg name="depth_registration" value="false" />
+          <arg name="depth_processing" value="false" />
+
+          <!-- We must specify an absolute topic name because if not it will be prefixed by "$(arg camera)".
+               Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 -->
+          <arg name="scan_topic" value="/scan" />
+        </include>
+
+    </group>
+
+</launch>
