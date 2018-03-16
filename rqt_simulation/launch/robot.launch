@@ -17,7 +17,7 @@
     <!-- The given behavior is automatically executed on start -->
     <arg name="behavior_name" default="Example Behavior" />
 
-    <group ns="$(arg robot_name)">
+    <!--<group ns="$(arg robot_name)">-->
 
         <!-- Run robot-specific software and spawn robot -->
         <include file="$(find c4r_simulation)/launch/robot_$(arg robot_model).launch">
@@ -31,6 +31,6 @@
             <arg name="color" value="$(arg color)" />
         </include>
 
-    </group>
+    <!--</group>-->
 
 </launch>
