@@ -2,15 +2,8 @@
 
 <launch>
 
-    <arg name="simulator" default="gazebo" />
 
-    <arg name="scenario" default="" /> <!-- Empty scenario to make sure it is consistent if required -->
-    <arg name="scenario_path" default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
-
-    <arg name="robot_name" default="robot" />
-    <arg name="initial_pose_x" default="0" />
-    <arg name="initial_pose_y" default="0" />
-    <arg name="initial_pose_a" default="0" />
+    <arg name="robot_name" default="turtlebot" />
 
     <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
 
