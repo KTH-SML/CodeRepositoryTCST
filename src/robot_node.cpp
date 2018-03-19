@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "hybrid_controller/ControlInput.h"
+#include "geometry_msgs/Twist.h"
 #include "geometry_msgs/PoseStamped.h"
 
 class Robot{
@@ -15,14 +15,14 @@ public:
 		pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/pose", 100);
 	}
 	
-	void controlCallback(const hybrid_controller::ControlInput::ConstPtr& msg){
+	void controlCallback(const geometry_msgs::Twist::ConstPtr& msg){
 		double t = ros::Time::now().toSec();
 		double dt = t - t_prev;
 		t_prev = t;
 
-		x += msg->vx*dt;
-		y += msg->vy*dt;
-		theta += msg->w*dt;
+		x += msg->linear.x*dt*0.001;
+		y += msg->linear.y*dt*0.001;
+		theta += msg->angular.z*dt;
 	}
 
 	void publish(){
