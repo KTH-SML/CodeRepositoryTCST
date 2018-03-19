@@ -83,8 +83,10 @@ double PPC::e(std::vector<double> X, double t){
     double epsilon = (rho_psi(X) - rho_max) / gamma(t);
     if(detect(epsilon)){
         if(k++ < K){
-            CriticalEventParam ce; //fill critical event inforamtion before and after repair
+            CriticalEventParam ce;
+            ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
             repair(X, t);
+            ce.r[1] = r; ce.rho_max[1] = rho_max; ce.gamma_0[1] = gamma_0; ce.gamma_inf[1] = gamma_inf; ce.l[1] = l; ce.t_star[1] = t_star;
             criticalEventCallback(ce);
         }
         if(epsilon>=0) epsilon = 0;

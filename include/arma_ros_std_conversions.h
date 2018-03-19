@@ -12,7 +12,7 @@ arma::vec pose_to_vec(geometry_msgs::PoseStamped ps){
 	arma::vec v(3);
 	v(0) = ps.pose.position.x;
 	v(1) = ps.pose.position.y;
-	v(2) = atan2(ps.pose.orientation.z, ps.pose.orientation.w);
+	v(2) = 2*atan2(ps.pose.orientation.z, ps.pose.orientation.w);
 	return v;
 }
 
@@ -20,7 +20,7 @@ std::vector<double> pose_to_std_vec(geometry_msgs::PoseStamped ps){
 	std::vector<double> v;
 	v.push_back(ps.pose.position.x);
 	v.push_back(ps.pose.position.y);
-	v.push_back(atan2(ps.pose.orientation.z, ps.pose.orientation.w));
+	v.push_back(2*atan2(ps.pose.orientation.z, ps.pose.orientation.w));
 	return v;
 }
 

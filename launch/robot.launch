@@ -1,0 +1,15 @@
+<launch>
+
+	<!-- qualisys: -->
+	<include file="$(find qualisys)/launch/qualisys.launch"/>
+	<include file="$(find qualisys)/launch/qualisys_odom.launch">
+		<arg name="model" value="nexus1" />
+	</include>
+
+    <!-- rosserial: -->
+	<node pkg="rosserial_python" type="serial_node.py" name="rosserial_python" output="screen">
+		<remap from="/cmdvel" to="/cmdvel0" />
+	</node>
+	
+</launch>
+

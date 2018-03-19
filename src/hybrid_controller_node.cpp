@@ -1,15 +1,15 @@
 #include "ros/ros.h"
-#include "hybrid_controller/ControlInput.h"
 #include "hybrid_controller/CriticalEvent.h"
 #include "geometry_msgs/PoseStamped.h"
+#include "geometry_msgs/Twist.h"
 #include <boost/bind.hpp>
 #include <string>
 #include <vector>
+#include <cmath>
 #include <algorithm>
 #include "PPC.hpp"
 #include <armadillo>
 #include "arma_ros_std_conversions.h"
-#include <iostream>
 
 class ControllerNode{
 	ros::Publisher control_input_pub, critical_event_pub;
@@ -29,7 +29,8 @@ public:
 		X = arma::vec(3*n_robots);
 
 		std::string robot_id_str = std::to_string(robot_id);
-		control_input_pub = nh.advertise<hybrid_controller::ControlInput>("/control_input_robot"+robot_id_str, 100);
+		control_input_pub = nh.advertise<geometry_msgs::Twist>("/cmdvel", 100);
+		//control_input_pub = nh.advertise<geometry_msgs::Twist>("/cmdvel"+robot_id_str, 100);
 		critical_event_pub = nh.advertise<hybrid_controller::CriticalEvent>("/critical_event"+robot_id_str, 100);
 
 		poses = std::vector<geometry_msgs::PoseStamped>(n_robots);
@@ -64,7 +65,9 @@ public:
 		if(std::any_of(state_was_read.cbegin(), state_was_read.cend(), [](bool v){return !v;})) return;
 		arma::vec u = prescribed_performance_controller.u(arma::conv_to<std::vector<double>>::from(X), pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
 
-		hybrid_controller::ControlInput u_msg = vec_to_control_input(u);
+		geometry_msgs::Twist u_msg;
+		u_msg.linear.x = u(0)*1000.0;
+		u_msg.linear.y = u(1)*1000.0;
 		control_input_pub.publish(u_msg);
 	}
 
@@ -74,6 +77,13 @@ public:
 
 	void publishCriticalEvent(CriticalEventParam critical_event_param){
 		hybrid_controller::CriticalEvent ce_msg;
+		ce_msg.stamp = ros::Time::now();
+		ce_msg.rho_max = critical_event_param.rho_max;
+		ce_msg.r = critical_event_param.r;
+		ce_msg.gamma_0 = critical_event_param.gamma_0;
+		ce_msg.gamma_inf = critical_event_param.gamma_inf;
+		ce_msg.l = critical_event_param.l;
+		ce_msg.t_star = critical_event_param.t_star;
 		critical_event_pub.publish(ce_msg);
 	}
 };

@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include "CriticalEventParam.h"
 #include "formula_parser.hpp"
-#include <iostream>
+
 class PPC{
     std::vector<double> X_std;
 
