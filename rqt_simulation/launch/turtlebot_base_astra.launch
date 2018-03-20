@@ -39,7 +39,6 @@
         <!-- mobile base nodelet manager -->
         <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
 
-        <arg name="serialport"/> <!-- TODO: use the serialport parameter to set the serial port of kobuki -->
         <arg name="manager"/>
 
         <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet $(arg manager)">
