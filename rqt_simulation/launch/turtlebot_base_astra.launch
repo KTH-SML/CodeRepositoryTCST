@@ -39,10 +39,6 @@
           <arg name="base" value="$(arg base)" />
           <arg name="serialport" value="$(arg serialport)" />
         </include>
-        <include file="$(find turtlebot_bringup)/launch/includes/netbook.launch.xml">
-          <arg name="battery" value="$(arg battery)" />
-        </include>
-
 
         <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
           <arg name="rgb_processing" value="false" />
