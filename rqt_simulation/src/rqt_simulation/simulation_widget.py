@@ -50,6 +50,7 @@ class SimulationWidget(QWidget):
         # Connect buttons from ui file with functions
         self.button_RI.pressed.connect(self.on_button_RI_pressed)                       # Select ROI and FTS button
         self.button_setup.clicked.connect(self.on_button_setup_pressed)                 # Setup Simulation button
+        self.button_setup_exp.clicked.connect(self.on_button_setup_exp_pressed)         # Setup Experiment button
         self.button_execute_task.clicked.connect(self.on_button_execute_task_pressed)   # Synthesize task button
         self.button_addRobot.clicked.connect(self.add_robot)                            # Add robot tab button
         self.button_remove_robot.clicked.connect(self.remove_robot)                     # Remove robot button
@@ -97,7 +98,7 @@ class SimulationWidget(QWidget):
         self.scenario = self.world_comboBox.currentText()
         map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
         self.loadConfig(map_yaml)
-        if self.scenario == 'pal_office':
+        if self.scenario == 'pal_office' or self.scenario == 'sml':
             map = 'map.pgm'
         else:
             map = 'map.png'
@@ -115,7 +116,7 @@ class SimulationWidget(QWidget):
         rectF = self.graphicsView_main.geometry()
         if (float(rectF.width())/mapSize.width() < float(rectF.height())/mapSize.height()):
             scale = float(rectF.width())/mapSize.width()
-        elif self.scenario == 'pal_office':
+        elif self.scenario == 'pal_office' or self.scenario == 'sml':
             scale = 0.7
         else:
             scale = float(rectF.height())/mapSize.height()
@@ -165,7 +166,7 @@ class SimulationWidget(QWidget):
         self.scenario = self.world_comboBox.currentText()
         map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
         self.loadConfig(map_yaml)
-        if self.scenario == 'pal_office':
+        if self.scenario == 'pal_office' or self.scenario == 'sml':
             map = 'map.pgm'
         else:
             map = 'map.png'
@@ -352,6 +353,55 @@ class SimulationWidget(QWidget):
         self.add_region_marker(self.region_of_interest, False)
         self.add_region_marker(self.initial_pose, True)
         self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
+
+    @Slot(bool)
+    def on_button_setup_exp_pressed(self):
+        scenario = self.world_comboBox.currentText()
+
+        # Disable buttons
+        self.button_RI.setEnabled(False)
+        self.button_setup.setEnabled(False)
+        self.button_remove_robot.setEnabled(False)
+        self.world_comboBox.setEnabled(False)
+        self.button_start_sim.setEnabled(True)
+        self.button_addRobot.setEnabled(False)
+
+        # Get robot types to generate RVIZ file
+        #robot_list = []
+        #for i in range(0, self.num_robots):
+        #    if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
+        #        robot_list.append('tiago')
+        #    elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
+        #        robot_list.append('turtlebot')
+        #file = RVIZFileGenerator(robot_list)
+
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch.configure_logging(uuid)
+
+        # Launch robots
+        launch_robot_list = []
+        for i in range(0, self.num_robots):
+            launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'turtlebot_navigation.launch')]))
+            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
+            #    sys.argv.append('robot_model:=tiago_steel')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
+            #    sys.argv.append('robot_model:=turtlebot')
+            sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
+            sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
+            sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
+            sys.argv.append('initial_pose_a:=0.0')
+            sys.argv.append('scenario:=' + scenario)
+
+            launch_robot_list[i].start()
+            #navigation = actionlib.SimpleActionClient('/' + self.tab_list[i].robot_name + '/move_base', MoveBaseAction)
+            #rospy.loginfo("wait for the move_base action server to come up")
+            #allow up to 5 seconds for the action server to come up
+            #navigation.wait_for_server(rospy.Duration(5))
+            #wait for the action server to come up
+            #navigation.wait_for_server()
+            del sys.argv[2:len(sys.argv)]
+
+            rospy.loginfo("server up")
 
     @Slot(bool)
     def on_button_execute_task_pressed(self):

@@ -73,14 +73,14 @@
    <widget class="QPushButton" name="button_setup">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>350</x>
       <y>630</y>
-      <width>651</width>
+      <width>321</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>Setup Simulation</string>
+     <string>Setup simulation</string>
     </property>
    </widget>
    <widget class="QPushButton" name="button_execute_task">
@@ -135,6 +135,11 @@
       <string>rng</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>sml</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
@@ -170,6 +175,19 @@
     </property>
     <property name="text">
      <string>Remove robot</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_setup_exp">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>630</y>
+      <width>291</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Setup experiment</string>
     </property>
    </widget>
   </widget>

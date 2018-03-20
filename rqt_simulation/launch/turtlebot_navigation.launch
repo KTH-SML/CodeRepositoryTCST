@@ -7,7 +7,7 @@
 
     <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>
 
-    <arg name="robot_name" default="" />
+    <arg name="robot_name" default="/" />
     <arg name="initial_pose_x" default="0" />
     <arg name="initial_pose_y" default="0" />
     <arg name="initial_pose_a" default="0" />
@@ -18,7 +18,7 @@
 
 
         <!-- Map server -->
-        <arg name="map_file" default="$/home/sml/tiago_public_ws/src/rqt_simulation_gui/sml/sml_map.yaml"/>
+        <arg name="map_file" default="/home/sml/tiago_public_ws/src/rqt_simulation_gui/sml/sml_map.yaml"/>
         <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
         <!-- AMCL -->

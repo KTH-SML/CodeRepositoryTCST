@@ -73,7 +73,7 @@ class Map_dialog(QDialog):
         self.graphicsScene.signalMouseReleasedPos.connect(self.pointRelease)
         self.graphicsScene.signalMouseMovePos.connect(self.mouseMove)
 
-        if self.scenario == 'pal_office':
+        if self.scenario == 'pal_office' or self.scenario == 'sml':
             map = 'map.pgm'
         else:
             map = 'map.png'
@@ -83,7 +83,10 @@ class Map_dialog(QDialog):
         pixmap = QPixmap(map_file)
         mapSize = pixmap.size()
         #self.graphicsScene.addPixmap(pixmap)
-
+        print('map_origin')
+        print(self.map_origin)
+        print('mapsize')
+        print(mapSize.height())
         self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
 
         #self.graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
@@ -193,10 +196,11 @@ class Map_dialog(QDialog):
         self.regionCounter += 1
         self.pixel_coords_list.append(pos)
         position_of_interest = {'position' : self.pixelToWorld(pos)}
+        print(self.pixelToWorld(pos))
         self.pose_of_interest = {'pose': position_of_interest}
         self.region_list.append('r' + str(self.regionCounter).zfill(2))
         #self.region_of_interest.update({'r' + str(self.regionCounter).zfill(2) : position_of_interest})
-        print(self.region_of_interest)
+
         markerSize = 13
 
         self.ellipse_items.append(QGraphicsEllipseItem(QRectF(QPointF(pos.x() - markerSize/2, pos.y() - markerSize/2), QSizeF(markerSize, markerSize))))
@@ -248,6 +252,7 @@ class Map_dialog(QDialog):
         self.region_of_interest['r' + str(self.regionCounter).zfill(2)] = self.pose_of_interest
         self.arrow_list.append(self.current_arrow)
         self.button_ROI.setEnabled(True)
+        print(self.region_of_interest)
 
     def mouseMove(self, pos):
         arrow_length = 50
@@ -260,6 +265,8 @@ class Map_dialog(QDialog):
 
 
     def pixelToWorld(self, pixel_coords = QPointF()):
+        print('origin')
+        print(self.worldOrigin)
         world_coords = ((pixel_coords.x() - self.worldOrigin.x()) * self.map_resolution, -(pixel_coords.y() - self.worldOrigin.y()) * self.map_resolution, 0.0)
         return world_coords
 
