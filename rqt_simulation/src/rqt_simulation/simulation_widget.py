@@ -12,6 +12,7 @@ import numpy as np
 from geometry_msgs.msg import Point, Pose, PoseArray
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
+from math import pi
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser
@@ -28,13 +29,14 @@ from rqt_simulation.ROS_Publisher import ROS_Publisher
 from rqt_simulation.RobotTab import RobotTab
 
 from ltl_tools.planner import ltl_planner
-
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
 
 import actionlib
 from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+
+from pyquaternion import Quaternion
 
 
 class SimulationWidget(QWidget):
@@ -278,10 +280,11 @@ class SimulationWidget(QWidget):
             self.tab_list[id -1].init_pose_msg.position.x = self.initial_pose['start_' + str(id)]['pose']['position'][0]
             self.tab_list[id -1].init_pose_msg.position.y = self.initial_pose['start_' + str(id)]['pose']['position'][1]
             self.tab_list[id -1].init_pose_msg.position.z = self.initial_pose['start_' + str(id)]['pose']['position'][2]
-            self.tab_list[id -1].init_pose_msg.orientation.x = self.initial_pose['start_' + str(id)]['pose']['orientation'][0]
-            self.tab_list[id -1].init_pose_msg.orientation.y = self.initial_pose['start_' + str(id)]['pose']['orientation'][1]
-            self.tab_list[id -1].init_pose_msg.orientation.z = self.initial_pose['start_' + str(id)]['pose']['orientation'][2]
-            self.tab_list[id -1].init_pose_msg.orientation.w = self.initial_pose['start_' + str(id)]['pose']['orientation'][3]
+            self.tab_list[id -1].init_pose_msg.orientation.w = self.initial_pose['start_' + str(id)]['pose']['orientation'][0]
+            self.tab_list[id -1].init_pose_msg.orientation.x = self.initial_pose['start_' + str(id)]['pose']['orientation'][1]
+            self.tab_list[id -1].init_pose_msg.orientation.y = self.initial_pose['start_' + str(id)]['pose']['orientation'][2]
+            self.tab_list[id -1].init_pose_msg.orientation.z = self.initial_pose['start_' + str(id)]['pose']['orientation'][3]
+
             index = self.region_list.index(self.tab_list[id -1].robot_comboBox_init.currentText())
             self.green_ellipse_list[id-1] = index
             for i in range(0, len(self.region_list)):
@@ -328,6 +331,8 @@ class SimulationWidget(QWidget):
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
+            quaternion = Quaternion(self.initial_pose['start_' + str(i+1)]['pose']['orientation'])
+            theta = quaternion.radians
             if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
                 sys.argv.append('robot_model:=tiago_steel')
             elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
@@ -335,7 +340,7 @@ class SimulationWidget(QWidget):
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
-            sys.argv.append('initial_pose_a:=0.0')
+            sys.argv.append('initial_pose_a:=' + str(theta))
             sys.argv.append('scenario:=' + scenario)
 
             launch_robot_list[i].start()
@@ -382,6 +387,8 @@ class SimulationWidget(QWidget):
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'turtlebot_navigation.launch')]))
+            quaternion = Quaternion(self.initial_pose['start_' + str(i+1)]['pose']['orientation'])
+            theta = quaternion.radians
             #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
             #    sys.argv.append('robot_model:=tiago_steel')
             #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
@@ -389,7 +396,7 @@ class SimulationWidget(QWidget):
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
-            sys.argv.append('initial_pose_a:=0.0')
+            sys.argv.append('initial_pose_a:=' + str(theta))
             sys.argv.append('scenario:=' + scenario)
 
             launch_robot_list[i].start()
