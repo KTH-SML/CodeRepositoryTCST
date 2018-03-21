@@ -55,6 +55,9 @@ class Map_dialog(QDialog):
         self.button_reset.pressed.connect(self.on_button_reset_pressed)
         self.button_set_edges.pressed.connect(self.on_button_set_edges_pressed)
         self.button_cancel.clicked.connect(self.on_button_cancel_pressed)
+        self.button_ROI.clicked.connect(self.remove_last_ROI)
+        self.button_ROI.setEnabled(False)
+        self.button_delete_edges.clicked.connect(self.delete_edges)
         #self.button_set_edges.setEnabled(False)
 
         self.regionCounter = 0
@@ -70,7 +73,7 @@ class Map_dialog(QDialog):
         self.graphicsScene.signalMouseReleasedPos.connect(self.pointRelease)
         self.graphicsScene.signalMouseMovePos.connect(self.mouseMove)
 
-        if self.scenario == 'pal_office':
+        if self.scenario == 'pal_office' or self.scenario == 'sml':
             map = 'map.pgm'
         else:
             map = 'map.png'
@@ -80,7 +83,10 @@ class Map_dialog(QDialog):
         pixmap = QPixmap(map_file)
         mapSize = pixmap.size()
         #self.graphicsScene.addPixmap(pixmap)
-
+        print('map_origin')
+        print(self.map_origin)
+        print('mapsize')
+        print(mapSize.height())
         self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
 
         #self.graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
@@ -139,10 +145,48 @@ class Map_dialog(QDialog):
         self.arrow_list = []
 
     @Slot(bool)
+    def remove_last_ROI(self):
+        self.graphicsScene.removeItem(self.ellipse_items[self.regionCounter-1])
+        self.graphicsScene.removeItem(self.ellipse_items_labels[self.regionCounter-1])
+        self.graphicsScene.removeArrow(self.arrow_list[self.regionCounter-1])
+        del self.arrow_list[self.regionCounter-1]
+        del self.FTS_matrix[self.regionCounter-1]
+        del self.ellipse_items[self.regionCounter-1]
+        del self.ellipse_items_labels[self.regionCounter-1]
+        del self.region_of_interest['r' + str(self.regionCounter).zfill(2)]
+        del self.region_list[self.regionCounter-1]
+        del self.pixel_coords_list[self.regionCounter-1]
+        del self.vbox_list[self.regionCounter-1]
+
+        self.grid.removeWidget(self.groupBox_list[self.regionCounter-1])
+        self.groupBox_list[self.regionCounter-1].deleteLater()
+        del self.groupBox_list[self.regionCounter-1]
+
+        for i in range(0, self.regionCounter-1):
+            self.vbox_list[i].removeWidget(self.FTS_matrix[i][self.regionCounter-1])
+            self.FTS_matrix[i][self.regionCounter-1].deleteLater()
+            del self.FTS_matrix[i][self.regionCounter-1]
+            if str((self.regionCounter)*(i+1)) in self.line_dict.keys():
+                self.graphicsScene.removeItem(self.line_dict[str((self.regionCounter)*(i+1))])
+                del self.line_dict[str((self.regionCounter)*(i+1))]
+
+
+        self.regionCounter = self.regionCounter - 1
+        if self.regionCounter < 1:
+            self.button_ROI.setEnabled(False)
+
+    @Slot(bool)
     def on_button_set_edges_pressed(self):
         for i in range(0, len(self.FTS_matrix)):
             for j in range(0, len(self.FTS_matrix[0])):
                 self.FTS_matrix[i][j].setCheckState(Qt.Checked)
+
+    @Slot(bool)
+    def delete_edges(self):
+        for i in range(0, len(self.FTS_matrix)):
+            for j in range(0, len(self.FTS_matrix[0])):
+                self.FTS_matrix[i][j].setCheckState(Qt.Unchecked)
+
 
     def pointSelection(self, pos):
         print('scene')
@@ -152,10 +196,11 @@ class Map_dialog(QDialog):
         self.regionCounter += 1
         self.pixel_coords_list.append(pos)
         position_of_interest = {'position' : self.pixelToWorld(pos)}
+        print(self.pixelToWorld(pos))
         self.pose_of_interest = {'pose': position_of_interest}
         self.region_list.append('r' + str(self.regionCounter).zfill(2))
         #self.region_of_interest.update({'r' + str(self.regionCounter).zfill(2) : position_of_interest})
-        print(self.region_of_interest)
+
         markerSize = 13
 
         self.ellipse_items.append(QGraphicsEllipseItem(QRectF(QPointF(pos.x() - markerSize/2, pos.y() - markerSize/2), QSizeF(markerSize, markerSize))))
@@ -200,12 +245,15 @@ class Map_dialog(QDialog):
         deltay = -pos.y() + self.pixel_coords_list[self.regionCounter -1].y()
         deltax = pos.x() - self.pixel_coords_list[self.regionCounter -1].x()
         theta = atan2(deltay, deltax)
+        print('theta selected')
         print(theta)
         quat = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
         print(quat)
         self.pose_of_interest['pose'].update({'orientation' : (float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3]))})
         self.region_of_interest['r' + str(self.regionCounter).zfill(2)] = self.pose_of_interest
         self.arrow_list.append(self.current_arrow)
+        self.button_ROI.setEnabled(True)
+        print(self.region_of_interest)
 
     def mouseMove(self, pos):
         arrow_length = 50
@@ -218,6 +266,8 @@ class Map_dialog(QDialog):
 
 
     def pixelToWorld(self, pixel_coords = QPointF()):
+        print('origin')
+        print(self.worldOrigin)
         world_coords = ((pixel_coords.x() - self.worldOrigin.x()) * self.map_resolution, -(pixel_coords.y() - self.worldOrigin.y()) * self.map_resolution, 0.0)
         return world_coords
 

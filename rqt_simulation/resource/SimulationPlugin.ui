@@ -6,180 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2150</width>
+    <width>1091</width>
     <height>779</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1091</width>
+    <height>779</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Simulation</string>
   </property>
-  <widget class="QComboBox" name="comboBox_robot2">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>50</y>
-     <width>111</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>None</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>TiaGo</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Turtlebot</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>30</y>
-     <width>59</width>
-     <height>15</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Robot 2</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comboBox_init_pose2">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>130</y>
-     <width>101</width>
-     <height>31</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QTextBrowser" name="textBrowser_prefix_2">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>360</y>
-     <width>251</width>
-     <height>41</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QTextBrowser" name="textBrowser_sufix_2">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>440</y>
-     <width>251</width>
-     <height>41</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_10">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>410</y>
-     <width>241</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Planner sufix robot 2</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_11">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>330</y>
-     <width>231</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Planner prefix robot 2</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="soft_task_input_2">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>290</y>
-     <width>251</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="hard_task_input_2">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>240</y>
-     <width>251</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>([]&lt;&gt; r01) &amp;&amp; ([]&lt;&gt; r02)</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_12">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>270</y>
-     <width>101</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Soft Tasks</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_13">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>180</y>
-     <width>261</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>14</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Task robot 2</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_14">
-   <property name="geometry">
-    <rect>
-     <x>1250</x>
-     <y>220</y>
-     <width>101</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Hard Tasks</string>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QGroupBox" name="World">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -189,14 +29,14 @@
     </rect>
    </property>
    <property name="title">
-    <string>GroupBox</string>
+    <string>World</string>
    </property>
    <widget class="QPushButton" name="button_addRobot">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>370</x>
       <y>510</y>
-      <width>211</width>
+      <width>151</width>
       <height>41</height>
      </rect>
     </property>
@@ -220,9 +60,9 @@
    <widget class="QPushButton" name="button_RI">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>180</x>
       <y>510</y>
-      <width>211</width>
+      <width>181</width>
       <height>41</height>
      </rect>
     </property>
@@ -233,14 +73,14 @@
    <widget class="QPushButton" name="button_setup">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>350</x>
       <y>630</y>
-      <width>651</width>
+      <width>321</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>Setup Simulation</string>
+     <string>Setup simulation</string>
     </property>
    </widget>
    <widget class="QPushButton" name="button_execute_task">
@@ -295,11 +135,16 @@
       <string>rng</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>sml</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>20</x>
       <y>480</y>
       <width>59</width>
       <height>15</height>
@@ -319,6 +164,32 @@
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="button_remove_robot">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>510</y>
+      <width>141</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Remove robot</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_setup_exp">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>630</y>
+      <width>291</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Setup experiment</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
@@ -330,13 +201,8 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
-   <widget class="QWidget" name="tab">
-    <attribute name="title">
-     <string>Robot 1</string>
-    </attribute>
-   </widget>
   </widget>
  </widget>
  <resources/>
