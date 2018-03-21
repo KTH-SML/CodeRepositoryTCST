@@ -28,4 +28,6 @@
 
     </group>
 
+          <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot_rviz_launchers)/rviz/navigation.rviz"/>
+
 </launch>
