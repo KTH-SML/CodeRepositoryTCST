@@ -61,6 +61,7 @@ class SimulationWidget(QWidget):
 
         # Disable buttons
         self.button_setup.setEnabled(False)
+        self.button_setup_exp.setEnabled(False)
         self.button_remove_robot.setEnabled(False)
         self.button_start_sim.setEnabled(False)
         self.button_execute_task.setEnabled(False)
@@ -211,6 +212,7 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_prefix_textbox.insertPlainText(self.prefix_string)
         self.prefix_string = ''
         self.button_setup.setEnabled(True)
+        self.button_setup_exp.setEnabled(True)
 
     # Callback for sufix from ltl_planner
     def sufix_callback(self, msg, source):
@@ -332,7 +334,12 @@ class SimulationWidget(QWidget):
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
             quaternion = Quaternion(self.initial_pose['start_' + str(i+1)]['pose']['orientation'])
-            theta = quaternion.radians
+            rot_axis = quaternion.axis
+            theta = quaternion.angle * rot_axis[2]
+            print('theta launch')
+            print(rot_axis)
+            print(theta)
+            print(quaternion)
             if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
                 sys.argv.append('robot_model:=tiago_steel')
             elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
@@ -386,9 +393,10 @@ class SimulationWidget(QWidget):
         # Launch robots
         launch_robot_list = []
         for i in range(0, self.num_robots):
-            launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'turtlebot_navigation.launch')]))
+            launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot_exp.launch')]))
             quaternion = Quaternion(self.initial_pose['start_' + str(i+1)]['pose']['orientation'])
-            theta = quaternion.radians
+            rot_axis = quaternion.axis
+            theta = quaternion.angle * rot_axis[2]
             #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
             #    sys.argv.append('robot_model:=tiago_steel')
             #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
@@ -441,28 +449,6 @@ class SimulationWidget(QWidget):
         start_msg = Bool()
         start_msg.data = True
         self.start_publisher.publish(start_msg)
-
-    @Slot(int)
-    def publish_once(self, publisher_id):
-        publisher = self.publisher_dict.get(publisher_id, None)
-        if publisher is not None:
-            publisher['publisher'].publish(publisher['message'])
-
-    def add_publisher(self, topic, type, rate, msg):
-
-        publisher = {}
-        publisher['publisher_id'] = self.id_counter
-        publisher['message'] = msg
-        publisher['publisher'] = rospy.Publisher(topic, type, queue_size=1)
-        self.publisher_dict[publisher['publisher_id']] = publisher
-        #self.publisher_dict['publisher_id'].update({'publisher_id' : self.id_counter})
-        #print(self.publisher_dict)
-        #self.publisher_dict.update({'publisher' : rospy.Publisher(topic, type, queue_size=1)})
-        publisher['timer'] = QTimer(self)
-        self._timeout_mapper.setMapping(publisher['timer'], publisher['publisher_id'])
-        publisher['timer'].timeout.connect(self._timeout_mapper.map)
-        publisher['timer'].start(int(1000.0 / rate))
-        self.id_counter += 1
 
     def position_msg_to_tuple(self, position_msg):
         position = (position_msg.x, position_msg.y, position_msg.z)

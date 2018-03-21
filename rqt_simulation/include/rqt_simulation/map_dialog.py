@@ -245,6 +245,7 @@ class Map_dialog(QDialog):
         deltay = -pos.y() + self.pixel_coords_list[self.regionCounter -1].y()
         deltax = pos.x() - self.pixel_coords_list[self.regionCounter -1].x()
         theta = atan2(deltay, deltax)
+        print('theta selected')
         print(theta)
         quat = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
         print(quat)
