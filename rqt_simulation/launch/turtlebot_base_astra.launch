@@ -44,14 +44,17 @@
         <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet $(arg manager)">
           <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
           <param name="device_port" value="$(arg serialport)" />
+          <param name="tf_prefix" value="$(arg robot_name)" />
+          <param name="odom_frame" value="$(arg robot_name)/odom"/>
+          <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
 
           <remap from="mobile_base/odom" to="odom"/>
           <!-- Don't do this - force applications to use a velocity mux for redirection
             <remap from="mobile_base/commands/velocity" to="cmd_vel"/>
           -->
-          <remap from="mobile_base/enable" to="/$(arg robot_name)/enable"/>
-          <remap from="mobile_base/disable" to="/$(arg robot_name)/disable"/>
-          <remap from="mobile_base/joint_states" to="/$(arg robot_name)/joint_states"/>
+          <remap from="mobile_base/enable" to="enable"/>
+          <remap from="mobile_base/disable" to="disable"/>
+          <remap from="mobile_base/joint_states" to="joint_states"/>
         </node>
 
         <!-- bumper/cliff to pointcloud -->
