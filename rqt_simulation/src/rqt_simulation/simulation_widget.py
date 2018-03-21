@@ -359,6 +359,8 @@ class SimulationWidget(QWidget):
             navigation.wait_for_server()
             del sys.argv[2:len(sys.argv)]
 
+            self.ros_publisher.add_publisher('/' + self.tab_list[i].robot_name + '/label_marker', Marker, 5.0, self.tab_list[i].label_marker_msg)
+
             rospy.loginfo("server up")
 
         # Publish region marker

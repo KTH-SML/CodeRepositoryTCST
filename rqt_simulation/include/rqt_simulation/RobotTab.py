@@ -82,3 +82,16 @@ class RobotTab(QWidget):
 
         self.prefix_string = ''
         self.sufix_string = ''
+
+        self.label_marker_msg = Marker()
+        self.label_marker_msg.pose = self.init_pose_msg
+        self.label_marker_msg.text = self.robot_name
+        self.label_marker_msg.type = self.label_marker_msg.TEXT_VIEW_FACING
+        self.label_marker_msg.id = 10
+        self.label_marker_msg.action = self.label_marker_msg.ADD
+        self.label_marker_msg.scale.z = 0.5
+        self.label_marker_msg.color.a = 1.0
+        self.label_marker_msg.color.r = 0.0
+        self.label_marker_msg.color.g = 0.0
+        self.label_marker_msg.color.b = 0.0
+        self.label_marker_msg.header.frame_id = '/map'
