@@ -3,7 +3,7 @@
 <launch>
 
     <arg name="scenario" default="sml" /> <!-- Empty scenario to make sure it is consistent if required -->
-    <arg name="scenario_path" default="/home/sml/tiago_public_ws/src/rqt_simulation_gui/sml/" />
+    <arg name="scenario_path" default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
 
     <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki)"/> <!-- create, roomba -->
     <arg name="battery"   value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>  <!-- /proc/acpi/battery/BAT0 -->
@@ -24,7 +24,7 @@
     <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 map $(arg robot_name)/map 100"/>
 
         <!-- Map server -->
-        <arg name="map_file" default="/home/sml/tiago_public_ws/src/rqt_simulation_gui/sml/sml_map.yaml"/>
+        <arg name="map_file" default="$(arg scenario_path)/map.yaml"/>
         <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
           <param name="frame_id" value="/map" />
         </node>

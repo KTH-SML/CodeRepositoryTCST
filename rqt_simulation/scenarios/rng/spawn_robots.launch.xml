@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<arg name="simulator" default="gazebo" /> <!-- forward to robot launch files -->
+
+	<arg name="scenario" value="rng" />
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_0" />
+		<arg name="robot_model" value="ita" />
+		<arg name="color" value="red" />
+		<arg name="initial_pose_x" value="7.0" />
+		<arg name="initial_pose_y" value="23.8" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_1" />
+		<arg name="robot_model" value="tiago_simple" />
+		<arg name="initial_pose_x" value="13.2" />
+		<arg name="initial_pose_y" value="15.2" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_2" />
+		<arg name="robot_model" value="ita" />
+		<arg name="color" value="blue" />
+		<arg name="initial_pose_x" value="19.5" />
+		<arg name="initial_pose_y" value="8.9" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_3" />
+		<arg name="robot_model" value="tiago_simple" />
+		<arg name="initial_pose_x" value="56.0" />
+		<arg name="initial_pose_y" value="10.7" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_4" />
+		<arg name="robot_model" value="ita" />
+		<arg name="color" value="gray" />
+		<arg name="initial_pose_x" value="66.9" />
+		<arg name="initial_pose_y" value="20.6" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_5" />
+		<arg name="robot_model" value="ita" />
+		<arg name="color" value="green" />
+		<arg name="initial_pose_x" value="43.4" />
+		<arg name="initial_pose_y" value="5.0" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+</launch>

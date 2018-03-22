@@ -1,0 +1,40 @@
+x:
+    props: ['n']
+    edges:
+    - {target: x, cost: 0}
+    - target: c
+      label: 'Pick-up Load'
+      cost: 1
+      cond: [['p']]
+    - target: w
+      label: 'Clean'
+      cost: 1
+      cond: [['s']]
+    - target: e
+      label: 'Equip'
+      cost: 1
+      cond: [['p']]
+c: # carries an object
+    props: ['c']
+    edges:
+    - {target: c, cost: 0}
+    - target: x
+      label: 'Drop Load'
+      cost: 1
+      cond: [['s'], ['d']]
+w: # carries waste
+    props: ['w']
+    edges:
+    - {target: w, cost: 0}
+    - target: x
+      label: 'Dispose Waste'
+      cost: 1
+      cond: [['d']]
+e: # special equipment
+    props: ['e']
+    edges:
+    - {target: e, cost: 0}
+    - target: x
+      label: 'Drop Equipment'
+      cost: 1
+      cond: [['d']]

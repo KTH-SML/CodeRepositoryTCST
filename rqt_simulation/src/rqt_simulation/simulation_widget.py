@@ -420,6 +420,11 @@ class SimulationWidget(QWidget):
 
             rospy.loginfo("server up")
 
+        # Publish region marker
+        self.add_region_marker(self.region_of_interest, False)
+        self.add_region_marker(self.initial_pose, True)
+        self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
+
     @Slot(bool)
     def on_button_execute_task_pressed(self):
         print('saved task')

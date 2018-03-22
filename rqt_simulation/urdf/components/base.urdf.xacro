@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="base" params="link mesh *odometryFrame *robotBaseFrame">
+
+		<gazebo>
+			<plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+				<commandTopic>cmd_vel</commandTopic>
+				<odometryTopic>odom</odometryTopic>
+				<odometryRate>20.0</odometryRate>
+				<xacro:insert_block name="odometryFrame" />
+				<xacro:insert_block name="robotBaseFrame" />
+			</plugin>
+		</gazebo>
+
+		<link name="${link}">
+			<!-- the base with the mesh fixed to it -->
+			<visual name="visual_robot">
+				<origin xyz="0 0 0" rpy="0 0 0" />
+				<geometry>
+					<mesh filename="${mesh}" />
+				</geometry>
+				<material name="material_robot" />
+			</visual>
+			<collision>
+				<origin xyz="0 0 0.5" rpy="0 0 0" />
+				<geometry>
+					<cylinder length="1" radius="0.24" />
+				</geometry>
+			</collision>
+			<inertial>
+				<mass value="1"/>
+				<origin xyz="0 0 0"/>
+				<inertia ixx="1" ixy="0.0" ixz="0.0"
+						 iyy="1" iyz="0.0"
+						 izz="1"/>
+			</inertial>
+		</link>
+
+		<!-- joint/transformation definitions -->
+
+		<joint name="joint_base_footprint" type="fixed">
+			<origin xyz="0 0 0.02" />
+			<parent link="base_footprint" />
+			<child link="base_stabilized_roll" />
+		</joint>
+		
+		<!-- the robot_state_publisher only handles 1D joints, so we divide the roll-pitch compensation -->
+		<joint name="joint_base_stabilized_roll" type="fixed">
+			<axis xyz="1 0 0" />
+			<parent link="base_stabilized_roll" />
+			<child link="base_stabilized_pitch" />
+		</joint>
+		<joint name="joint_base_stabilized_pitch" type="fixed">
+			<axis xyz="0 1 0" />
+			<parent link="base_stabilized_pitch" />
+			<child link="${link}" />
+		</joint>
+		<!-- virtual links which which model the roll and pitch movements of the robot -->
+		<link name="base_stabilized_roll">
+			<inertial>
+				<mass value="0.1"/>
+				<origin xyz="0 0 0"/>
+				<inertia ixx="0.01" ixy="0.0" ixz="0.0"
+						 iyy="0.01" iyz="0.0"
+						 izz="0.01"/>
+			</inertial>
+		</link>
+		<link name="base_stabilized_pitch">
+			<inertial>
+				<mass value="0.1"/>
+				<origin xyz="0 0 0"/>
+				<inertia ixx="1" ixy="0.0" ixz="0.0"
+						 iyy="1" iyz="0.0"
+						 izz="1"/>
+			</inertial>
+		</link>
+
+		<!-- just a virtual link which is fixed to the ground plane -->
+		<link name="base_footprint">
+			<inertial>
+				<mass value="0.1"/>
+				<origin xyz="0 0 0"/>
+				<inertia ixx="1" ixy="0.0" ixz="0.0"
+						 iyy="1" iyz="0.0"
+						 izz="1"/>
+			</inertial>
+		</link> 
+
+	</xacro:macro>
+
+</robot>

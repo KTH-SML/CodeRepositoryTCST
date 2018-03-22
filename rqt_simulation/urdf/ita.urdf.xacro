@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!-- created with Phobos 0.7 -->
+<robot name="Robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	
+	<xacro:arg name="color" default="red" /> <!-- Color of the robot mesh -->
+	<xacro:arg name="gpu" default="false" /> <!-- Enables GPU laser plugin -->
+	<xacro:arg name="tf_prefix" default="/" /> <!-- Fix for missing planar move namespacing -->
+
+	<xacro:property name="base_link" value="base_link" />
+	
+	<xacro:include filename="$(find c4r_simulation)/urdf/components/base.urdf.xacro" />
+	<xacro:include filename="$(find c4r_simulation)/urdf/components/lidar.urdf.xacro" />
+	<xacro:include filename="$(find c4r_simulation)/urdf/components/imu.urdf.xacro" />
+	<xacro:include filename="$(find c4r_simulation)/urdf/components/asus.urdf.xacro" />
+	<xacro:include filename="$(find c4r_simulation)/urdf/components/lightring.urdf.xacro" />
+
+
+	<!-- Construct the robot -->
+
+	<xacro:base link="${base_link}" mesh="package://c4r_simulation/meshes/ita_$(arg color).dae">
+		<odometryFrame>$(arg tf_prefix)odom</odometryFrame>
+		<robotBaseFrame>$(arg tf_prefix)base_footprint</robotBaseFrame>
+	</xacro:base>
+
+	<xacro:lidar name="laser" parent="${base_link}" gpu="$(arg gpu)">
+		<origin xyz="0.18 0.0 0.25" rpy="3.14159 0 0" />
+	</xacro:lidar>
+
+	<xacro:imu name="imu" parent="${base_link}">
+		<origin xyz="-0.10 0 0.77" rpy="0 0 -1.5708" />
+	</xacro:imu>
+
+	<xacro:asus name="asus_front" parent="${base_link}">
+		<origin xyz="0.18 0.0 0.72" rpy="0 -0.09 0" />
+	</xacro:asus>
+
+	<xacro:asus name="asus_rear" parent="${base_link}">
+		<origin xyz="-0.18 0 0.6" rpy="0 0 3.14159" />
+	</xacro:asus>
+
+	<xacro:lightring name="lightring" parent="${base_link}">
+		<origin xyz="0 0 0.69" rpy="0 0.13 0" />
+	</xacro:lightring>
+
+</robot>

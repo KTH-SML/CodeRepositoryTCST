@@ -1,0 +1,540 @@
+r01:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 7.88
+  - 4.5200000000000005
+  - 0.0
+r02:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 14.08
+  - 4.58
+  - 0.0
+r03:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 10.92
+  - 6.98
+  - 0.0
+r04:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 4.98
+  - 7.0
+  - 0.0
+r05:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 4.98
+  - 5.04
+  - 0.0
+r06:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 5.1000000000000005
+  - 1.1400000000000001
+  - 0.0
+r07:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 7.96
+  - 0.5
+  - 0.0
+r08:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 10.98
+  - 0.5
+  - 0.0
+r09:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 1.54
+  - 1.4000000000000001
+  - 0.0
+r10:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 2.98
+  - 5.04
+  - 0.0
+r11:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 1.08
+  - 6.58
+  - 0.0
+r12:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 2.72
+  - 8.32
+  - 0.0
+r13:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 7.86
+  - 8.46
+  - 0.0
+r14:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 15.06
+  - 8.48
+  - 0.0
+r15:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  - cost: 1.0
+    target: r12
+  - cost: 1.0
+    target: r13
+  - cost: 1.0
+    target: r14
+  - cost: 1.0
+    target: r15
+  position:
+  - 17.04
+  - 8.6
+  - 0.0

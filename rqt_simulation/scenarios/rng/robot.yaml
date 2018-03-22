@@ -1,0 +1,200 @@
+default:
+  props: [default]
+  description: 'default'
+  edges:
+  - {target: default, cost: 0}
+
+  # pick up printer supplies
+  - target: default
+    label: "Pick up paper"
+    cost: 2
+    cond: ['enable_context and sp and num_paper < 2']
+    effect: ['num_paper += 1']
+  # deliver printer supplies
+  - target: default
+    label: "Deliver paper to printer"
+    cost: 2
+    cond: ['enable_context and p and num_paper > 0 and num_paper_printer < 3']
+    effect: ['num_paper -= 1', 'num_paper_printer += 1']
+
+  # pick up kitchen supplies
+  - target: default
+    label: "Pick up coffee"
+    cost: 2
+    cond: ['enable_context and sk and num_coffee < 1']
+    effect: ['num_coffee += 1']
+  # deliver kitchen supplies
+  - target: default
+    label: "Deliver coffee"
+    cost: 2
+    cond: ['enable_context and k and num_coffee > 0 and num_coffee_kitchen < 1']
+    effect: ['num_coffee -= 1', 'num_coffee_kitchen += 1']
+
+  # docking
+  - target: docked
+    cost: 2
+    cond: [c]
+
+  # pick up full bin
+  - target: fullbin
+    cost: 1
+    cond: [desk]
+  # pick up empty bin
+  - target: emptybin
+    cost: 1
+    cond: [g]
+
+  # begin to guide a person
+  - target: guiding
+    cost: 3
+    cond: [e,desk]
+    command:
+        state_module: ita_signaling_states.change_light_state
+        state_class: ChangeLightState
+        parameter_names: ['add_signals']
+        parameter_values: ['["ConstantGreen"]']
+        outcomes: ['light_changed', 'error']
+        transitions: ['{TARGET}', '{TARGET}']
+
+  # turn camera on
+  - target: camera
+    cost: .5
+    cond: [pub,meeting]
+    command:
+        state_module: ita_signaling_states.change_light_state
+        state_class: ChangeLightState
+        parameter_names: ['add_signals']
+        parameter_values: ['["ConstantYellow"]']
+        outcomes: ['light_changed', 'error']
+        transitions: ['{TARGET}', '{TARGET}']
+
+  # begin to carry a document
+  - target: carrying
+    cost: 1
+    cond: [desk,p]
+    command:
+        state_module: flexbe_states.wait_state
+        state_class: WaitState
+        parameter_names: ['wait_time']
+        parameter_values: ['2.0']
+        outcomes: ['done']
+        transitions: ['{TARGET}']
+
+docked:
+  props: [docked]
+  description: 'docked in charging station'
+  edges:
+  - {target: docked, cost: 0}
+  # charging
+  - target: docked
+    label: 'Charging...'
+    cost: 2
+    cond: ['enable_context and c and battery <= 95']
+    effect: ['battery += 7']
+  # undocking
+  - target: default
+    cost: 1
+    cond: [c]
+
+fullbin:
+  props: [fullbin]
+  description: 'carrying full bin'
+  edges:
+  - {target: fullbin, cost: 0}
+  - target: disposebin
+    cost: 3
+    cond: [g]
+
+emptybin:
+  props: [emptybin]
+  description: 'carrying empty bin'
+  edges:
+  - {target: emptybin, cost: 0}
+  - target: default
+    cost: 1
+    cond: [sb,desk]
+
+disposebin:
+  props: [dispose]
+  description: 'emptying bin'
+  edges:
+  - {target: disposebin, cost: 0}
+  - target: emptybin
+    cost: 0
+    cond: []
+
+guiding:
+  props: [guide]
+  description: 'guiding person'
+  edges:
+  - {target: guiding, cost: 0}
+  - target: default
+    cost: 3
+    cond: [desk,e,meeting]
+    command:
+        state_module: ita_signaling_states.change_light_state
+        state_class: ChangeLightState
+        parameter_names: ['remove_signals']
+        parameter_values: ['["ConstantGreen"]']
+        outcomes: ['light_changed', 'error']
+        transitions: ['{TARGET}', '{TARGET}']
+
+camera:
+  props: [camera]
+  description: 'camera on'
+  edges:
+  - {target: camera, cost: 0}
+  - target: default
+    cost: .5
+    cond: [pub,meeting]
+    command:
+        state_module: ita_signaling_states.change_light_state
+        state_class: ChangeLightState
+        parameter_names: ['remove_signals']
+        parameter_values: ['["ConstantYellow"]']
+        outcomes: ['light_changed', 'error']
+        transitions: ['{TARGET}', '{TARGET}']
+  - target: photo
+    cost: 1
+    command:
+        state_module: ita_tooling_states.record_bag_state
+        state_class: RecordBagState
+        parameter_names: ['bag_name', 'topics', 'record_duration']
+        parameter_values: 
+          - '"~/img_recording_{LOCATION}"'
+          - '["/{ROBOT}/asus_front/rgb/image_raw"]'
+          - '2.0'
+        outcomes: ['done']
+        transitions: ['{TARGET}']
+
+photo:
+  props: [photo,camera]
+  description: 'photo is being taken'
+  edges:
+  - {target: photo, cost: 0}
+  - target: camera
+    cost: .5
+    command:
+        state_module: flexbe_states.log_state
+        state_class: LogState
+        parameter_names: ['text']
+        parameter_values: ['"Image taken and saved to: ~/img_recording_{LOCATION}"']
+        outcomes: ['done']
+        transitions: ['{TARGET}']
+
+carrying:
+  props: [carry]
+  description: 'carrying document'
+  edges:
+  - {target: carrying, cost: 0}
+  - target: default
+    cost: 1
+    cond: [desk,meeting]
+    command:
+        state_module: flexbe_states.wait_state
+        state_class: WaitState
+        parameter_names: ['wait_time']
+        parameter_values: ['2.0']
+        outcomes: ['done']
+        transitions: ['{TARGET}']
+

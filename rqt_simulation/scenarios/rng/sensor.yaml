@@ -1,0 +1,4 @@
+x:
+  props: []
+  edges:
+  - {target: x}

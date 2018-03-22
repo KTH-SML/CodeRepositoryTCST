@@ -10,7 +10,7 @@
     <arg name="color"          default="orange" /> <!-- color arg is ignored -->
 
     <arg name="scenario"       default="pal_office" />
-    <arg name="scenario_path"  default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+    <arg name="scenario_path"  default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
 
     <arg name="public_sim"     value="true" />
     <arg name="robot"          value="steel" />
@@ -68,7 +68,7 @@
 
 
     <!-- Map server-->
-    <arg name="map_file" default="$(find c4r_simulation)/scenarios/$(arg scenario)/map.yaml"/>
+    <arg name="map_file" default="$(find rqt_simulation)/scenarios/$(arg scenario)/map.yaml"/>
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
     <!--  <param name="frame_id" value="/$(arg robot_name)/map"/>-->

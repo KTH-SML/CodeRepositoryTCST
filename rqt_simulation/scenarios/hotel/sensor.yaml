@@ -1,0 +1,13 @@
+x:
+  props: []
+  edges:
+  - {target: x}
+  - target: request
+    probability: .6
+    cond: ['h']
+request:
+  props: ['r']
+  edges:
+  - {target: request}
+  - target: x
+    probability: 1
