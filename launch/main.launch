@@ -7,20 +7,19 @@
 
 	<rosparam param="u_max">[10.0, 6.28]</rosparam>
 	<param name="K" type="int" value="10"/>
-	<param name="n_robots" type="int" value="1"/>
+	<param name="n_robots" type="int" value="2"/>
 
 
 	<!-- controllers: -->
-	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen" >
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" >
 		<remap from="/cmdvel" to="/cmdvel0" />
 		<param name="~robot_id" type="int" value="0"/>
-	</node><!--
+	</node>
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
-		<remap from="/control_input" to="/control_input_robot1" />
-        <remap from="/pose" to ="/pose_robot1" />
+		<remap from="/cmdvel" to="/cmdvel1" />
 		<param name="~robot_id" type="int" value="1"/>
 	</node>
-	
+	<!--
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller2" output="screen">
 		<remap from="/control_input" to="/control_input_robot2" />
         <remap from="/pose" to ="/pose_robot2" />
@@ -29,15 +28,15 @@
 
 
 	<!-- virtual robots -->
-	<node pkg="robot" type="robot_node" name="robot0" output="screen" >
+	<node pkg="robot" type="robot_node" name="robot0" output="screen">
 		<remap from="/control_input" to="/cmdvel0" />
 		<remap from="/pose" to="/pose_robot0" />
-	</node><!--
+	</node>
 	<node pkg="robot" type="robot_node" name="robot1" output="screen" >
-		<remap from="/control_input" to="/control_input_robot1" />
+		<remap from="/control_input" to="/cmdvel1" />
 		<remap from="/pose" to="/pose_robot1" />
 	</node>
-	
+	<!--
 	<node pkg="robot" type="robot_node" name="robot2" output="screen" >
 		<remap from="/control_input" to="/control_input_robot2" />
 		<remap from="/pose" to="/pose_robot2" />
