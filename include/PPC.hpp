@@ -22,6 +22,7 @@ class PPC{
     double a, b;
     std::string formula, formula_type;
     std::vector<std::string> dformula;
+    bool satisfied = false;
 
     FormulaParser<double> rho_fp;
     std::vector<FormulaParser<double>> drho_fp;
@@ -58,6 +59,8 @@ public:
     bool detect(double rho_psi);
 
     void repair(std::vector<double> X, double t);
+
+    bool formula_satisfied(std::vector<double> X, double t);
 };
     
 #endif   

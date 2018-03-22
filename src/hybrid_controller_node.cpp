@@ -66,8 +66,10 @@ public:
 		arma::vec u = prescribed_performance_controller.u(arma::conv_to<std::vector<double>>::from(X), pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
 
 		geometry_msgs::Twist u_msg;
-		u_msg.linear.x = u(0)*1000.0;
-		u_msg.linear.y = u(1)*1000.0;
+		double c = cos(X(robot_id*3+2));
+		double s = sin(X(robot_id*3+2));
+		u_msg.linear.x = (u(0)*c + u(1)*s)*1000.0;
+		u_msg.linear.y = (-u(0)*s + u(1)*c)*1000.0;
 		control_input_pub.publish(u_msg);
 	}
 

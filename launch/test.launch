@@ -1,12 +1,6 @@
 <launch>
 
-	<!--<node name="rosbag" pkg="rosbag" type="record" args="-o $(find hybrid_controller)/bags/ -a"/>-->
-
-	<!-- qualisys: -->
-	<include file="$(find qualisys)/launch/qualisys.launch"/>
-	<include file="$(find qualisys)/launch/qualisys_odom.launch">
-		<arg name="model" value="nexus1" />
-	</include>
+	<node name="rosbag" pkg="rosbag" type="record" args="-o $(find hybrid_controller)/bags/ -a"/>
 
 	<!-- formulas: -->
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
@@ -15,19 +9,14 @@
 
 	<rosparam param="u_max">[0.5, 6.28]</rosparam>
 	<param name="K" type="int" value="10"/>
-
-	<node pkg="rosserial_python" type="serial_node.py" name="rosserial_python" output="screen">
-		<remap from="/cmdvel" to="/cmdvel0" />
-	</node>
-
-
+            
 	<!-- controllers: -->
-	<!--
+
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0">
 		<remap from="/cmdvel" to="/cmdvel0" />
+		<remap from="/pose_robot0" to="/nexus0/pose"/>
 		<param name="~robot_id" type="int" value="0"/>
 	</node>
-	-->
 
 	<!-- virtual robots -->
 	<param name="n_robots" type="int" value="1"/>
