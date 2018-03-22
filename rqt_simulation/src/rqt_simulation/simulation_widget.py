@@ -9,7 +9,7 @@ import yaml
 import codecs
 import roslaunch
 import numpy as np
-from geometry_msgs.msg import Point, Pose, PoseArray
+from geometry_msgs.msg import Point, Pose, PoseArray, PoseStamped
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
 from math import pi
@@ -78,6 +78,12 @@ class SimulationWidget(QWidget):
         self.prefix_plan_subscriber_list = []
         self.sufix_plan_topic_list = []
         self.sufix_plan_subscriber_list = []
+        self.current_goal_topic_list = []
+        self.current_goal_subscriber_list = []
+
+        self.prefix_string = ''
+        self.sufix_string = ''
+        self.current_goal_string = ''
 
         # Initialize GraphicsScene
         self.current_graphicsScene = MapGraphicsScene()
@@ -93,8 +99,6 @@ class SimulationWidget(QWidget):
 
         # Items for displaying FTS
         self.line_dict = {}
-        self.prefix_string = ''
-        self.sufix_string = ''
         self.arrow_list = []
 
         # Load map image
@@ -232,6 +236,20 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_sufix_textbox.insertPlainText(self.sufix_string)
         self.sufix_string = ''
 
+    def goal_callback(self, msg, source):
+        for i in range(0, len(self.region_of_interest)):
+            if self.position_msg_to_tuple(msg.pose.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
+                self.current_goal_string = self.region_of_interest.keys()[i]
+        index = self.current_goal_topic_list.index(source)
+        # Send signal for recieved msg
+        self.current_goal_subscriber_list[index].received.emit(index)
+
+    @pyqtSlot(int)
+    def received_goal(self, index):
+        self.tab_list[index].robot_current_goal_textbox.clear()
+        self.tab_list[index].robot_current_goal_textbox.insertPlainText('Current goal: ')
+        self.tab_list[index].robot_current_goal_textbox.insertPlainText(self.current_goal_string)
+
     @Slot(bool)
     def on_button_RI_pressed(self):
         # Check if map is empty and remove items
@@ -358,8 +376,6 @@ class SimulationWidget(QWidget):
             #wait for the action server to come up
             navigation.wait_for_server()
             del sys.argv[2:len(sys.argv)]
-
-            self.ros_publisher.add_publisher('/' + self.tab_list[i].robot_name + '/label_marker', Marker, 5.0, self.tab_list[i].label_marker_msg)
 
             rospy.loginfo("server up")
 
@@ -488,6 +504,10 @@ class SimulationWidget(QWidget):
 
         self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
         self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
+
+        self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/current_goal')
+        self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], PoseStamped, self.goal_callback))
+        self.current_goal_subscriber_list[self.num_robots-1].received.connect(self.received_goal)
 
         self.green_ellipse_list.append(0)
 

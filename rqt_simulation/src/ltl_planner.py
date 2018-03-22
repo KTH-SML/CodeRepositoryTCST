@@ -107,6 +107,10 @@ def HardTaskCallback(hard_task):
     global hard_task_GUI
     hard_task_GUI = hard_task.data
 
+def navi_goal_state_cb(feedback):
+    global navi_goal_state
+    #print(navigation.get_state())
+
 
 
 def FormatGoal(goal, index, time_stamp):
@@ -267,6 +271,8 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
     global init_pose_GUI
     global soft_task_GUI
     global hard_task_GUI
+    global navi_goal_state
+    global navigation
     active = False
     robot_pose = [None, init_pose]
     human_detected = False
@@ -395,7 +401,7 @@ def planner(ts, init_pose, act, robot_task, robot_name='TIAGo'):
                 else:
                     print 'Robot %s next move is motion to %s' %(str(robot_name), str(next_move))
                     navi_goal = FormatGoal(next_move, planner.index, t)
-                    navigation.send_goal(navi_goal)
+                    navigation.send_goal(navi_goal, feedback_cb=navi_goal_state_cb)
                     print('Goal %s sent to %s.' %(str(next_move), str(robot_name)))
                     ############
                     #success = navigation.wait_for_result(rospy.Duration(60))
