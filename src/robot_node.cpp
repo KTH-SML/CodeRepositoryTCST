@@ -1,7 +1,9 @@
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
 #include "geometry_msgs/PoseStamped.h"
-
+#include <stdlib.h>
+#include <time.h>
+#include <iostream>
 class Robot{
 	ros::Publisher pose_pub;
 	ros::Subscriber control_sub;
@@ -10,7 +12,10 @@ class Robot{
 public:
 	Robot(ros::NodeHandle nh){
 		t_prev = ros::Time::now().toSec();
-		x = y = theta = 0.0;
+		x = y = theta = 0.0; theta = -3.14158/4;
+		srand(getpid() * time(NULL));
+		x = ((double) rand() / (RAND_MAX))*0.1;
+
 		control_sub = nh.subscribe("/control_input", 100, &Robot::controlCallback, this);
 		pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/pose", 100);
 	}
@@ -20,9 +25,11 @@ public:
 		double dt = t - t_prev;
 		t_prev = t;
 
-		x += msg->linear.x*dt*0.001;
-		y += msg->linear.y*dt*0.001;
 		theta += msg->angular.z*dt;
+		double c = cos(theta);
+		double s = sin(theta);
+		x += (msg->linear.x*c - msg->linear.y*s) * dt * 0.001;
+		y += (msg->linear.x*s + msg->linear.y*c) * dt * 0.001;
 	}
 
 	void publish(){
