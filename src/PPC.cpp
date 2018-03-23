@@ -22,8 +22,9 @@ void PPC::init(double t_0, arma::vec x, arma::vec X){
     }
 
     double rho_0 = rho_psi(X_std);
-    rho_max = MAX(0, rho_0) + 1.0; // replace constant 1.0
-    zeta_u = (rho_opt - rho_max)/K;
+    //rho_max = MAX(0, rho_0) + 1.0; // replace constant 1.0
+    rho_max = MAX(0, rho_0) + (rho_opt - MAX(0, rho_0))*0.9;
+    zeta_u = (rho_opt - rho_max)/K; 
     r = rho_max * arma::randu() / 2;
 
     if(formula_type == "G"){
@@ -70,8 +71,9 @@ arma::vec PPC::drho_psi(std::vector<double> X){
     for(int i=0; i<dformula.size(); i++){
         drho(i) = drho_fp[i].value(X);
     }
-    if(!drho.is_finite())
+    if(!drho.is_finite()){
         drho.zeros();
+    }
     return drho;
 }
 
@@ -83,8 +85,10 @@ double PPC::e(std::vector<double> X, double t){
     double epsilon = (rho_psi(X) - rho_max) / gamma(t);
     if(detect(epsilon)){
         if(k++ < K){
-            CriticalEventParam ce; //fill critical event inforamtion before and after repair
+            CriticalEventParam ce;
+            ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
             repair(X, t);
+            ce.r[1] = r; ce.rho_max[1] = rho_max; ce.gamma_0[1] = gamma_0; ce.gamma_inf[1] = gamma_inf; ce.l[1] = l; ce.t_star[1] = t_star;
             criticalEventCallback(ce);
         }
         if(epsilon>=0) epsilon = 0;
@@ -94,6 +98,14 @@ double PPC::e(std::vector<double> X, double t){
 }
 
 arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
+    
+    if(formula_satisfied(X, t-t_0)){
+        satisfied = true;
+    }
+    if(satisfied){
+        return arma::zeros<arma::vec>(3);
+    }
+
     double e_ = e(X, t-t_0);
     arma::vec u_;
     if(std::isinf(e_)){
@@ -144,4 +156,13 @@ void PPC::repair(std::vector<double> X, double t){
     }
 
     gamma_0 = (gamma_tr - gamma_inf)*exp(l*t) + gamma_inf;
+}
+
+bool PPC::formula_satisfied(std::vector<double> X, double t){
+    double rho = rho_psi(X);
+    if(formula_type == "F" && t >= a && t <= b  || formula_type == "G" && t >= b){
+        if( r < rho && rho < rho_max)
+            return true;
+    }
+    return false;
 }

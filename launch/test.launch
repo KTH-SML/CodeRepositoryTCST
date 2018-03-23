@@ -1,0 +1,49 @@
+<launch>
+
+	<node name="rosbag" pkg="rosbag" type="record" args="-o $(find hybrid_controller)/bags/ -a"/>
+
+	<!-- qualisys: -->
+	<include file="$(find qualisys)/launch/qualisys.launch"/>
+
+	<include file="$(find qualisys)/launch/qualisys_odom.launch">
+		<arg name="model" value="nexus0" />
+	</include>
+	
+	<include file="$(find qualisys)/launch/qualisys_odom.launch">
+		<arg name="model" value="nexus1" />
+	</include>
+	
+	<!-- formulas: -->
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives.yaml" />
+
+
+	<rosparam param="u_max">[0.5, 6.28]</rosparam>
+	<param name="K" type="int" value="10"/>
+
+
+	<param name="n_robots" type="int" value="2"/>
+
+	<!-- controllers: -->
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
+		<remap from="/cmdvel" to="/cmdvel0" />
+		<param name="~robot_id" type="int" value="0"/>
+
+		<remap from="/pose_robot0" to="/nexus0/pose"/>
+		<remap from="/pose_robot1" to="/nexus1/pose"/>
+	</node>
+
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
+		<remap from="/cmdvel" to="/cmdvel1" />
+		<param name="~robot_id" type="int" value="1"/>
+
+		<remap from="/pose_robot0" to="/nexus0/pose"/>
+		<remap from="/pose_robot1" to="/nexus1/pose"/>
+	</node>
+
+	<!--
+	<node pkg="rviz" type="rviz" name="rviz" />
+	-->
+	
+</launch>
+
