@@ -8,7 +8,7 @@ import yaml
 import codecs
 import roslaunch
 import numpy as np
-from geometry_msgs.msg import Point, Pose, PoseArray, PoseWithCovarianceStamped, PoseStamped
+from geometry_msgs.msg import Point, Pose, PoseArray, PoseWithCovarianceStamped, PoseStamped, PolygonStamped, PointStamped
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
 
@@ -103,10 +103,14 @@ class RobotTab(QWidget):
         self.label_marker_msg.header.frame_id = '/map'
 
         self.last_current_pose = PoseStamped()
+        self.last_footprint_point = PointStamped()
 
         self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
 
         self.current_pose_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_callback)
+        self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
+
+        self.simulation_started = False
         #self.local_plan_sub
 
         #self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
@@ -115,12 +119,22 @@ class RobotTab(QWidget):
         self.label_marker_msg.header = msg.header
         self.label_marker_msg.pose = msg.pose.pose
         self.label_marker_msg.pose.position.z = 1.0
-        print('got_pose')
-        if  msg.pose.pose != self.last_current_pose.pose:
-            print('now')
+        if msg.pose.pose != self.last_current_pose.pose:
             self.last_current_pose.header = msg.header
-        print((msg.header.stamp - self.last_current_pose.header.stamp).to_sec())
-        if (msg.header.stamp - self.last_current_pose.header.stamp).to_sec() > 5.0:
-            print('now2')
         self.last_current_pose.pose = msg.pose.pose
+
+    def local_footprint_callback(self, msg):
+        if self.simulation_started:
+            msg_point_rounded = Point()
+            msg_point_rounded.x = round(msg.polygon.points[0].x, 3)
+            msg_point_rounded.y = round(msg.polygon.points[0].y, 3)
+            msg_point_rounded.z = round(msg.polygon.points[0].z, 3)
+
+            if msg_point_rounded != self.last_footprint_point.point:
+                self.last_footprint_point.header = msg.header
+            if (msg.header.stamp - self.last_footprint_point.header.stamp).to_sec() > 5.0:
+                print('clear')
+
+            self.last_footprint_point.point = msg_point_rounded
+        #print(self.last_footprint_point)
 

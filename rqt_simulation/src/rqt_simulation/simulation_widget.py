@@ -243,6 +243,7 @@ class SimulationWidget(QWidget):
         index = self.current_goal_topic_list.index(source)
         # Send signal for recieved msg
         self.current_goal_subscriber_list[index].received.emit(index)
+        self.tab_list[index].simulation_started = True
 
     @pyqtSlot(int)
     def received_goal(self, index):
