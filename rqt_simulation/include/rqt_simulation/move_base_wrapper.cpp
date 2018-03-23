@@ -5,6 +5,8 @@
 #include <ros/serialization.h>
 
 #include <std_srvs/Empty.h>
+
+#include <move_base/move_base.h>
 //#include <std_msgs/Int64.h>
 
 /* Read a ROS message from a serialized string.
@@ -49,9 +51,15 @@ public:
 
   std::string clearCostmapsService(const std::string& str_req, const std::string& str_resp)
   {
-    nav_msgs::GetPlan::Request req = from_python<nav_msgs::GetPlan::Request>(str_req);
-    nav_msgs::GetPlan::Response resp = from_python<nav_msgs::GetPlan::Response>(str_resp);
+    std_srvs::Empty::Request req = from_python<std_srvs::Empty::Request>(str_req);
+    std_srvs::Empty::Response resp = from_python<std_srvs::Empty::Response>(str_resp);
 
+    return to_python(true);
   }
 
+};
+
+BOOST_PYTHON_MODULE(_move_base_wrapper_cpp)
+{
+  boost::python::class_<MoveBaseWrapper>("MoveBaseWrapper", boost::python::init<>()).def("clearCostmapsService", &MoveBaseWrapper::clearCostmapsService);
 }

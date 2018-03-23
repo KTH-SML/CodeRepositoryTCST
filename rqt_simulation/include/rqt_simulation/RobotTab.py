@@ -11,6 +11,7 @@ import numpy as np
 from geometry_msgs.msg import Point, Pose, PoseArray, PoseWithCovarianceStamped, PoseStamped, PolygonStamped, PointStamped
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
+from std_srvs.srv import Empty
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser
@@ -20,6 +21,11 @@ from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, 
 from rqt_simulation.ROS_Publisher import ROS_Publisher
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
+
+import actionlib
+from actionlib import SimpleActionClient
+from actionlib_msgs.msg import GoalStatus
+from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal, MoveBaseGoal
 
 class RobotTab(QWidget):
     def __init__(self, num_robots):
@@ -111,17 +117,17 @@ class RobotTab(QWidget):
         self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
 
         self.simulation_started = False
+
+        self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
         #self.local_plan_sub
 
-        #self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
+        self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
+        self.robot_current_goal = MoveBaseActionGoal()
 
     def current_pose_callback(self, msg):
         self.label_marker_msg.header = msg.header
         self.label_marker_msg.pose = msg.pose.pose
         self.label_marker_msg.pose.position.z = 1.0
-        if msg.pose.pose != self.last_current_pose.pose:
-            self.last_current_pose.header = msg.header
-        self.last_current_pose.pose = msg.pose.pose
 
     def local_footprint_callback(self, msg):
         if self.simulation_started:
@@ -132,9 +138,13 @@ class RobotTab(QWidget):
 
             if msg_point_rounded != self.last_footprint_point.point:
                 self.last_footprint_point.header = msg.header
+
             if (msg.header.stamp - self.last_footprint_point.header.stamp).to_sec() > 5.0:
                 print('clear')
-
+                self.clear_costmap()
+                #self.robot_current_goal.header.stamp = rospy.Time.now()
+                self.move_base_ac.send_goal(self.robot_current_goal.goal)
+                self.last_footprint_point.header = msg.header
             self.last_footprint_point.point = msg_point_rounded
         #print(self.last_footprint_point)
 

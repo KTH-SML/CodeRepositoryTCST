@@ -34,7 +34,7 @@ from ltl_tools.ts import MotionFts, ActionModel, MotActModel
 import actionlib
 from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal, MoveBaseGoal
 
 from pyquaternion import Quaternion
 
@@ -238,11 +238,12 @@ class SimulationWidget(QWidget):
 
     def goal_callback(self, msg, source):
         for i in range(0, len(self.region_of_interest)):
-            if self.position_msg_to_tuple(msg.pose.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
+            if self.position_msg_to_tuple(msg.goal.target_pose.pose.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
                 self.current_goal_string = self.region_of_interest.keys()[i]
         index = self.current_goal_topic_list.index(source)
         # Send signal for recieved msg
         self.current_goal_subscriber_list[index].received.emit(index)
+        self.tab_list[index].robot_current_goal = msg
         self.tab_list[index].simulation_started = True
 
     @pyqtSlot(int)
@@ -506,8 +507,8 @@ class SimulationWidget(QWidget):
         self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
         self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
 
-        self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/current_goal')
-        self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], PoseStamped, self.goal_callback))
+        self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/goal')
+        self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], MoveBaseActionGoal, self.goal_callback))
         self.current_goal_subscriber_list[self.num_robots-1].received.connect(self.received_goal)
 
         self.green_ellipse_list.append(0)

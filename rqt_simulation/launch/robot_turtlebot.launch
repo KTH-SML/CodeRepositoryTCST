@@ -52,8 +52,8 @@
       <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
     </node>
 
-    <!-- TF lookup
-    <node pkg="tf_lookup" type="tf_lookup" name="tf_lookup" output="screen"/>-->
+    <!-- TF lookup -->
+    <node pkg="tf_lookup" type="tf_lookup" name="tf_lookup" output="screen"/>
 
     <!-- Fake laser -->
     <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
