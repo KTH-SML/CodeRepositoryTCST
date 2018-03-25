@@ -23,7 +23,6 @@
   <run_depend>rqt_gui_py</run_depend>
   <run_depend>c4r_simulation</run_depend>
   <run_depend>geometry_msgs</run_depend>
-  <run_depend>sim_GUI</run_depend>
 
   <export>
     <rqt_gui plugin="${prefix}/plugin.xml"/>

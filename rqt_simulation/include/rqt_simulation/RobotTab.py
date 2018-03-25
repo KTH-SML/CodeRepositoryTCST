@@ -5,6 +5,7 @@ import sys
 import rospy
 import rospkg
 import yaml
+import time
 import codecs
 import roslaunch
 import numpy as np
@@ -14,7 +15,7 @@ from std_msgs.msg import Bool, String
 from std_srvs.srv import Empty
 
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser
+from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser, QPushButton
 from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
 from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QTransform, QFont
 
@@ -82,6 +83,10 @@ class RobotTab(QWidget):
         self.robot_current_goal_textbox = QTextBrowser()
         self.layout.addWidget(self.robot_current_goal_textbox)
 
+        self.robot_resend_goal_button = QPushButton('Clear costmap')
+        self.layout.addWidget(self.robot_resend_goal_button)
+
+
         self.setLayout(self.layout)
 
         self.init_pose_msg = Pose()
@@ -119,7 +124,7 @@ class RobotTab(QWidget):
         self.simulation_started = False
 
         self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
-        #self.local_plan_sub
+        self.robot_resend_goal_button.clicked.connect(self.call_clear_costmap_srvs)
 
         self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
         self.robot_current_goal = MoveBaseActionGoal()
@@ -142,9 +147,18 @@ class RobotTab(QWidget):
             if (msg.header.stamp - self.last_footprint_point.header.stamp).to_sec() > 5.0:
                 print('clear')
                 self.clear_costmap()
-                #self.robot_current_goal.header.stamp = rospy.Time.now()
+                usleep = lambda x: time.sleep(x)
+                usleep(1)
                 self.move_base_ac.send_goal(self.robot_current_goal.goal)
                 self.last_footprint_point.header = msg.header
             self.last_footprint_point.point = msg_point_rounded
         #print(self.last_footprint_point)
+
+    @Slot(bool)
+    def call_clear_costmap_srvs(self):
+        self.clear_costmap()
+        usleep = lambda x: time.sleep(x)
+        usleep(1)
+        self.move_base_ac.send_goal(self.robot_current_goal.goal)
+        print('Costmap cleared')
 

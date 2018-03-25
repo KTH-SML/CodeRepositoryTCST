@@ -244,7 +244,6 @@ class SimulationWidget(QWidget):
         # Send signal for recieved msg
         self.current_goal_subscriber_list[index].received.emit(index)
         self.tab_list[index].robot_current_goal = msg
-        self.tab_list[index].simulation_started = True
 
     @pyqtSlot(int)
     def received_goal(self, index):
@@ -474,6 +473,8 @@ class SimulationWidget(QWidget):
         start_msg = Bool()
         start_msg.data = True
         self.start_publisher.publish(start_msg)
+        for i in range(0, self.num_robots):
+            self.tab_list[i].simulation_started = True
 
     def position_msg_to_tuple(self, position_msg):
         position = (position_msg.x, position_msg.y, position_msg.z)
@@ -520,6 +521,8 @@ class SimulationWidget(QWidget):
         if self.num_robots > 1:
             self.num_robots = self.num_robots - 1
 
+            del self.current_goal_topic_list[self.num_robots]
+            del self.current_goal_subscriber_list[self.num_robots]
             del self.prefix_plan_subscriber_list[self.num_robots]
             del self.sufix_plan_subscriber_list[self.num_robots]
             del self.prefix_plan_topic_list[self.num_robots]
@@ -531,11 +534,12 @@ class SimulationWidget(QWidget):
                 #self.ellipse_items_RI[self.green_ellipse_list[self.num_robots]].setBrush(QBrush(QColor('red')))
             del self.green_ellipse_list[self.num_robots]
 
-            for i in range(0, len(self.region_list)):
-                if i in self.green_ellipse_list:
-                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
-                else:
-                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
+            if self.region_list > 0:
+                for i in range(0, len(self.region_list)):
+                    if i in self.green_ellipse_list:
+                        self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
+                    else:
+                        self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
 
             self.tabWidget.removeTab(self.num_robots)
             del self.tab_list[self.num_robots]

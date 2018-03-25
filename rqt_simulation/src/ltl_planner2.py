@@ -121,6 +121,7 @@ class LtlPlannerNode(object):
                 self.navi_goal = self.FormatGoal(self.next_move, self.planner.index, t)
                 self.navigation.send_goal(self.navi_goal)
                 print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
+                print(self.planner.index)
 
     def GetInitPoseCallback(self, pose):
         self.init_pose = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w))
