@@ -14,10 +14,9 @@ source ~/tiago_public_ws/devel/setup.$shell
 export TURTLEBOT_BASE=kobuki
 echo "TURTLEBOT_BASE set to $TURTLEBOT_BASE"
 
-export ROS_MASTER_URI=http://192.168.221.:11311
+export ROS_MASTER_URI=http://sml06:11311
 echo "ROS_MASTER_URI set to $ROS_MASTER_URI"
 
-echo "TURTLEBOT_BASE set to $TURTLEBOT_BASE"
 export TURTLEBOT_STACKS=hexagons
 echo "TURTLEBOT_STACKS set to $TURTLEBOT_STACKS"
 export TURTLEBOT_3D_SENSOR=astra

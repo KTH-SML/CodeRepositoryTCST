@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="simulator"      default="gazebo" />
+    <arg name="robot_name"     default="robot" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+    <arg name="color"          default="orange" /> <!-- color arg is ignored -->
+
+    <arg name="scenario"       default="pal_office" />
+    <arg name="scenario_path"  default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+
+    <arg name="public_sim"     value="true" />
+    <arg name="robot"          value="steel" />
+
+    <arg name="planner"        value="base"/>
+    <arg name="global_planner" value="navfn"/>
+    <arg name="local_planner"  value="eband"/>
+    <arg name="localization"   value="amcl"/>
+
+    <arg name="gzpose" value="-x $(arg initial_pose_x) -y $(arg initial_pose_y) -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
+    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 /map $(arg robot_name)/map 100"/>
+
+    <!-- Write the pose in the pose.yaml used by amcl -->
+    <node pkg="tiago_multi" type="pose_writing.sh" name="multi_pose_writing"
+          args="$(arg robot_name) $(arg initial_pose_x) $(arg initial_pose_y)" output="screen"/>
+
+    <!-- spawn robot in simulation -->
+    <include file="$(find tiago_gazebo)/launch/tiago_spawn.launch">
+        <arg name="robot"  value="$(arg robot)"/>
+        <arg name="gzpose" value="$(arg gzpose)"/>
+        <arg name="multi"  value="multiple:=true namespace:=$(arg robot_name)"/>
+        <arg name="model_name" value="$(arg robot_name)_$(arg robot)"/>
+    </include>
+
+
+    <!-- bring up robot -->
+    <include file="$(find tiago_gazebo)/launch/simulation_tiago_bringup.launch">
+        <arg name="robot"       value="$(arg robot)"/>
+        <arg name="public_sim"  value="$(arg public_sim)"/>
+        <arg name="tf_prefix" value="$(arg robot_name)"/>
+    </include>
+
+    <!-- navigation component -->
+    <include file="$(find tiago_2dnav)/launch/navigation.launch">
+        <arg name="state"          value="localization"/>
+        <arg name="planner"        value="$(arg planner)"/>
+        <arg name="global_planner" value="$(arg global_planner)"/>
+        <arg name="local_planner"  value="$(arg local_planner)"/>
+        <arg name="localization"   value="$(arg localization)"/>
+        <arg name="map"            value="$(arg scenario_path)"/>
+        <arg name="public_sim"     value="$(arg public_sim)"/>
+        <arg name="tf_prefix"      value="$(arg robot_name)"/>
+        <arg name="multiple"       value="true"/>
+    </include>
+
+    <group if="$(arg public_sim)">
+        <node name="relay_map" pkg="topic_tools" type="relay" args="map vo_map"/>
+    </group>
+
+    <node name="tuck_arm" pkg="tiago_gazebo" type="tuck_arm.py" output="screen"/>
+             
+</launch>

@@ -1,0 +1,45 @@
+# initial planning value for context variables
+init:
+    battery: 100
+    num_coffee: 0
+    num_paper: 0
+
+    num_coffee_kitchen: 0
+    num_paper_printer: 0
+
+    enable_context: True
+
+
+# list of all context variables which are independent for each robot
+# (need to be mentioned at init)
+independent:
+  - battery
+  - num_coffee
+  - num_paper
+
+
+# function(g,b)
+# g - good
+# b - bad
+# return True if g is better than b
+compare:
+    battery: g > b
+    num_coffee: g > b
+    num_paper: g > b
+
+    num_coffee_kitchen: g > b
+    num_paper_printer: g > b
+
+
+# function(v,c)
+# v - value
+# c - cost
+# reflect implicit cost dependency of v
+# return new value of v modified based on c
+cost:
+    battery: v - 1*c
+
+
+# context variables solely calculated from other context variables
+derived:
+    carrying: num_coffee + num_paper > 0

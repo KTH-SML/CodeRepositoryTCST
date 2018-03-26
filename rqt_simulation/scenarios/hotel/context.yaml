@@ -1,0 +1,30 @@
+# initial planning value for context variables
+init:
+   battery: 100
+   drinks_s1: 10
+   drinks_s2: 10
+
+# list of all context variables which are independent for each robot
+# (need to be mentioned at init)
+independent: [battery]
+
+# function(g,b)
+# g - good
+# b - bad
+# return True if g is better than b
+compare:
+    battery: g > b    # the more the better
+    drinks_s1: g > b
+    drinks_s2: g > b
+
+# function(v,c)
+# v - value
+# c - cost
+# reflect implicit cost dependency of v
+# return new value of v modified based on c
+cost:
+    battery: v - 3*c    # battery decays proportional to costs
+
+# context variables solely calculated from other context variables
+derived:
+    powered: battery > 0

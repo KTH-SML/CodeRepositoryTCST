@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+    
+    <param name="use_sim_time" value="true"/>
+
+    <arg name="robot_name" default="robot" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+    <arg name="robot_model" default="ita" />
+    <arg name="color" default="red" />
+
+    <!-- Spawn robot in simulation -->
+    <rosparam subst_value="true" ns="/stage_objs/$(arg robot_name)">
+        model_type: robot
+        pose: [$(arg initial_pose_x), $(arg initial_pose_y), 0, $(arg initial_pose_a)]
+        color: $(arg color)
+    </rosparam>
+
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find rqt_simulation)/urdf/$(arg robot_model).urdf.xacro' color:=$(arg color) tf_prefix:=$(arg robot_name)/" />
+       
+</launch>

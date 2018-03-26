@@ -1,0 +1,94 @@
+bin:
+    system: 'R1,R2,R3,R4,R5'
+    initial_condition: 'M02.default.x, M13.default.x, M54.default.x, M43.default.x, M38.default.x ; enable_context: False'
+    goal: '
+      F(d5 & default & X((carrybin U dispose) & F default)) &
+      F(d5 & emptybin & X (d5 & default)) &
+      G(fullbin -> !pub)'
+    valid: True
+    cost: 65.7
+
+supplies:
+    system: 'R1,R2,R3,R4,R5,R6'
+    initial_condition: 'M02.default.x, M13.default.x, M54.default.x, M43.default.x, M38.default.x, M45.default.x'
+    goal: 'F "num_paper_printer >= 2" & F "num_coffee_kitchen == 1" & G "battery > 20"'
+    valid: True
+    cost: 49.4
+
+supplies_reduced:
+    system: 'R1,R2,R3,R4,R5,R6'
+    initial_condition: '
+      M02.default.x(battery:100),
+      M13.default.x(battery:70),
+      M54.default.x(battery:100),
+      M43.default.x(battery:60),
+      M38.default.x(battery:60),
+      M45.default.x(battery:100)'
+    goal: 'F "num_paper_printer >= 2" & F "num_coffee_kitchen == 1" & G "battery > 20"'
+    valid: True
+    cost: 58.9
+
+printer:
+    system: 'R1,R2,R3,R4,R5,R6'
+    initial_condition: 'M02.default.x, M13.default.x, M54.default.x, M43.default.x, M38.default.x, M45.default.x'
+    goal: '
+      F (p & carry U (d10 & X ! carry)) &
+      F (p & carry U (d7 & X ! carry)) &
+      F (p & carry U (d5 & X ! carry)) &
+      G (carry -> ! pub) &
+      F "num_paper_printer > 0"'
+    valid: True
+    cost: 50.9
+
+printer_comb:
+    system: 'R1'
+    initial_condition: 'M02.default.x'
+    goal: '
+      F (p & carry U (d10 & X ! carry)) & G (carry -> ! pub),
+      F (p & carry U (d7 & X ! carry)) & G (carry -> ! pub),
+      F (p & carry U (d5 & X ! carry)) & G (carry -> ! pub),
+      F "num_paper_printer > 0"'
+    valid: True
+    combinations: True
+
+video_real:
+    system: 'mimo,c3bo'
+    initial_condition: 'M02.default.x, M13.default.x ; enable_context: False'
+    goal: '
+      F (m1 & photo) & F (m4 & photo) & F (m6 & photo) & G (! meeting -> ! camera),
+      F (d5 & carry U (d3 & X ! carry)) & G (carry -> ! pub),
+      F (d11 & guide U (m6 & X ! guide))'
+    valid: True
+    cost: 126.0
+
+video_sim:
+    system: 'R1,R2,R3,R4,R5,R6'
+    initial_condition: 'M02.default.x, M13.default.x, M54.default.x, M43.default.x, M38.default.x, M45.default.x ; enable_context: False'
+    goal: '
+      F (m1 & photo) & F (m4 & photo) & F (m6 & photo) & G (! meeting -> ! camera),
+      F (d5 & carry U (d3 & X ! carry)) & G (carry -> ! pub),
+      F (d11 & guide U (m6 & X ! guide))'
+    valid: True
+    cost: 61.5
+
+video_comb:
+    system: 'R1'
+    initial_condition: 'M02.default.x ; enable_context:False'
+    goal: '
+      F (m1 & photo) & G (! meeting -> ! camera),
+      F (m4 & photo) & G (! meeting -> ! camera),
+      F (m6 & photo) & G (! meeting -> ! camera),
+      F (d5 & carry U (d3 & X ! carry)) & G (carry -> ! pub),
+      F (d11 & guide U (m6 & X ! guide))'
+    valid: True
+    combinations: True
+
+guide:
+    system: 'R1,R2,R3,R4,R5,R6'
+    initial_condition: 'M02.default.x, M13.default.x, M54.default.x, M43.default.x, M38.default.x, M45.default.x ; enable_context: False'
+    goal: '
+      F (e & guide U (m4 & X ! guide)) & F (d11 & guide U (m6 & X ! guide))'
+    valid: True
+    cost: 52.52
+
+

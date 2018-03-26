@@ -9,7 +9,7 @@ import yaml
 import codecs
 import roslaunch
 import numpy as np
-from geometry_msgs.msg import Point, Pose, PoseArray
+from geometry_msgs.msg import Point, Pose, PoseArray, PoseStamped
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
 from math import pi
@@ -34,7 +34,7 @@ from ltl_tools.ts import MotionFts, ActionModel, MotActModel
 import actionlib
 from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal, MoveBaseGoal
 
 from pyquaternion import Quaternion
 
@@ -78,6 +78,12 @@ class SimulationWidget(QWidget):
         self.prefix_plan_subscriber_list = []
         self.sufix_plan_topic_list = []
         self.sufix_plan_subscriber_list = []
+        self.current_goal_topic_list = []
+        self.current_goal_subscriber_list = []
+
+        self.prefix_string = ''
+        self.sufix_string = ''
+        self.current_goal_string = ''
 
         # Initialize GraphicsScene
         self.current_graphicsScene = MapGraphicsScene()
@@ -93,8 +99,6 @@ class SimulationWidget(QWidget):
 
         # Items for displaying FTS
         self.line_dict = {}
-        self.prefix_string = ''
-        self.sufix_string = ''
         self.arrow_list = []
 
         # Load map image
@@ -231,6 +235,21 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_sufix_textbox.insertPlainText('Sufix: ')
         self.tab_list[index].robot_sufix_textbox.insertPlainText(self.sufix_string)
         self.sufix_string = ''
+
+    def goal_callback(self, msg, source):
+        for i in range(0, len(self.region_of_interest)):
+            if self.position_msg_to_tuple(msg.goal.target_pose.pose.position) == self.region_of_interest[self.region_of_interest.keys()[i]]['pose']['position']:
+                self.current_goal_string = self.region_of_interest.keys()[i]
+        index = self.current_goal_topic_list.index(source)
+        # Send signal for recieved msg
+        self.current_goal_subscriber_list[index].received.emit(index)
+        self.tab_list[index].robot_current_goal = msg
+
+    @pyqtSlot(int)
+    def received_goal(self, index):
+        self.tab_list[index].robot_current_goal_textbox.clear()
+        self.tab_list[index].robot_current_goal_textbox.insertPlainText('Current goal: ')
+        self.tab_list[index].robot_current_goal_textbox.insertPlainText(self.current_goal_string)
 
     @Slot(bool)
     def on_button_RI_pressed(self):
@@ -418,6 +437,11 @@ class SimulationWidget(QWidget):
 
             rospy.loginfo("server up")
 
+        # Publish region marker
+        self.add_region_marker(self.region_of_interest, False)
+        self.add_region_marker(self.initial_pose, True)
+        self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
+
     @Slot(bool)
     def on_button_execute_task_pressed(self):
         print('saved task')
@@ -449,6 +473,8 @@ class SimulationWidget(QWidget):
         start_msg = Bool()
         start_msg.data = True
         self.start_publisher.publish(start_msg)
+        for i in range(0, self.num_robots):
+            self.tab_list[i].simulation_started = True
 
     def position_msg_to_tuple(self, position_msg):
         position = (position_msg.x, position_msg.y, position_msg.z)
@@ -482,6 +508,10 @@ class SimulationWidget(QWidget):
         self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
         self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
 
+        self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/goal')
+        self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], MoveBaseActionGoal, self.goal_callback))
+        self.current_goal_subscriber_list[self.num_robots-1].received.connect(self.received_goal)
+
         self.green_ellipse_list.append(0)
 
 
@@ -491,6 +521,8 @@ class SimulationWidget(QWidget):
         if self.num_robots > 1:
             self.num_robots = self.num_robots - 1
 
+            del self.current_goal_topic_list[self.num_robots]
+            del self.current_goal_subscriber_list[self.num_robots]
             del self.prefix_plan_subscriber_list[self.num_robots]
             del self.sufix_plan_subscriber_list[self.num_robots]
             del self.prefix_plan_topic_list[self.num_robots]
@@ -502,11 +534,12 @@ class SimulationWidget(QWidget):
                 #self.ellipse_items_RI[self.green_ellipse_list[self.num_robots]].setBrush(QBrush(QColor('red')))
             del self.green_ellipse_list[self.num_robots]
 
-            for i in range(0, len(self.region_list)):
-                if i in self.green_ellipse_list:
-                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
-                else:
-                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
+            if self.region_list > 0:
+                for i in range(0, len(self.region_list)):
+                    if i in self.green_ellipse_list:
+                        self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
+                    else:
+                        self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
 
             self.tabWidget.removeTab(self.num_robots)
             del self.tab_list[self.num_robots]

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<arg name="simulator" default="gazebo" /> <!-- forward to robot launch files -->
+
+	<arg name="scenario" value="kth" />
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_0" />
+		<arg name="robot_model" value="ita" />
+		<arg name="color" value="red" />
+		<arg name="initial_pose_x" value="28.7" />
+		<arg name="initial_pose_y" value="6.7" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_1" />
+		<arg name="color" value="green" />
+		<arg name="initial_pose_x" value="35.2" />
+		<arg name="initial_pose_y" value="5.9" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+	<include file="$(find c4r_simulation)/launch/robot.launch">
+		<arg name="simulator" value="$(arg simulator)" />
+		<arg name="robot_name" value="robot_2" />
+		<arg name="robot_model" value="tiago_simple" />
+		<arg name="initial_pose_x" value="31.0" />
+		<arg name="initial_pose_y" value="8.0" />
+		<arg name="initial_pose_a" value="0.0" />
+	</include>
+
+</launch>

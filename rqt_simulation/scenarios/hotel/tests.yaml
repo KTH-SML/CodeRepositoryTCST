@@ -1,0 +1,33 @@
+room_service:
+    system: 'R1,R2,R3'
+    initial_condition: 'M01.x.x, M13.x.x, M20.x.x'
+    goal: 'F (h1 & c & X !c) & F (h2 & c & X !c) & F (h3 & c & X !c) & F (h4 & c & X !c) & G(c -> !p)'
+    valid: True
+    cost: 29
+room_service_constraints:
+    system: 'R1,R2,R3'
+    initial_condition: 'M01.x.x(battery:65), M13.x.x(battery:58), M20.x.x(battery:53) ; drinks_s1:2'
+    goal: 'F (h1 & c & X !c) & F (h2 & c & X !c) & F (h3 & c & X !c) & F (h4 & c & X !c) & G "battery > 0"'
+    valid: True
+    cost: 42
+
+greet_simple:
+    system: 'R1,R2,R3'
+    initial_condition: 'M01.x.x(battery:65), M13.x.x(battery:58), M20.x.x(battery:53)'
+    goal: 'F p & G "battery > 20"'
+    valid: True
+    cost: 3
+luggage_service:
+    system: 'R1,R2,R3'
+    initial_condition: 'M01.x.x(battery:65), M13.x.x(battery:58), M20.x.x(battery:53)'
+    goal: 'F (l & F h6) & G "battery > 20"'
+    valid: True
+    cost: 47
+
+room_service_reactive:
+    system: 'R1,R2'
+    initial_condition: 'M01.x.x, M13.x.x'
+    goal: 'F (h1 & F s) & G ((h1 & r) -> F(h1 & c & X ! c & F s)), F (h2 & F s) & G ((h2 & r) -> F(h2 & c & X ! c & F s))'
+    valid: True
+    cost: 23
+    simulate: random #interactive

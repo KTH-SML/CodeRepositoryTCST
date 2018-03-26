@@ -1,0 +1,120 @@
+r01:
+  edges:
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r10
+  - cost: 1.0
+    target: r11
+  position:
+  - -7.0
+  - -2.1
+  - 0.0
+r02:
+  edges:
+  - cost: 1.0
+    target: r01
+  position:
+  - -5.2
+  - -8.8
+  - 0.0
+r03:
+  edges: []
+  position:
+  - -0.35000000000000003
+  - -7.8500000000000005
+  - 0.0
+r04:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r11
+  position:
+  - -2.15
+  - -1.35
+  - 0.0
+r05:
+  edges:
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r06
+  - cost: 1.0
+    target: r08
+  position:
+  - 3.35
+  - -0.1
+  - 0.0
+r06:
+  edges:
+  - cost: 1.0
+    target: r05
+  position:
+  - 4.8500000000000005
+  - -7.0
+  - 0.0
+r07:
+  edges:
+  - cost: 1.0
+    target: r09
+  position:
+  - 8.700000000000001
+  - -7.25
+  - 0.0
+r08:
+  edges:
+  - cost: 1.0
+    target: r05
+  - cost: 1.0
+    target: r09
+  - cost: 1.0
+    target: r12
+  position:
+  - 7.2
+  - 0.65
+  - 0.0
+r09:
+  edges:
+  - cost: 1.0
+    target: r07
+  - cost: 1.0
+    target: r08
+  position:
+  - 7.45
+  - -3.9000000000000004
+  - 0.0
+r10:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r11
+  position:
+  - -10.350000000000001
+  - -0.30000000000000004
+  - 0.0
+r11:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r04
+  - cost: 1.0
+    target: r10
+  position:
+  - -5.25
+  - 5.050000000000001
+  - 0.0
+r12:
+  edges:
+  - cost: 1.0
+    target: r08
+  position:
+  - 7.9
+  - 7.1000000000000005
+  - 0.0

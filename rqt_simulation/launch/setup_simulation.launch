@@ -3,7 +3,7 @@
 <launch>
 
 	<arg name="scenario" default="pal_office" />
-	<arg name="scenario_path" default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+	<arg name="scenario_path" default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
 
 	<arg name="headless" default="false" />
 	<arg name="rviz" default="auto_gen" /> <!-- see config folder -->
@@ -16,7 +16,7 @@
 
 
 	<!-- Set up World -->
-	<include file="$(find c4r_simulation)/launch/$(arg simulator)_world.launch">
+	<include file="$(find rqt_simulation)/launch/$(arg simulator)_world.launch">
 		<arg name="world" value="$(arg scenario)" />
 		<arg name="headless" value="$(arg headless)" />
 	</include>

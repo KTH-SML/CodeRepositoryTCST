@@ -10,7 +10,7 @@
     <arg name="color"          default="orange" /> <!-- color arg is ignored -->
 
     <arg name="scenario"       default="pal_office" />
-    <arg name="scenario_path"  default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+    <arg name="scenario_path"  default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
 
     <arg name="public_sim"     value="true" />
     <arg name="robot"          value="steel" />
@@ -52,8 +52,9 @@
       <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
     </node>
 
-    <!-- TF lookup
-    <node pkg="tf_lookup" type="tf_lookup" name="tf_lookup" output="screen"/>-->
+    <!-- TF lookup 
+    <node pkg="tf_lookup" type="tf_lookup" name="tf_lookup" output="screen"/>
+    -->
 
     <!-- Fake laser -->
     <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
@@ -68,10 +69,10 @@
 
 
     <!-- Map server-->
-    <arg name="map_file" default="$(find c4r_simulation)/scenarios/$(arg scenario)/map.yaml"/>
+    <arg name="map_file" default="$(find rqt_simulation)/scenarios/$(arg scenario)/map.yaml"/>
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
-    <!--  <param name="frame_id" value="/$(arg robot_name)/map"/>-->
+      <param name="frame_id" value="/$(arg robot_name)/map"/>
     </node>
 
     <!-- Localization -->
@@ -105,11 +106,12 @@
    <arg name="global_frame_id" default="$(arg robot_name)/map"/>
    <arg name="odom_topic" default="odom" />
    <arg name="laser_topic" default="scan" />
+   <arg name="map_topic" default="map" />
    <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/dummy.yaml"/>
 
    <node pkg="move_base" type="move_base" respawn="false" name="move_base" clear_params="true" output="screen">
-     <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-     <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+     <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="global_costmap" />
+     <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="local_costmap" />
      <rosparam file="$(find rqt_simulation)/config/planner/local_costmap_params.yaml" command="load" />
      <rosparam file="$(find turtlebot_navigation)/param/global_costmap_params.yaml" command="load" />
      <rosparam file="$(find rqt_simulation)/config/planner/dwa_local_planner_params.yaml" command="load" />
@@ -132,6 +134,7 @@
      <remap from="cmd_vel" to="navigation_velocity_smoother/raw_cmd_vel"/>
      <remap from="odom" to="$(arg odom_topic)"/>
      <remap from="scan" to="$(arg laser_topic)"/>
+     <remap from="map" to="$(arg map_topic)"/>
    </node>
 
 <!--

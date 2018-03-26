@@ -1,0 +1,6 @@
+default:
+  props: [default]
+  description: 'default'
+  edges:
+  - {target: default, cost: 0}
+

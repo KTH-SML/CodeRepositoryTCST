@@ -46,14 +46,14 @@ class RVIZFileGenerator:
             self.add_robot(robot_list[i])
 
         # Region of interest marker
-        self.vis_manager_displays.append({   'Class' : 'rviz/MarkerArray',
-                                        'Enabled' : True,
-                                        'Marker Topic' : '/region_of_interest',
-                                        'Name' : 'MarkerArray',
-                                        'Namespaces' : {
-                                          "" : True },
-                                        'Queue Size' : 100,
-                                        'Value' : True })
+        self.vis_manager_displays.append({  'Class' : 'rviz/MarkerArray',
+                                            'Enabled' : True,
+                                            'Marker Topic' : '/region_of_interest',
+                                            'Name' : 'ROIMarker',
+                                            'Namespaces' : {
+                                                 "" : True },
+                                            'Queue Size' : 100,
+                                            'Value' : True })
 
 
 
@@ -132,6 +132,10 @@ class RVIZFileGenerator:
         # Robot footprint
         footprint_topic = '/' + self.robot_name + '/move_base/local_costmap/footprint'
         robot_folder.append(self.add_robot_footprint(footprint_topic))
+
+        # Robot name marker
+        label_marker_topic = '/' + self.robot_name + '/label_marker'
+        robot_folder.append(self.add_marker(label_marker_topic))
 
         # Folder with robot sensors
         dict_robot_sensors = {'Class' : 'rviz/Group'}
@@ -375,6 +379,18 @@ class RVIZFileGenerator:
                                 'Value' : True}
 
         return robot_footprint
+
+    def add_marker(self, topic):
+        marker =  { 'Class' : 'rviz/Marker',
+                    'Enabled' : True,
+                    'Marker Topic' : topic,
+                    'Name' : 'ROIMarker',
+                    'Namespaces' : {
+                         "" : True },
+                    'Queue Size' : 100,
+                    'Value' : True }
+
+        return marker
 
     def add_robot_laser(self, topic):
         robot_laser = { 'Alpha' : 0.5,

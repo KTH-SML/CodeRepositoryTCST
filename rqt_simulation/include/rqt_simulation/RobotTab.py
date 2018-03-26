@@ -5,21 +5,28 @@ import sys
 import rospy
 import rospkg
 import yaml
+import time
 import codecs
 import roslaunch
 import numpy as np
-from geometry_msgs.msg import Point, Pose, PoseArray
+from geometry_msgs.msg import Point, Pose, PoseArray, PoseWithCovarianceStamped, PoseStamped, PolygonStamped, PointStamped
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
+from std_srvs.srv import Empty
 
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser
+from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser, QPushButton
 from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
 from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QTransform, QFont
 
 from rqt_simulation.ROS_Publisher import ROS_Publisher
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
+
+import actionlib
+from actionlib import SimpleActionClient
+from actionlib_msgs.msg import GoalStatus
+from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal, MoveBaseGoal
 
 class RobotTab(QWidget):
     def __init__(self, num_robots):
@@ -71,6 +78,15 @@ class RobotTab(QWidget):
         self.robot_sufix_textbox = QTextBrowser()
         self.layout.addWidget(self.robot_sufix_textbox)
 
+        self.robot_label_current_goal = QLabel('Current goal robot ' + str(self.num_robots))
+        self.layout.addWidget(self.robot_label_current_goal)
+        self.robot_current_goal_textbox = QTextBrowser()
+        self.layout.addWidget(self.robot_current_goal_textbox)
+
+        self.robot_resend_goal_button = QPushButton('Clear costmap')
+        self.layout.addWidget(self.robot_resend_goal_button)
+
+
         self.setLayout(self.layout)
 
         self.init_pose_msg = Pose()
@@ -82,3 +98,67 @@ class RobotTab(QWidget):
 
         self.prefix_string = ''
         self.sufix_string = ''
+
+        self.label_marker_msg = Marker()
+        self.label_marker_msg.pose = self.init_pose_msg
+        self.label_marker_msg.pose.position.z = 1.0
+        self.label_marker_msg.text = self.robot_name
+        self.label_marker_msg.type = self.label_marker_msg.TEXT_VIEW_FACING
+        self.label_marker_msg.id = self.num_robots
+        self.label_marker_msg.action = self.label_marker_msg.ADD
+        self.label_marker_msg.scale.z = 0.5
+        self.label_marker_msg.color.a = 1.0
+        self.label_marker_msg.color.r = 0.0
+        self.label_marker_msg.color.g = 0.0
+        self.label_marker_msg.color.b = 0.0
+        self.label_marker_msg.header.frame_id = '/map'
+
+        self.last_current_pose = PoseStamped()
+        self.last_footprint_point = PointStamped()
+
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
+
+        self.current_pose_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_callback)
+        self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
+
+        self.simulation_started = False
+
+        self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
+        self.robot_resend_goal_button.clicked.connect(self.call_clear_costmap_srvs)
+
+        self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
+        self.robot_current_goal = MoveBaseActionGoal()
+
+    def current_pose_callback(self, msg):
+        self.label_marker_msg.header = msg.header
+        self.label_marker_msg.pose = msg.pose.pose
+        self.label_marker_msg.pose.position.z = 1.0
+
+    def local_footprint_callback(self, msg):
+        if self.simulation_started:
+            msg_point_rounded = Point()
+            msg_point_rounded.x = round(msg.polygon.points[0].x, 3)
+            msg_point_rounded.y = round(msg.polygon.points[0].y, 3)
+            msg_point_rounded.z = round(msg.polygon.points[0].z, 3)
+
+            if msg_point_rounded != self.last_footprint_point.point:
+                self.last_footprint_point.header = msg.header
+
+            if (msg.header.stamp - self.last_footprint_point.header.stamp).to_sec() > 5.0:
+                print('clear')
+                self.clear_costmap()
+                usleep = lambda x: time.sleep(x)
+                usleep(1)
+                self.move_base_ac.send_goal(self.robot_current_goal.goal)
+                self.last_footprint_point.header = msg.header
+            self.last_footprint_point.point = msg_point_rounded
+        #print(self.last_footprint_point)
+
+    @Slot(bool)
+    def call_clear_costmap_srvs(self):
+        self.clear_costmap()
+        usleep = lambda x: time.sleep(x)
+        usleep(1)
+        self.move_base_ac.send_goal(self.robot_current_goal.goal)
+        print('Costmap cleared')
+

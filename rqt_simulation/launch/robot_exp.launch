@@ -3,7 +3,7 @@
 <launch>
 
     <arg name="scenario" default="sml" /> <!-- Empty scenario to make sure it is consistent if required -->
-    <arg name="scenario_path" default="/home/sml/tiago_public_ws/src/rqt_simulation_gui/sml/" />
+    <arg name="scenario_path" default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
 
     <arg name="robot_name" default="robot1" />
     <arg name="initial_pose_x" default="0" />

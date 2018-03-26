@@ -1,0 +1,31 @@
+simple:
+    system: R1
+    initial_condition: 'M06.x.Sn'
+    goal: 'F m3'
+    valid: True
+    cost: 9
+sequence:
+    system: 'R1, R2, R3'
+    initial_condition: 'M06.x.Sn, M25.x.Sn, M08.x.Sn'
+    goal: 'F m8 & (!m8 U m5) & (!m5 U m2) & (!m2 U m10) & (!m10 U a3)'
+    valid: True
+    cost: 30 # R1
+delivery_simple:
+    system: 'R1, R2, R3'
+    initial_condition: 'M06.x.Sn, M25.x.Sn, M08.x.Sn'
+    goal: 'F(!l && b3 && X l U (m3 && X m3 U !l))'
+    valid: True
+    cost: 24
+bring_supplies:
+    system: 'R1, R2, R3, R4, R5'
+    initial_condition: 'M06.x.Sn, M25.x.Sn, M08.x.Sn, M31.x.Sn, M22.x.Sn'
+    goal: 'F(! l & a & X(l U m2)) , F(! l & a & X(l U m5)) , F(! l & b & X(l U m8)) , F(! l & c & X(l U m2)) , F(! l & b & X(l U m7))'
+    valid: True
+    cost: 56
+bring_supplies_reactive:
+    system: 'R1, R2, R3, R4, R5'
+    initial_condition: 'M06.x.Sn, M25.x.Sn, M08.x.Sn, M31.x.Sn, M22.x.Sn'
+    goal: 'F(!l & a & Xl U (m2 & X!l)) & F(!l & b & Xl U m8) & G(alarm -> F r1) & G((o & m2) -> (m2 U (w U r2)))'
+    valid: True
+    cost: 28
+    simulate: random #interactive

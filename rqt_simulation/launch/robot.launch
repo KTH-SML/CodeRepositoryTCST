@@ -5,7 +5,7 @@
     <arg name="simulator" default="gazebo" />
 
     <arg name="scenario" default="" /> <!-- Empty scenario to make sure it is consistent if required -->
-    <arg name="scenario_path" default="$(find c4r_simulation)/scenarios/$(arg scenario)" />
+    <arg name="scenario_path" default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
 
     <arg name="robot_name" default="robot" />
     <arg name="initial_pose_x" default="0" />
@@ -20,7 +20,7 @@
     <group ns="$(arg robot_name)">
 
         <!-- Run robot-specific software and spawn robot -->
-        <include file="$(find c4r_simulation)/launch/robot_$(arg robot_model).launch">
+        <include file="$(find rqt_simulation)/launch/robot_$(arg robot_model).launch">
             <arg name="simulator" value="$(arg simulator)" />
             <arg name="scenario" value="$(arg scenario)" />
             <arg name="scenario_path" value="$(arg scenario_path)" />
