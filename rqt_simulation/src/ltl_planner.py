@@ -110,8 +110,11 @@ class LtlPlannerNode(object):
             goal_euler = euler_from_quaternion([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
 
             orientation_error = current_euler[0] - goal_euler[0] + current_euler[1] - goal_euler[1]  + current_euler[2] - goal_euler[2]
-
-            if (position_error < 0.15) and (orientation_error < 0.3):
+            print('pos_err')
+            print(position_error)
+            print('orien_err')
+            print(orientation_error)
+            if ((position_error < 0.15) and (orientation_error < 0.3)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
                 print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
                 self.planner.find_next_move()
                 t = rospy.Time.now()-self.t0

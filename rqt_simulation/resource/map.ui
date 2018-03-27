@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1325</width>
+    <width>860</width>
     <height>721</height>
    </rect>
   </property>
@@ -14,25 +14,43 @@
    <string>Map</string>
   </property>
   <property name="layoutDirection">
-   <enum>Qt::RightToLeft</enum>
+   <enum>Qt::LeftToRight</enum>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
   <widget class="QGroupBox" name="groupBox">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>701</width>
+     <x>9</x>
+     <y>9</y>
+     <width>841</width>
      <height>721</height>
     </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>841</width>
+     <height>721</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>841</width>
+     <height>721</height>
+    </size>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
    </property>
    <property name="title">
     <string>Map</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="4" column="2">
