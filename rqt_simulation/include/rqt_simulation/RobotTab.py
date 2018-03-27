@@ -46,7 +46,7 @@ class RobotTab(QWidget):
         self.robot_label_name.setFont(font)
         self.layout.addWidget(self.robot_label_name)
         self.robot_comboBox = CustomComboBox(self.num_robots-1)
-        self.robot_comboBox.addItems(['None', 'TiaGo', 'Turtlebot'])
+        self.robot_comboBox.addItems(['None', 'TiaGo', 'Turtlebot', 'srd250'])
         self.layout.addWidget(self.robot_comboBox)
 
         self.robot_label_init = QLabel('Initial pose')

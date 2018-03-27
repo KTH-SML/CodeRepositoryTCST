@@ -363,6 +363,8 @@ class SimulationWidget(QWidget):
                 sys.argv.append('robot_model:=tiago_steel')
             elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
                 sys.argv.append('robot_model:=turtlebot')
+            elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
+                sys.argv.append('robot_model:=srd250')
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             sys.argv.append('initial_pose_x:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.initial_pose['start_' + str(i+1)]['pose']['position'][1]))
@@ -375,7 +377,7 @@ class SimulationWidget(QWidget):
             #allow up to 5 seconds for the action server to come up
             #navigation.wait_for_server(rospy.Duration(5))
             #wait for the action server to come up
-            navigation.wait_for_server()
+            #navigation.wait_for_server()
             del sys.argv[2:len(sys.argv)]
 
             rospy.loginfo("server up")
