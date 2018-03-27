@@ -20,6 +20,17 @@
     <arg name="local_planner"  value="eband"/>
     <arg name="localization"   value="amcl"/>
 
+    <arg name="state"          default="localization"/>
+    <arg name="mapping"        default="karto"/>
+    <arg name="octomap"        default="false"/>
+    <arg name="disable_vo"     default="false"/>
+    <arg name="multiple"       default="true"/>
+
+    <arg name="map" default="$(arg scenario_path)"/>
+
+    <arg name="symlink" default="$(env HOME)/.pal/tiago_maps/config"/>
+
+
     <arg name="gzpose" value="-x $(arg initial_pose_x) -y $(arg initial_pose_y) -z 0.0 -R 0.0 -P 0.0 -Y $(arg initial_pose_a)"/>
     <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 /map $(arg robot_name)/map 100"/>
 
@@ -43,18 +54,63 @@
         <arg name="tf_prefix" value="$(arg robot_name)"/>
     </include>
 
-    <!-- navigation component -->
-    <include file="$(find tiago_2dnav)/launch/navigation.launch">
-        <arg name="state"          value="localization"/>
-        <arg name="planner"        value="$(arg planner)"/>
-        <arg name="global_planner" value="$(arg global_planner)"/>
-        <arg name="local_planner"  value="$(arg local_planner)"/>
-        <arg name="localization"   value="$(arg localization)"/>
-        <arg name="map"            value="$(arg scenario_path)"/>
-        <arg name="public_sim"     value="$(arg public_sim)"/>
-        <arg name="tf_prefix"      value="$(arg robot_name)"/>
-        <arg name="multiple"       value="true"/>
+    <!-- Project RGBD point cloud to laser-scan -->
+    <include file="$(find tiago_laser_sensors)/launch/rgbd_depth_laser.launch">
+      <arg name="image" value="xtion/depth_registered/image_raw"/>
+      <arg name="scan"  value="rgbd_scan"/>
+      <arg name="multiple" value="$(arg multiple)"/>
+      <arg name="tf_prefix"      value="$(arg robot_name)"/>
     </include>
+
+    <!-- Map -->
+    <include file="$(find pal_navigation_sm)/launch/map.launch">
+      <arg name="map"     value="$(arg map)"/>
+      <arg name="symlink" value="$(arg symlink)"/>
+      <arg name="multiple" value="$(arg multiple)"/>
+      <arg name="tf_prefix" value="$(arg robot_name)"/>
+    </include>
+
+    <arg name="scan" default="scan"/>
+    <arg name="amcl_with_mapping" default="false"/>
+
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+      <remap from="scan" to="$(arg scan)"/>
+
+      <!-- Load the last saved pose estimate (initial pose) -->
+      <param name="initial_pose_x" value="$(arg initial_pose_x)"/>
+      <param name="initial_pose_y" value="$(arg initial_pose_y)"/>
+      <param name="initial_pose_a" value="$(arg initial_pose_a)"/>
+
+      <rosparam file="$(find tiago_2dnav)/config/localization/amcl.yaml" command="load"/>
+      <param name="use_map_topic" value="$(arg amcl_with_mapping)"/>
+      <param name="first_map_only" value="false"/>
+      <param if="$(arg multiple)" name="odom_frame_id" value="$(arg robot_name)/odom"/>
+      <param if="$(arg multiple)" name="base_frame_id" value="$(arg robot_name)/base_footprint"/>
+      <param if="$(arg multiple)" name="global_frame_id" value="$(arg robot_name)/map"/>
+    </node>
+
+
+    <!-- Navigation State Machine -->
+    <include file="$(find tiago_2dnav)/launch/state_machine.launch">
+      <arg name="state" value="$(arg state)"/>
+      <arg name="public_sim" value="$(arg public_sim)"/>
+      <arg if="$(arg multiple)" name="map_frame" value="/$(arg robot_name)/map"/>
+      <arg if="$(arg multiple)" name="base_frame" value="/$(arg robot_name)/base_footprint"/>
+    </include>
+
+    <!-- Planning -->
+    <include file="$(find tiago_2dnav)/launch/move_$(arg planner).launch">
+      <arg name="global_planner" value="$(arg global_planner)"/>
+      <arg name="local_planner"  value="$(arg local_planner)"/>
+      <arg name="public_sim"     value="$(arg public_sim)"/>
+      <arg name="tf_prefix"      value="$(arg robot_name)"/>
+      <arg name="multiple"       value="$(arg multiple)"/>
+    </include>
+
+    <!-- VO map server -->
+    <group unless="$(arg public_sim)">
+      <include file="$(find pal_vo_server)/launch/vo_server.launch"/>
+    </group>
 
     <group if="$(arg public_sim)">
         <node name="relay_map" pkg="topic_tools" type="relay" args="map vo_map"/>
