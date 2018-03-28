@@ -122,7 +122,11 @@ class RVIZFileGenerator:
         robot_folder = []
 
         # Robot model
-        robot_folder.append(self.add_robot_model(self.robot_name))
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            tf_prefix = self.robot_name
+        elif robot_model == 'srd250':
+            tf_prefix = ''
+        robot_folder.append(self.add_robot_model(self.robot_name, tf_prefix))
 
         # Robot odometry
         if robot_model == 'tiago':
@@ -130,41 +134,43 @@ class RVIZFileGenerator:
             robot_folder.append(self.add_robot_odometry(odom_topic))
 
         # Robot footprint
-        footprint_topic = '/' + self.robot_name + '/move_base/local_costmap/footprint'
-        robot_folder.append(self.add_robot_footprint(footprint_topic))
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            footprint_topic = '/' + self.robot_name + '/move_base/local_costmap/footprint'
+            robot_folder.append(self.add_robot_footprint(footprint_topic))
 
         # Robot name marker
         label_marker_topic = '/' + self.robot_name + '/label_marker'
         robot_folder.append(self.add_marker(label_marker_topic))
 
-        # Folder with robot sensors
-        dict_robot_sensors = {'Class' : 'rviz/Group'}
-        robot_sensors_folder = []
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            # Folder with robot sensors
+            dict_robot_sensors = {'Class' : 'rviz/Group'}
+            robot_sensors_folder = []
 
-        # Robot laser
-        laser_topic = '/' + self.robot_name + '/scan'
-        robot_sensors_folder.append(self.add_robot_laser(laser_topic))
+            # Robot laser
+            laser_topic = '/' + self.robot_name + '/scan'
+            robot_sensors_folder.append(self.add_robot_laser(laser_topic))
 
-        # Robot RGBD scan
-        if robot_model == 'tiago':
-            RGBD_scan_topic = '/' + self.robot_name + '/rgbd_scan'
-            robot_sensors_folder.append(self.add_robot_RGBD_scan(RGBD_scan_topic))
+            # Robot RGBD scan
+            if robot_model == 'tiago':
+                RGBD_scan_topic = '/' + self.robot_name + '/rgbd_scan'
+                robot_sensors_folder.append(self.add_robot_RGBD_scan(RGBD_scan_topic))
 
-        # Robot depth cloud
-        if robot_model == 'tiago':
-            depth_cloud_topic = '/' + self.robot_name + '/xtion/depth_registered/points'
-        elif robot_model == 'turtlebot':
-            depth_cloud_topic = '/' + self.robot_name + '/camera/depth/points'
-        robot_sensors_folder.append(self.add_robot_depth_cloud(depth_cloud_topic))
+            # Robot depth cloud
+            if robot_model == 'tiago':
+                depth_cloud_topic = '/' + self.robot_name + '/xtion/depth_registered/points'
+            elif robot_model == 'turtlebot':
+                depth_cloud_topic = '/' + self.robot_name + '/camera/depth/points'
+            robot_sensors_folder.append(self.add_robot_depth_cloud(depth_cloud_topic))
 
-        # Sonar cloud
-        if robot_model == 'tiago':
-            sonar_topic = '/' + self.robot_name + '/sonar_cloud'
-            robot_sensors_folder.append(self.add_robot_sonar_cloud(sonar_topic))
+            # Sonar cloud
+            if robot_model == 'tiago':
+                sonar_topic = '/' + self.robot_name + '/sonar_cloud'
+                robot_sensors_folder.append(self.add_robot_sonar_cloud(sonar_topic))
 
-        dict_robot_sensors.update({'Displays' : robot_sensors_folder})
-        dict_robot_sensors.update({'Enabled' : True, 'Name' : 'Sensors'})
-        robot_folder.append(dict_robot_sensors)
+            dict_robot_sensors.update({'Displays' : robot_sensors_folder})
+            dict_robot_sensors.update({'Enabled' : True, 'Name' : 'Sensors'})
+            robot_folder.append(dict_robot_sensors)
 
         dict_robot_folder.update({'Displays' : robot_folder})
         dict_robot_folder.update({'Enabled' : True, 'Name' : 'Robot'})
@@ -179,94 +185,99 @@ class RVIZFileGenerator:
         dict_base_folder = {'Class' : 'rviz/Group'}
         base_folder = []
 
-        # Global planner folder
-        dict_global_folder = {'Class' : 'rviz/Group'}
-        global_folder = []
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            # Global planner folder
+            dict_global_folder = {'Class' : 'rviz/Group'}
+            global_folder = []
 
-        # Global Plan folder
-        dict_global_plan_folder = {'Class' : 'rviz/Group'}
-        global_plan_folder = []
+            # Global Plan folder
+            dict_global_plan_folder = {'Class' : 'rviz/Group'}
+            global_plan_folder = []
 
-        # Global NavfnROS planner
-        if robot_model == 'tiago':
-            Navfn_topic = '/' + self.robot_name + '/move_base/NavfnROS/plan'
-        elif robot_model == 'turtlebot':
-            Navfn_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/plan'
-        global_plan_folder.append(self.add_path(Navfn_topic, 'Navfn'))
+            # Global NavfnROS planner
+            if robot_model == 'tiago':
+                Navfn_topic = '/' + self.robot_name + '/move_base/NavfnROS/plan'
+            elif robot_model == 'turtlebot':
+                Navfn_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/plan'
+            global_plan_folder.append(self.add_path(Navfn_topic, 'Navfn'))
 
-        # Global EBandPlannerROS planner
-        if robot_model == 'tiago':
-            global_plan_topic = '/' + self.robot_name + '/move_base/EBandPlannerROS/global_plan'
-        elif robot_model == 'turtlebot':
-            global_plan_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/global_plan'
-        global_plan_folder.append(self.add_path(global_plan_topic, 'Global'))
+            # Global EBandPlannerROS planner
+            if robot_model == 'tiago':
+                global_plan_topic = '/' + self.robot_name + '/move_base/EBandPlannerROS/global_plan'
+            elif robot_model == 'turtlebot':
+                global_plan_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/global_plan'
+            global_plan_folder.append(self.add_path(global_plan_topic, 'Global'))
 
-        dict_global_plan_folder.update({'Displays' : global_plan_folder})
-        dict_global_plan_folder.update({'Enabled' : True, 'Name' : 'Plan'})
+            dict_global_plan_folder.update({'Displays' : global_plan_folder})
+            dict_global_plan_folder.update({'Enabled' : True, 'Name' : 'Plan'})
 
-        global_folder.append(dict_global_plan_folder)
+            global_folder.append(dict_global_plan_folder)
 
-        # Global potential costmap
-        if robot_model == 'tiago':
-            global_potential_topic = '/' + self.robot_name + '/move_base/global_costmap/costmap'
-        elif robot_model == 'turtlebot':
-            global_potential_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/potential'
-        global_folder.append(self.add_costmap(global_potential_topic))
+            # Global potential costmap
+            if robot_model == 'tiago':
+                global_potential_topic = '/' + self.robot_name + '/move_base/global_costmap/costmap'
+            elif robot_model == 'turtlebot':
+                global_potential_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/potential'
+            global_folder.append(self.add_costmap(global_potential_topic))
 
-        # Global costmap
-        global_costmap_topic = '/' + self.robot_name + '/move_base/global_costmap/costmap'
-        global_folder.append(self.add_costmap(global_costmap_topic))
+            # Global costmap
+            global_costmap_topic = '/' + self.robot_name + '/move_base/global_costmap/costmap'
+            global_folder.append(self.add_costmap(global_costmap_topic))
 
-        dict_global_folder.update({'Displays' : global_folder})
-        dict_global_folder.update({'Enabled' : True, 'Name' : 'Global'})
+            dict_global_folder.update({'Displays' : global_folder})
+            dict_global_folder.update({'Enabled' : True, 'Name' : 'Global'})
 
-        base_folder.append(dict_global_folder)
+            base_folder.append(dict_global_folder)
 
-        # Local planner folder
-        dict_local_folder = {'Class' : 'rviz/Group'}
-        local_folder = []
+            # Local planner folder
+            dict_local_folder = {'Class' : 'rviz/Group'}
+            local_folder = []
 
-        # Local Plan folder
-        dict_local_plan_folder = {'Class' : 'rviz/Group'}
-        local_plan_folder = []
+            # Local Plan folder
+            dict_local_plan_folder = {'Class' : 'rviz/Group'}
+            local_plan_folder = []
 
-        # Local EBandPlannerROS
-        if robot_model == 'tiago':
-            local_eband_topic = '/' + self.robot_name + '/move_base/EBandPlannerROS/local_plan'
-            local_plan_folder.append(self.add_path(local_eband_topic, 'EBand'))
+            # Local EBandPlannerROS
+            if robot_model == 'tiago':
+                local_eband_topic = '/' + self.robot_name + '/move_base/EBandPlannerROS/local_plan'
+                local_plan_folder.append(self.add_path(local_eband_topic, 'EBand'))
 
-        # Local DWAPlannerROS
-        dwa_plan_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/local_plan'
-        local_plan_folder.append(self.add_path(dwa_plan_topic, 'DWA'))
+            # Local DWAPlannerROS
+            dwa_plan_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/local_plan'
+            local_plan_folder.append(self.add_path(dwa_plan_topic, 'DWA'))
 
-        # Local PalPlannerROS
-        if robot_model == 'tiago':
-            local_pal_topic = '/' + self.robot_name + '/move_base/PalPlannerROS/local_plan'
-            local_plan_folder.append(self.add_path(local_pal_topic, 'Pal'))
+            # Local PalPlannerROS
+            if robot_model == 'tiago':
+                local_pal_topic = '/' + self.robot_name + '/move_base/PalPlannerROS/local_plan'
+                local_plan_folder.append(self.add_path(local_pal_topic, 'Pal'))
 
-        dict_local_plan_folder.update({'Displays' : local_plan_folder})
-        dict_local_plan_folder.update({'Enabled' : True, 'Name' : 'Plan'})
+            dict_local_plan_folder.update({'Displays' : local_plan_folder})
+            dict_local_plan_folder.update({'Enabled' : True, 'Name' : 'Plan'})
 
-        local_folder.append(dict_local_plan_folder)
+            local_folder.append(dict_local_plan_folder)
 
-        # Local costmap
-        local_costmap_topic = '/' + self.robot_name + '/move_base/local_costmap/costmap'
-        local_folder.append(self.add_costmap(local_costmap_topic))
+            # Local costmap
+            local_costmap_topic = '/' + self.robot_name + '/move_base/local_costmap/costmap'
+            local_folder.append(self.add_costmap(local_costmap_topic))
 
-        # Local costcloud
-        if robot_model == 'tiago':
-            local_costcloud_topic = '/' + self.robot_name + '/move_base/TrajectoryPlannerROS/cost_cloud'
-        elif robot_model == 'turtlebot':
-            local_costcloud_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/cost_cloud'
-        local_folder.append(self.add_costcloud(local_costcloud_topic))
+            # Local costcloud
+            if robot_model == 'tiago':
+                local_costcloud_topic = '/' + self.robot_name + '/move_base/TrajectoryPlannerROS/cost_cloud'
+            elif robot_model == 'turtlebot':
+                local_costcloud_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/cost_cloud'
+            local_folder.append(self.add_costcloud(local_costcloud_topic))
 
-        dict_local_folder.update({'Displays' : local_folder})
-        dict_local_folder.update({'Enabled' : True, 'Name' : 'Local'})
+            dict_local_folder.update({'Displays' : local_folder})
+            dict_local_folder.update({'Enabled' : True, 'Name' : 'Local'})
 
-        base_folder.append(dict_local_folder)
+            base_folder.append(dict_local_folder)
 
         # Goal marker
-        base_folder.append(self.add_goal_marker(self.robot_name))
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            goal_topic = '/' + self.robot_name + '/move_base/current_goal'
+        elif robot_model == 'srd250':
+            goal_topic = '/' + self.robot_name + '/command/pose'
+        base_folder.append(self.add_goal_marker(self.robot_name, goal_topic))
 
         dict_base_folder.update({'Displays' : base_folder})
         dict_base_folder.update({'Enabled' : True, 'Name' : 'Base'})
@@ -278,16 +289,17 @@ class RVIZFileGenerator:
 
         robot.append(dict_planning_folder)
 
-        dict_localization_folder = {'Class' : 'rviz/Group'}
-        localization_folder = []
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            dict_localization_folder = {'Class' : 'rviz/Group'}
+            localization_folder = []
 
-        # Localization
-        localization_folder.append(self.add_particlecloud(self.robot_name))
+            # Localization
+            localization_folder.append(self.add_particlecloud(self.robot_name))
 
-        dict_localization_folder.update({'Displays' : localization_folder})
-        dict_localization_folder.update({'Enabled' : True, 'Name' : 'Localization'})
+            dict_localization_folder.update({'Displays' : localization_folder})
+            dict_localization_folder.update({'Enabled' : True, 'Name' : 'Localization'})
 
-        robot.append(dict_localization_folder)
+            robot.append(dict_localization_folder)
 
         dict_mapping_folder = {'Class' : 'rviz/Group'}
         mapping_folder = []
@@ -296,19 +308,21 @@ class RVIZFileGenerator:
         mapping_folder.append(self.add_map(self.robot_name))
 
         # Trajectory
-        mapping_folder.append(self.add_slam_trajectory(self.robot_name))
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            mapping_folder.append(self.add_slam_trajectory(self.robot_name))
 
         dict_mapping_folder.update({'Displays' : mapping_folder})
         dict_mapping_folder.update({'Enabled' : True, 'Name' : 'Mapping'})
 
         robot.append(dict_mapping_folder)
 
-        # Camera
-        if robot_model == 'tiago':
-            image_topic = '/' + self.robot_name + '/xtion/rgb/image_raw'
-        elif robot_model == 'turtlebot':
-            image_topic = '/' + self.robot_name + '/camera/rgb/image_raw'
-        robot.append(self.add_camera(image_topic))
+        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+            # Camera
+            if robot_model == 'tiago':
+                image_topic = '/' + self.robot_name + '/xtion/rgb/image_raw'
+            elif robot_model == 'turtlebot':
+                image_topic = '/' + self.robot_name + '/camera/rgb/image_raw'
+            robot.append(self.add_camera(image_topic))
 
         dict_robot.update({'Displays' : robot})
         dict_robot.update({'Enabled' : True, 'Name' : self.robot_name})
@@ -337,14 +351,14 @@ class RVIZFileGenerator:
 
         return dict_grid
 
-    def add_robot_model(self, robot_name):
+    def add_robot_model(self, robot_name, tf_prefix):
         robot_model =     { 'Alpha': 1,
                             'Class' : 'rviz/RobotModel',
                             'Collision Enabled' : False,
                             'Enabled': True,
                             'Name' : 'RobotModel',
                             'Robot Description' : robot_name + '/robot_description',
-                            'TF Prefix' : robot_name,
+                            'TF Prefix' : tf_prefix,
                             'Update Interval' : 0,
                             'Value' : True,
                             'Visual Enabled' : True }
@@ -602,7 +616,7 @@ class RVIZFileGenerator:
 
         return costcloud
 
-    def add_goal_marker(self, robot_name):
+    def add_goal_marker(self, robot_name, topic):
         goal_marker = { 'Alpha' : 1,
                         'Axes Length' : 1,
                         'Axes Radius' : 0.1,
@@ -615,7 +629,7 @@ class RVIZFileGenerator:
                         'Shaft Length' : 1,
                         'Shaft Radius' : 0.05,
                         'Shape' : 'Arrow',
-                        'Topic' : '/' + robot_name + '/move_base/current_goal',
+                        'Topic' : topic,
                         'Unreliable' : False,
                         'Value' : True }
 

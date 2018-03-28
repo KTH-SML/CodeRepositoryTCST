@@ -338,6 +338,8 @@ class SimulationWidget(QWidget):
                 robot_list.append('tiago')
             elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
                 robot_list.append('turtlebot')
+            elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
+                robot_list.append('srd250')
         file = RVIZFileGenerator(robot_list)
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
@@ -399,14 +401,14 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
 
-        # Get robot types to generate RVIZ file
-        #robot_list = []
-        #for i in range(0, self.num_robots):
-        #    if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-        #        robot_list.append('tiago')
-        #    elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-        #        robot_list.append('turtlebot')
-        #file = RVIZFileGenerator(robot_list)
+        #Get robot types to generate RVIZ file
+        robot_list = []
+        for i in range(0, self.num_robots):
+            if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
+                robot_list.append('tiago')
+            elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
+                robot_list.append('turtlebot')
+        file = RVIZFileGenerator(robot_list)
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
