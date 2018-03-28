@@ -18,16 +18,23 @@
     <arg name="paused" default="false"/>
     <!-- The following line causes gzmsg and gzerr messages to be printed to the console
         (even when Gazebo is started through roslaunch) -->
-    <arg name="verbose" default="false"/>
+    <arg name="verbose" default="true"/>
 
     <arg name="scenario"       default="pal_office" />
     <arg name="scenario_path"  default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
+	
+	<!---->
+    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 world /map 100"/>
+    
+        <!-- Map server-->
+    <arg name="map_file" default="$(find rqt_simulation)/scenarios/$(arg scenario)/map.yaml"/>
 
-    <arg name="gzpose" value="-x $(arg initial_pose_x) -y $(arg initial_pose_y) -z 0.0 -R 0.0 -P 0.0 -Y $(arg initial_pose_a)"/>
-    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 map $(arg robot_name)/map 100"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+      <param name="frame_id" value="/map"/>
+    </node>
+    
 
     <!-- UAV Group - copy this group N times if you want to spawn N drones. Change respectively the names and starting positions -->
-    <group ns="$(arg mav_name)">
       <include file="$(find uavs_simulation_gazebo)/launch/spawn_mav.launch">
         <arg name="mav_name" value="$(arg mav_name)" />
         <arg name="model" value="$(find uavs_simulation_gazebo)/models/$(arg mav_name)/$(arg mav_name)_generic_odometry_sensor.gazebo" />
@@ -35,16 +42,24 @@
         <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
         <arg name="log_file" value="$(arg log_file)"/>
         <arg name="enable_mavlink_interface" value="true" />
+        <!--
         <arg name="tf_prefix" value="$(arg robot_name)" />
-        <arg name="namespace" value="$(arg robot_name)" />
+        -->
+        <arg name="namespace" value="$(arg robot_name)" /> 
+        
+        <arg name="x" value="$(arg initial_pose_x)" />
+        <arg name="y" value="$(arg initial_pose_y)" />
       </include>
-
-      <!-- controller interface
-      <include file="$(find uavs_simulation_gazebo)/launch/$(arg mav_name)_control.launch"/>-->
-
+      
+      <!-- controller interface -->
+      <include file="$(find uavs_simulation_gazebo)/launch/$(arg mav_name)_control.launch">
+      	<arg name="x" value="$(arg initial_pose_x)" />
+      	<arg name="y" value="$(arg initial_pose_y)" />
+      <!--	<arg name="yaw" value="$(arg initial_pose_a)" /> -->
+      </include>
+	  
       <!-- state publishers -->
-      <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-      <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-    </group>
+      <node name="robot_state_publisher" pkg="robot_state_publisher" clear_params="true" type="robot_state_publisher" />
+      <node name="joint_state_publisher" pkg="joint_state_publisher" clear_params="true" type="joint_state_publisher" />
 
 </launch>

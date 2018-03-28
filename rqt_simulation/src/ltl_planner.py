@@ -43,6 +43,7 @@ class LtlPlannerNode(object):
         self.hard_task = ''
         self.soft_task = ''
         self.robot_name = rospy.get_param('robot_name')
+        self.agent_type = rospy.get_param('agent_type')
 
         #-----------
         # Publishers
@@ -52,11 +53,18 @@ class LtlPlannerNode(object):
         self.PrefixPlanPublisher = rospy.Publisher('prefix_plan', PoseArray, queue_size = 1)
         # Synthesised sufix plan Publisher
         self.SufixPlanPublisher = rospy.Publisher('sufix_plan', PoseArray, queue_size = 1)
+        # Goal pose for arial vehicle
+        if self.agent_type == 'arial':
+            self.GoalPublisher = rospy.Publisher('command/pose', PoseStamped, queue_size = 1)
 
         #------------
         # Subscribers
         #------------
-        self.sub_amcl_pose = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.PoseCallback)
+        if self.agent_type == 'ground':
+            localization_topic = 'amcl_pose'
+        elif self.agent_type == 'arial':
+            localization_topic = 'ground_truth/pose_with_covariance'
+        self.sub_amcl_pose = rospy.Subscriber(localization_topic, PoseWithCovarianceStamped, self.PoseCallback)
         # trigger start from GUI
         self.sub_active_flag = rospy.Subscriber('/planner_active', Bool, self.SetActiveCallback)
         # initial position from GUI
@@ -84,11 +92,11 @@ class LtlPlannerNode(object):
         self.SufixPlanPublisher.publish(sufix_msg)
         ### start up move_base
         self.navigation = actionlib.SimpleActionClient("move_base", MoveBaseAction)
-        rospy.loginfo("wait for the move_base action server to come up")
+        #rospy.loginfo("wait for the move_base action server to come up")
         #allow up to 5 seconds for the action server to come up
         #navigation.wait_for_server(rospy.Duration(5))
         #wait for the action server to come up
-        self.navigation.wait_for_server()
+        #self.navigation.wait_for_server()
 
     def SetActiveCallback(self, state):
         self.active = state.data
@@ -99,33 +107,66 @@ class LtlPlannerNode(object):
             self.next_move = self.planner.next_move
             print 'Robot %s next move is motion to %s' %(str(self.robot_name), str(self.next_move))
             self.navi_goal = self.FormatGoal(self.next_move, self.planner.index, t)
-            self.navigation.send_goal(self.navi_goal)
+
+            if self.agent_type == 'ground':
+                self.navigation.send_goal(self.navi_goal)
+            elif self.agent_type == 'arial':
+                self.GoalPublisher.publish(self.navi_goal)
+
             print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
 
     def PoseCallback(self, current_pose):
         # PoseWithCovarianceStamped data from amcl_pose
         if self.active:
-            position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.target_pose.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.target_pose.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.target_pose.pose.position.z)**2)
-            current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
-            goal_euler = euler_from_quaternion([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
+            if self.agent_type == 'ground':
+                position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.target_pose.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.target_pose.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.target_pose.pose.position.z)**2)
+                current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
+                goal_euler = euler_from_quaternion([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
+            elif self.agent_type == 'arial':
+                position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.pose.position.z)**2)
+                current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
+                goal_euler = euler_from_quaternion([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
 
             orientation_error = current_euler[0] - goal_euler[0] + current_euler[1] - goal_euler[1]  + current_euler[2] - goal_euler[2]
-            print('pos_err')
-            print(position_error)
-            print('orien_err')
-            print(orientation_error)
-            if ((position_error < 0.15) and (orientation_error < 0.3)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
-                print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
-                self.planner.find_next_move()
-                t = rospy.Time.now()-self.t0
-                print '----------Time: %.2f----------' %t.to_sec()
-                self.next_move = self.planner.next_move
-                print 'Robot %s next move is motion to %s' %(str(self.robot_name), str(self.next_move))
-                self.navi_goal = self.FormatGoal(self.next_move, self.planner.index, t)
-                self.navigation.send_goal(self.navi_goal)
-                print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
+            #print('pos_err')
+            #print(position_error)
+            #print('orien_err')
+            #print(orientation_error)
+            if self.agent_type == 'ground':
+                #print('planner')
+                #if ((position_error < 0.15) and (orientation_error < 0.3)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
+                if ((position_error < 0.15)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
+                    print('now')
+                    print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
+                    self.planner.find_next_move()
+                    t = rospy.Time.now()-self.t0
+                    print '----------Time: %.2f----------' %t.to_sec()
+                    self.next_move = self.planner.next_move
+                    print 'Robot %s next move is motion to %s' %(str(self.robot_name), str(self.next_move))
+                    self.navi_goal = self.FormatGoal(self.next_move, self.planner.index, t)
+                    if self.agent_type == 'ground':
+                        self.navigation.send_goal(self.navi_goal)
+                    elif self.agent_type == 'arial':
+                        self.GoalPublisher.publish(self.navi_goal)
+                    print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
+            elif self.agent_type == 'arial':
+                if ((position_error < 0.15) and (orientation_error < 0.3)):
+                    print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
+                    self.planner.find_next_move()
+                    t = rospy.Time.now()-self.t0
+                    print '----------Time: %.2f----------' %t.to_sec()
+                    self.next_move = self.planner.next_move
+                    print 'Robot %s next move is motion to %s' %(str(self.robot_name), str(self.next_move))
+                    self.navi_goal = self.FormatGoal(self.next_move, self.planner.index, t)
+                    if self.agent_type == 'ground':
+                        self.navigation.send_goal(self.navi_goal)
+                    elif self.agent_type == 'arial':
+                        self.GoalPublisher.publish(self.navi_goal)
+                    print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
 
     def GetInitPoseCallback(self, pose):
+        if self.agent_type == 'arial':
+            pose.position.z = 2.0
         self.init_pose = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w))
 
     def SoftTaskCallback(self, soft_task):
@@ -135,17 +176,32 @@ class LtlPlannerNode(object):
         self.hard_task = hard_task.data
 
     def FormatGoal(self, goal, index, time_stamp):
-        GoalMsg = MoveBaseGoal()
-        GoalMsg.target_pose.header.seq = index
-        GoalMsg.target_pose.header.stamp = time_stamp
-        GoalMsg.target_pose.header.frame_id = 'map'
-        GoalMsg.target_pose.pose.position.x = goal[0][0]
-        GoalMsg.target_pose.pose.position.y = goal[0][1]
-        #quaternion = quaternion_from_euler(0, 0, goal[2])
-        GoalMsg.target_pose.pose.orientation.x = goal[1][1]
-        GoalMsg.target_pose.pose.orientation.y = goal[1][2]
-        GoalMsg.target_pose.pose.orientation.z = goal[1][3]
-        GoalMsg.target_pose.pose.orientation.w = goal[1][0]
+        if self.agent_type == 'ground':
+            GoalMsg = MoveBaseGoal()
+            GoalMsg.target_pose.header.seq = index
+            GoalMsg.target_pose.header.stamp = time_stamp
+            GoalMsg.target_pose.header.frame_id = 'map'
+            GoalMsg.target_pose.pose.position.x = goal[0][0]
+            GoalMsg.target_pose.pose.position.y = goal[0][1]
+            #quaternion = quaternion_from_euler(0, 0, goal[2])
+            GoalMsg.target_pose.pose.orientation.x = goal[1][1]
+            GoalMsg.target_pose.pose.orientation.y = goal[1][2]
+            GoalMsg.target_pose.pose.orientation.z = goal[1][3]
+            GoalMsg.target_pose.pose.orientation.w = goal[1][0]
+        elif self.agent_type == 'arial':
+            GoalMsg = PoseStamped()
+            GoalMsg.header.seq = index
+            GoalMsg.header.stamp = time_stamp
+            GoalMsg.header.frame_id = 'map'
+            GoalMsg.pose.position.x = goal[0][0]
+            GoalMsg.pose.position.y = goal[0][1]
+            GoalMsg.pose.position.z = 2.0
+
+            #quaternion = quaternion_from_euler(0, 0, goal[2])
+            #GoalMsg.pose.orientation.x = goal[1][1]
+            #GoalMsg.pose.orientation.y = goal[1][2]
+            #GoalMsg.pose.orientation.z = goal[1][3]
+            #GoalMsg.pose.orientation.w = goal[1][0]
         return GoalMsg
 
     def plan_msg_builder(self, plan, time_stamp):

@@ -53,8 +53,8 @@
 
 
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" clear_params="true" output="screen">
-          <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-          <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+          <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="global_costmap" />
+          <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="local_costmap" />
           <rosparam file="$(find rqt_simulation)/config/planner/local_costmap_params.yaml" command="load" />
           <rosparam file="$(find rqt_simulation)/config/planner/global_costmap_params.yaml" command="load" />
           <rosparam file="$(find rqt_simulation)/config/planner/dwa_local_planner_params.yaml" command="load" />
