@@ -40,7 +40,7 @@
           <arg name="global_frame_id" value="$(arg robot_name)/map"/>
         </include>
 
-        <!-- Move base
+        <!-- Move base -->
         <include file="$(find turtlebot_navigation)/launch/includes/velocity_smoother.launch.xml"/>
         <include file="$(find turtlebot_navigation)/launch/includes/safety_controller.launch.xml"/>
 
@@ -50,9 +50,9 @@
         <arg name="odom_topic" default="odom" />
         <arg name="laser_topic" default="scan" />
         <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/dummy.yaml"/>
--->
 
-<!--
+
+<!---->
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" clear_params="true" output="screen">
           <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="global_costmap" />
           <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="local_costmap" />
@@ -62,14 +62,14 @@
           <rosparam file="$(find rqt_simulation)/config/planner/move_base_params.yaml" command="load" />
           <rosparam file="$(find turtlebot_navigation)/param/global_planner_params.yaml" command="load" />
           <rosparam file="$(find turtlebot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
--->
-          <!-- external params file that could be loaded into the move_base namespace
+
+          <!-- external params file that could be loaded into the move_base namespace -->
           <rosparam file="$(arg custom_param_file)" command="load" />
 
           <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
           <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/>
--->
-          <!-- reset frame_id parameters using user input data
+
+          <!-- reset frame_id parameters using user input data -->
           <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>
           <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
           <param name="local_costmap/global_frame" value="$(arg odom_frame_id)"/>
@@ -80,7 +80,7 @@
           <remap from="odom" to="$(arg odom_topic)"/>
           <remap from="scan" to="$(arg laser_topic)"/>
         </node>
--->
+
 
 
 </launch>
