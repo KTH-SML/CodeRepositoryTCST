@@ -413,6 +413,10 @@ class SimulationWidget(QWidget):
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
 
+        # Launch rviz
+        launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rviz.launch')])
+        launch_world.start()
+
         # Launch robots
         launch_robot_list = []
         for i in range(0, self.num_robots):

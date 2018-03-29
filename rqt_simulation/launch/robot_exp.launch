@@ -28,6 +28,4 @@
 
     </group>
 
-          <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rqt_simulation)/config/rviz/auto_gen.rviz"/>
-
 </launch>
