@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1091</width>
-    <height>779</height>
+    <height>814</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -25,7 +25,7 @@
      <x>10</x>
      <y>10</y>
      <width>691</width>
-     <height>751</height>
+     <height>801</height>
     </rect>
    </property>
    <property name="title">
@@ -48,7 +48,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>690</y>
+      <y>750</y>
       <width>651</width>
       <height>41</height>
      </rect>
@@ -190,6 +190,19 @@
      <string>Setup experiment</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="button_record_rosbag">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>690</y>
+      <width>651</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Record rosbag</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
@@ -197,7 +210,7 @@
      <x>720</x>
      <y>30</y>
      <width>351</width>
-     <height>731</height>
+     <height>781</height>
     </rect>
    </property>
    <property name="currentIndex">
