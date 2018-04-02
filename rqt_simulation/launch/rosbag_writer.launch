@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="num_robots" default="1"/>
+
+      <node name="rosbag_writer" pkg="rqt_simulation" type="rosbag_writer.py" output="screen"/>
+          <param name="num_robots" type="int" value="$(arg num_robots)" />
+
+</launch>

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from subprocess import call
 import sys
 import rospy
 import rospkg
@@ -56,6 +57,7 @@ class SimulationWidget(QWidget):
         self.button_execute_task.clicked.connect(self.on_button_execute_task_pressed)   # Synthesize task button
         self.button_addRobot.clicked.connect(self.add_robot)                            # Add robot tab button
         self.button_remove_robot.clicked.connect(self.remove_robot)                     # Remove robot button
+        self.button_record_rosbag.clicked.connect(self.on_button_rosbag_clicked)
         self.button_start_sim.clicked.connect(self.on_button_start_sim_pressed)         # Start simulation button
         self.world_comboBox.currentIndexChanged.connect(self.reset)                     # World combobox
 
@@ -72,6 +74,8 @@ class SimulationWidget(QWidget):
         # Robot tab variables
         self.num_robots = 0
         self.tab_list = []
+
+        self.rosbag_active = False
 
         # Subscriber for prefix and sufix
         self.prefix_plan_topic_list = []
@@ -349,6 +353,14 @@ class SimulationWidget(QWidget):
         launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
         sys.argv.append('scenario:=' + scenario)
         launch_world.start()
+        del sys.argv[2:len(sys.argv)]
+
+        # Launch rosbag logger
+        if self.rosbag_active == True:
+            launch_logger = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rosbag_writer.launch')])
+            sys.argv.append('num_robots:=' + str(self.num_robots))
+            launch_logger.start()
+            del sys.argv[2:len(sys.argv)]
 
         # Launch robots
         launch_robot_list = []
@@ -412,6 +424,13 @@ class SimulationWidget(QWidget):
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
+
+        # Launch rosbag logger
+        if self.rosbag_active == True:
+            launch_logger = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rosbag_writer.launch')])
+            sys.argv.append('num_robots:=' + str(self.num_robots))
+            launch_logger.start()
+            del sys.argv[2:len(sys.argv)]
 
         # Launch rviz
         launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rviz.launch')])
@@ -485,6 +504,15 @@ class SimulationWidget(QWidget):
         for i in range(0, self.num_robots):
             self.tab_list[i].simulation_started = True
 
+    @Slot(bool)
+    def on_button_rosbag_clicked(self):
+        if self.rosbag_active == False:
+            self.rosbag_active = True
+            self.button_record_rosbag.setDown(True)
+        elif self.rosbag_active == True:
+            self.rosbag_active = False
+            self.button_record_rosbag.setDown(False)
+
     def position_msg_to_tuple(self, position_msg):
         position = (position_msg.x, position_msg.y, position_msg.z)
         return position
@@ -503,6 +531,13 @@ class SimulationWidget(QWidget):
                self.tab_list[self.num_robots-1].robot_comboBox_init.addItem(self.region_of_interest.keys()[i])
            self.tab_list[self.num_robots-1].robot_comboBox_init.model().sort(0)
         if len(self.ellipse_items_RI) > 0:
+           self.tab_list[self.num_robots-1].init_pose_msg.position.x = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['position'][0]
+           self.tab_list[self.num_robots-1].init_pose_msg.position.y = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['position'][1]
+           self.tab_list[self.num_robots-1].init_pose_msg.position.z = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['position'][2]
+           self.tab_list[self.num_robots-1].init_pose_msg.orientation.w = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['orientation'][0]
+           self.tab_list[self.num_robots-1].init_pose_msg.orientation.x = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['orientation'][1]
+           self.tab_list[self.num_robots-1].init_pose_msg.orientation.y = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['orientation'][2]
+           self.tab_list[self.num_robots-1].init_pose_msg.orientation.z = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['orientation'][3]
            self.ellipse_items_RI[0].setBrush(QBrush(QColor('green')))
            rect = self.ellipse_items_RI[0].rect()
            point = rect.topLeft()
