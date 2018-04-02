@@ -1,3 +1,3 @@
  #!/bin/bash 
-
-roslaunch rqt_simulation turtlebot_base_astra.launch robot_name:=robot1
+ROBOT_NAME=$1
+roslaunch rqt_simulation turtlebot_base_astra.launch robot_name:=$ROBOT_NAME
