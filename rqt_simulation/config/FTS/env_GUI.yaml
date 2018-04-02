@@ -1,0 +1,54 @@
+r01:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  pose:
+    orientation:
+    - 0.5537478323882297
+    - 0.0
+    - 0.0
+    - 0.8326844168863359
+    position:
+    - 13.18
+    - 9.42
+    - 0.0
+r02:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  pose:
+    orientation:
+    - 0.639331333927513
+    - -0.0
+    - -0.0
+    - -0.7689313658958561
+    position:
+    - 11.52
+    - 13.44
+    - 0.0
+r03:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r03
+  pose:
+    orientation:
+    - 0.5402604845887837
+    - 0.0
+    - 0.0
+    - 0.8414978364748733
+    position:
+    - 16.56
+    - 10.3
+    - 0.0

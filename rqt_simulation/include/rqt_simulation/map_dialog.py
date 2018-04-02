@@ -18,16 +18,17 @@ from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, 
 
 class Map_dialog(QDialog):
     signalCheckBoxIndex = pyqtSignal([int], [int])
-    def __init__(self, scenario, current_graphicsScene):
+    def __init__(self, current_graphicsScene):
 
         super(Map_dialog, self).__init__()
         self.setObjectName('Map_dialog')
-        self.scenario = scenario
+        #self.scenario = scenario
 
         checkBoxChanged = pyqtSignal([int], [int])
 
         #main_widget = SimulationWidget()
-        print(self.scenario)
+        #print(self.scenario)
+        self.graphicsScene = current_graphicsScene
 
         ui_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'resource', 'map.ui')
         loadUi(ui_file, self)
@@ -40,15 +41,15 @@ class Map_dialog(QDialog):
         self.vbox = QVBoxLayout()
 
         self.clicked = False
-        self.arrow_list = []
+        #self.arrow_list = []
 
         #self.grid.addWidget(self.graphicsView, 0, 0, 2, 1)
         #self.grid.addWidget(self.button_save_ROI, 0, 2)
         #self.grid.addWidget(self.button_reset, 1, 2)
         self.setLayout(self.grid)
 
-        map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
-        self.loadConfig(map_yaml)
+        #map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.graphicsScene.scenario, 'map.yaml')
+        #self.loadConfig(map_yaml)
 
         self.button_save_FTS.pressed.connect(self.on_button_FTS_save_pressed)
         self.button_save_FTS.setEnabled(False)
@@ -60,34 +61,34 @@ class Map_dialog(QDialog):
         self.button_delete_edges.clicked.connect(self.delete_edges)
         #self.button_set_edges.setEnabled(False)
 
-        self.regionCounter = 0
+        #self.graphicsScene.regionCounter = 0
         self.region_list = []
-        self.ellipse_items = []
+        #self.ellipse_items = []
         self.region_of_interest = {}
-        self.ellipse_items_labels = []
-        self.pixel_coords_list = []
-        self.line_dict = {}
+        #self.ellipse_items_labels = []
+        #self.pixel_coords_list = []
+        #self.line_dict = {}
 
-        self.graphicsScene = current_graphicsScene
+
         self.graphicsScene.signalMousePressedPos.connect(self.pointSelection)
         self.graphicsScene.signalMouseReleasedPos.connect(self.pointRelease)
         self.graphicsScene.signalMouseMovePos.connect(self.mouseMove)
 
-        if self.scenario == 'pal_office' or self.scenario == 'sml':
-            map = 'map.pgm'
-        else:
-            map = 'map.png'
+        #if self.scenario == 'pal_office' or self.scenario == 'sml':
+        #    map = 'map.pgm'
+        #else:
+        #    map = 'map.png'
 
-        map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
-        print(map_file)
-        pixmap = QPixmap(map_file)
-        mapSize = pixmap.size()
+        #map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
+        #print(map_file)
+        #pixmap = QPixmap(map_file)
+        #mapSize = pixmap.size()
         #self.graphicsScene.addPixmap(pixmap)
-        print('map_origin')
-        print(self.map_origin)
-        print('mapsize')
-        print(mapSize.height())
-        self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
+        #print('map_origin')
+        #print(self.map_origin)
+        #print('mapsize')
+        #print(mapSize.height())
+        #self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
 
         #self.graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
         self.graphicsView.setScene(self.graphicsScene)
@@ -121,58 +122,73 @@ class Map_dialog(QDialog):
     @Slot(bool)
     def on_button_reset_pressed(self):
         print('Reset')
-        for i in range(0, self.regionCounter):
-            self.graphicsScene.removeItem(self.ellipse_items[i])
-            self.graphicsScene.removeItem(self.ellipse_items_labels[i])
+
+        for i in range(0, self.graphicsScene.regionCounter):
+            #self.graphicsScene.remove_ROI()
+            #self.graphicsScene.removeItem(self.ellipse_items[i])
+            #self.graphicsScene.removeItem(self.ellipse_items_labels[i])
             self.grid.removeWidget(self.groupBox_list[0])
             self.groupBox_list[0].deleteLater()
             del self.groupBox_list[0]
-        for i in range(0, len(self.line_dict)):
-            self.graphicsScene.removeItem(self.line_dict[self.line_dict.keys()[i]])
-        for i in range(0, len(self.arrow_list)):
-            self.graphicsScene.removeArrow(self.arrow_list[i])
+       # for i in range(0, len(self.graphicsScene.line_dict)):
+            #print(self.graphicsScene.line_dict.keys()[i])
+            #print(self.graphicsScene.line_dict[self.graphicsScene.line_dict.keys()[i]])
+           # self.graphicsScene.remove_edge(self.graphicsScene.line_dict.keys()[0])
+        #for i in range(0, len(self.arrow_list)):
+            #self.graphicsScene.removeArrow(self.arrow_list[i])
+        self.graphicsScene.reset()
         self.vbox = QVBoxLayout()
         self.vbox_list = []
         self.FTS_matrix = []
-        self.ellipse_items = []
-        self.ellipse_items_labels = []
+        #self.ellipse_items = []
+        #self.ellipse_items_labels = []
         self.region_of_interest = {}
         self.region_list = []
-        self.regionCounter = 0
-        self.pixel_coords_list = []
+        #self.graphicsScene.regionCounter = 0
+        #self.pixel_coords_list = []
         self.button_save_FTS.setEnabled(False)
-        self.line_dict = {}
-        self.arrow_list = []
+        #self.line_dict = {}
+        #self.arrow_list = []
 
     @Slot(bool)
     def remove_last_ROI(self):
-        self.graphicsScene.removeItem(self.ellipse_items[self.regionCounter-1])
-        self.graphicsScene.removeItem(self.ellipse_items_labels[self.regionCounter-1])
-        self.graphicsScene.removeArrow(self.arrow_list[self.regionCounter-1])
-        del self.arrow_list[self.regionCounter-1]
-        del self.FTS_matrix[self.regionCounter-1]
-        del self.ellipse_items[self.regionCounter-1]
-        del self.ellipse_items_labels[self.regionCounter-1]
-        del self.region_of_interest['r' + str(self.regionCounter).zfill(2)]
-        del self.region_list[self.regionCounter-1]
-        del self.pixel_coords_list[self.regionCounter-1]
-        del self.vbox_list[self.regionCounter-1]
-
-        self.grid.removeWidget(self.groupBox_list[self.regionCounter-1])
-        self.groupBox_list[self.regionCounter-1].deleteLater()
-        del self.groupBox_list[self.regionCounter-1]
-
-        for i in range(0, self.regionCounter-1):
-            self.vbox_list[i].removeWidget(self.FTS_matrix[i][self.regionCounter-1])
-            self.FTS_matrix[i][self.regionCounter-1].deleteLater()
-            del self.FTS_matrix[i][self.regionCounter-1]
-            if str((self.regionCounter)*(i+1)) in self.line_dict.keys():
-                self.graphicsScene.removeItem(self.line_dict[str((self.regionCounter)*(i+1))])
-                del self.line_dict[str((self.regionCounter)*(i+1))]
 
 
-        self.regionCounter = self.regionCounter - 1
-        if self.regionCounter < 1:
+
+        #self.graphicsScene.removeItem(self.ellipse_items[self.graphicsScene.regionCounter-1])
+        #self.graphicsScene.removeItem(self.ellipse_items_labels[self.graphicsScene.regionCounter-1])
+        #self.graphicsScene.removeArrow(self.arrow_list[self.graphicsScene.regionCounter-1])
+        #del self.arrow_list[self.graphicsScene.regionCounter-1]
+        del self.FTS_matrix[self.graphicsScene.regionCounter-1]
+        #del self.ellipse_items[self.graphicsScene.regionCounter-1]
+        #del self.ellipse_items_labels[self.graphicsScene.regionCounter-1]
+        del self.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)]
+        del self.region_list[self.graphicsScene.regionCounter-1]
+        #del self.pixel_coords_list[self.graphicsScene.regionCounter-1]
+        del self.vbox_list[self.graphicsScene.regionCounter-1]
+
+        self.grid.removeWidget(self.groupBox_list[self.graphicsScene.regionCounter-1])
+        self.groupBox_list[self.graphicsScene.regionCounter-1].deleteLater()
+        del self.groupBox_list[self.graphicsScene.regionCounter-1]
+
+        for i in range(0, self.graphicsScene.regionCounter-1):
+            self.vbox_list[i].removeWidget(self.FTS_matrix[i][self.graphicsScene.regionCounter-1])
+            self.FTS_matrix[i][self.graphicsScene.regionCounter-1].deleteLater()
+            del self.FTS_matrix[i][self.graphicsScene.regionCounter-1]
+            if self.graphicsScene.regionCounter < (i+1):
+                if ((str(self.graphicsScene.regionCounter) + '-' + str(i+1)) in self.graphicsScene.line_dict.keys()):
+                    self.graphicsScene.remove_edge((str(self.graphicsScene.regionCounter) + '-' + str(i+1)))
+            else:
+                if ((str(i+1) + '-' + str(self.graphicsScene.regionCounter)) in self.graphicsScene.line_dict.keys()):
+                    self.graphicsScene.remove_edge((str(i+1) + '-' + str(self.graphicsScene.regionCounter)))
+            #if ((str(self.graphicsScene.regionCounter) + '-' + str(i+1)) in self.line_dict.keys()) or ((str(i+1) + '-' + str(self.graphicsScene.regionCounter)) in self.line_dict.keys()):
+
+                #self.graphicsScene.removeItem(self.line_dict[str((self.graphicsScene.regionCounter)*(i+1))])
+                #del self.line_dict[str((self.graphicsScene.regionCounter)*(i+1))]
+        self.graphicsScene.remove_ROI()
+
+        #self.graphicsScene.regionCounter = self.graphicsScene.regionCounter - 1
+        if self.graphicsScene.regionCounter < 1:
             self.button_ROI.setEnabled(False)
 
     @Slot(bool)
@@ -193,27 +209,31 @@ class Map_dialog(QDialog):
         print(pos)
         self.clicked = True
         self.current_arrow = []
-        self.regionCounter += 1
-        self.pixel_coords_list.append(pos)
-        position_of_interest = {'position' : self.pixelToWorld(pos)}
-        print(self.pixelToWorld(pos))
+        #self.graphicsScene.regionCounter += 1
+        self.graphicsScene.add_ROI(pos)
+        print(self.graphicsScene.regionCounter)
+        #self.pixel_coords_list.append(pos)
+        position_of_interest = {'position' : self.graphicsScene.pixelToWorld(pos)}
+        print(self.graphicsScene.pixelToWorld(pos))
         self.pose_of_interest = {'pose': position_of_interest}
-        self.region_list.append('r' + str(self.regionCounter).zfill(2))
-        #self.region_of_interest.update({'r' + str(self.regionCounter).zfill(2) : position_of_interest})
+        self.region_list.append('r' + str(self.graphicsScene.regionCounter).zfill(2))
+        #self.region_of_interest.update({'r' + str(self.graphicsScene.regionCounter).zfill(2) : position_of_interest})
 
-        markerSize = 13
+        #markerSize = 13
 
-        self.ellipse_items.append(QGraphicsEllipseItem(QRectF(QPointF(pos.x() - markerSize/2, pos.y() - markerSize/2), QSizeF(markerSize, markerSize))))
-        self.ellipse_items[self.regionCounter - 1].setBrush(QBrush(QColor('red')))
-        self.graphicsScene.addItem(self.ellipse_items[self.regionCounter - 1])
+        #self.ellipse_items.append(QGraphicsEllipseItem(QRectF(QPointF(pos.x() - markerSize/2, pos.y() - markerSize/2), QSizeF(markerSize, markerSize))))
+        #self.ellipse_items[self.graphicsScene.regionCounter - 1].setBrush(QBrush(QColor('red')))
+        #self.graphicsScene.addItem(self.ellipse_items[self.graphicsScene.regionCounter - 1])
 
-        label_font = QFont()
-        label_font.setPointSize(15)
-        regionString = 'r' + str(self.regionCounter).zfill(2)
-        self.ellipse_items_labels.append(QGraphicsTextItem(regionString))
-        self.ellipse_items_labels[self.regionCounter - 1].setPos(pos)
-        self.ellipse_items_labels[self.regionCounter - 1].setFont(label_font)
-        self.graphicsScene.addItem(self.ellipse_items_labels[self.regionCounter - 1])
+        #label_font = QFont()
+        #label_font.setPointSize(15)
+        regionString = 'r' + str(self.graphicsScene.regionCounter).zfill(2)
+        #self.ellipse_items_labels.append(QGraphicsTextItem(regionString))
+        #self.ellipse_items_labels[self.graphicsScene.regionCounter - 1].setPos(pos)
+        #self.ellipse_items_labels[self.graphicsScene.regionCounter - 1].setFont(label_font)
+        #self.graphicsScene.addItem(self.ellipse_items_labels[self.graphicsScene.regionCounter - 1])
+
+
         self.button_save_FTS.setEnabled(True)
 
         groupBox = QGroupBox(regionString)
@@ -223,16 +243,16 @@ class Map_dialog(QDialog):
 
         vbox = QVBoxLayout()
         self.vbox_list.append(vbox)
-        for i in range(0, self.regionCounter):
-            if i == (self.regionCounter-1):
+        for i in range(0, self.graphicsScene.regionCounter):
+            if i == (self.graphicsScene.regionCounter-1):
                 for j in range(0, i+1):
                     self.FTS_matrix[i].append(QCheckBox('r' + str(j+1).zfill(2)))
                     self.FTS_matrix[i][j].stateChanged.connect(self.edge_both_ways)
                     self.vbox_list[i].addWidget(self.FTS_matrix[i][j])
             else:
-                self.FTS_matrix[i].append(QCheckBox('r' + str(self.regionCounter).zfill(2)))
-                self.FTS_matrix[i][self.regionCounter-1].stateChanged.connect(self.edge_both_ways)
-                self.vbox_list[i].addWidget(self.FTS_matrix[i][self.regionCounter-1])
+                self.FTS_matrix[i].append(QCheckBox('r' + str(self.graphicsScene.regionCounter).zfill(2)))
+                self.FTS_matrix[i][self.graphicsScene.regionCounter-1].stateChanged.connect(self.edge_both_ways)
+                self.vbox_list[i].addWidget(self.FTS_matrix[i][self.graphicsScene.regionCounter-1])
 
         for i in range(0, len(self.groupBox_list)):
             self.groupBox_list[i].setLayout(self.vbox_list[i])
@@ -242,52 +262,62 @@ class Map_dialog(QDialog):
         self.clicked = False
         print('release')
         print(pos)
-        deltay = -pos.y() + self.pixel_coords_list[self.regionCounter -1].y()
-        deltax = pos.x() - self.pixel_coords_list[self.regionCounter -1].x()
+        deltay = -pos.y() + self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter -1].y()
+        deltax = pos.x() - self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter -1].x()
         theta = atan2(deltay, deltax)
         print('theta selected')
         print(theta)
         quat = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
         print(quat)
         self.pose_of_interest['pose'].update({'orientation' : (float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3]))})
-        self.region_of_interest['r' + str(self.regionCounter).zfill(2)] = self.pose_of_interest
-        self.arrow_list.append(self.current_arrow)
+        self.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)] = self.pose_of_interest
+        self.graphicsScene.arrow_list.append(self.current_arrow)
         self.button_ROI.setEnabled(True)
         print(self.region_of_interest)
 
     def mouseMove(self, pos):
         arrow_length = 50
         if self.clicked:
-            theta = atan2((pos.y() - self.pixel_coords_list[self.regionCounter - 1].y()) , (pos.x() - self.pixel_coords_list[self.regionCounter - 1].x()))
-            end_point = QPointF(self.pixel_coords_list[self.regionCounter - 1].x() + arrow_length * cos(theta), self.pixel_coords_list[self.regionCounter - 1].y() + arrow_length * sin(theta))
+            theta = atan2((pos.y() - self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter - 1].y()) , (pos.x() - self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter - 1].x()))
+            end_point = QPointF(self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter - 1].x() + arrow_length * cos(theta), self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter - 1].y() + arrow_length * sin(theta))
             if len(self.current_arrow) > 0:
                 self.graphicsScene.removeArrow(self.current_arrow)
-            self.current_arrow = self.graphicsScene.addArrow(self.pixel_coords_list[self.regionCounter - 1], end_point)
+            self.current_arrow = self.graphicsScene.addArrow(self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter - 1], end_point)
 
 
-    def pixelToWorld(self, pixel_coords = QPointF()):
-        print('origin')
-        print(self.worldOrigin)
-        world_coords = ((pixel_coords.x() - self.worldOrigin.x()) * self.map_resolution, -(pixel_coords.y() - self.worldOrigin.y()) * self.map_resolution, 0.0)
-        return world_coords
+   # def pixelToWorld(self, pixel_coords = QPointF()):
+   #     print('origin')
+   #     print(self.graphicsScene.worldOrigin)
+   #     world_coords = ((pixel_coords.x() - self.graphicsScene.worldOrigin.x()) * self.graphicsScene.map_resolution, -(pixel_coords.y() - self.graphicsScene.worldOrigin.y()) * self.graphicsScene.map_resolution, 0.0)
+   #     return world_coords
 
     @Slot(bool)
     def edge_both_ways(self, state):        
-        for i in range(0, self.regionCounter):
-            for j in range(0, self.regionCounter):
+        for i in range(0, self.graphicsScene.regionCounter):
+            for j in range(0, self.graphicsScene.regionCounter):
                 if self.FTS_matrix[i][j].checkState() != self.FTS_matrix[j][i].checkState():
                     if state == 2:
                         self.FTS_matrix[j][i].setCheckState(2)
-                        if str((j+1)*(i+1)) not in self.line_dict.keys():
-                            self.line_dict[str((j+1)*(i+1))] = QGraphicsLineItem(QLineF(self.pixel_coords_list[i], self.pixel_coords_list[j]))
-                            self.graphicsScene.addItem(self.line_dict[str((j+1)*(i+1))])
-                            print((j+1)*(i+1))
+                        if i < j:
+                            if (str(i+1) + '-' + str(j+1)) not in self.graphicsScene.line_dict.keys():
+                                self.graphicsScene.add_edge(i+1, j+1)
+                                #self.line_dict[(str(j+1) + '-' + str(i+1))] = QGraphicsLineItem(QLineF(self.graphicsScene.pixel_coords_list[i], self.graphicsScene.pixel_coords_list[j]))
+                                #self.graphicsScene.addItem(self.line_dict[(str(j+1) + '-' + str(i+1))])
+                                print((str(i+1) + '-' + str(j+1)))
+                        else:
+                            if (str(j+1) + '-' + str(i+1)) not in self.graphicsScene.line_dict.keys():
+                                self.graphicsScene.add_edge(j+1, i+1)
+                                #self.line_dict[(str(j+1) + '-' + str(i+1))] = QGraphicsLineItem(QLineF(self.graphicsScene.pixel_coords_list[i], self.graphicsScene.pixel_coords_list[j]))
+                                #self.graphicsScene.addItem(self.line_dict[(str(j+1) + '-' + str(i+1))])
+                                print((str(j+1) + '-' + str(i+1)))
+
                     elif state == 0:
-                        print((j+1)*(i+1))
+                        print((str(i+1) + '-' + str(j+1)))
                         self.FTS_matrix[j][i].setCheckState(0)
-                        if str((j+1)*(i+1)) in self.line_dict.keys():
-                            self.graphicsScene.removeItem(self.line_dict[str((j+1)*(i+1))])
-                            del self.line_dict[str((j+1)*(i+1))]
+                        if (str(i+1) + '-' + str(j+1)) in self.graphicsScene.line_dict.keys():
+                            self.graphicsScene.remove_edge(str(i+1) + '-' + str(j+1))
+                            #self.graphicsScene.removeItem(self.line_dict[(str(j+1) + '-' + str(i+1))])
+                            #del self.line_dict[(str(j+1) + '-' + str(i+1))]
 
     @Slot(bool)
     def on_button_cancel_pressed(self):

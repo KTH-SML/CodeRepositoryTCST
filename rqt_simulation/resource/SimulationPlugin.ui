@@ -163,6 +163,9 @@
       <height>421</height>
      </rect>
     </property>
+    <property name="mouseTracking">
+     <bool>false</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="button_remove_robot">
     <property name="geometry">

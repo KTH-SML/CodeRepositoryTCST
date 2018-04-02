@@ -94,45 +94,48 @@ class SimulationWidget(QWidget):
         self.graphicsView_main.setScene(self.current_graphicsScene)
 
         # Items for displaying ROIs
-        self.ellipse_items_RI = []
-        self.ellipse_items_labels_RI = []
+        #self.ellipse_items_RI = []
+        #self.ellipse_items_labels_RI = []
         self.initial_pose_textItem_list = []
         self.initial_pose = {}
         self.region_of_interest = {}
         self.green_ellipse_list = []
 
         # Items for displaying FTS
-        self.line_dict = {}
-        self.arrow_list = []
+        #self.line_dict = {}
+        #self.arrow_list = []
 
         # Load map image
         self.scenario = self.world_comboBox.currentText()
-        map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
-        self.loadConfig(map_yaml)
-        if self.scenario == 'pal_office' or self.scenario == 'sml':
-            map = 'map.pgm'
-        else:
-            map = 'map.png'
+        self.current_graphicsScene.load_map(self.scenario)
+        #map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
+        #self.loadConfig(map_yaml)
+        #if self.scenario == 'pal_office' or self.scenario == 'sml':
+        #    map = 'map.pgm'
+        #else:
+        #    map = 'map.png'
 
-        map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
-        pixmap = QPixmap(map_file)
-        mapSize = pixmap.size()
-        self.current_graphicsScene.addPixmap(pixmap)
+        #map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
+        #pixmap = QPixmap(map_file)
+        #mapSize = pixmap.size()
+        #self.current_graphicsScene.addPixmap(pixmap)
 
         # Add world origin
-        self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
-        self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
+        #self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
+        #self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
 
         # Scale map
         rectF = self.graphicsView_main.geometry()
-        if (float(rectF.width())/mapSize.width() < float(rectF.height())/mapSize.height()):
-            scale = float(rectF.width())/mapSize.width()
+        if (float(rectF.width())/self.current_graphicsScene.mapSize.width() < float(rectF.height())/self.current_graphicsScene.mapSize.height()):
+            scale = float(rectF.width())/self.current_graphicsScene.mapSize.width()
         elif self.scenario == 'pal_office' or self.scenario == 'sml':
             scale = 0.7
         else:
-            scale = float(rectF.height())/mapSize.height()
+            scale = float(rectF.height())/self.current_graphicsScene.mapSize.height()
         transform = QTransform(scale, 0, 0.0, scale, 0, 0)
         self.graphicsView_main.setTransform(transform)
+
+        #self.map_dialog = Map_dialog(self.current_graphicsScene)
 
         # ROI marker msg
         self.region_pose_marker_array_msg = MarkerArray()
@@ -157,8 +160,8 @@ class SimulationWidget(QWidget):
         # Reinitialize map and clear all item lists
         self.current_graphicsScene = MapGraphicsScene()
         self.graphicsView_main.setScene(self.current_graphicsScene)
-        self.ellipse_items_RI = []
-        self.ellipse_items_labels_RI = []
+        #self.ellipse_items_RI = []
+        #self.ellipse_items_labels_RI = []
         self.initial_pose_textItem_list = []
         for i in range(0, self.num_robots):
             self.tab_list[i].robot_comboBox_init.clear()
@@ -169,32 +172,34 @@ class SimulationWidget(QWidget):
         self.initial_pose = {}
         self.region_of_interest = {}
 
-        self.line_dict = {}
+        #self.line_dict = {}
         self.prefix_string = ''
         self.sufix_string = ''
-        self.arrow_list = []
+        #self.arrow_list = []
 
         self.scenario = self.world_comboBox.currentText()
-        map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
-        self.loadConfig(map_yaml)
-        if self.scenario == 'pal_office' or self.scenario == 'sml':
-            map = 'map.pgm'
-        else:
-            map = 'map.png'
+        self.current_graphicsScene.load_map(self.scenario)
+        #self.map_dialog = Map_dialog(self.current_graphicsScene)
+        #map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, 'map.yaml')
+        #self.loadConfig(map_yaml)
+        #if self.scenario == 'pal_office' or self.scenario == 'sml':
+        #    map = 'map.pgm'
+        #else:
+        #    map = 'map.png'
 
-        map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
-        pixmap = QPixmap(map_file)
-        mapSize = pixmap.size()
-        self.current_graphicsScene.addPixmap(pixmap)
+        #map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
+        #pixmap = QPixmap(map_file)
+        #mapSize = pixmap.size()
+        #self.current_graphicsScene.addPixmap(pixmap)
 
-        self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
-        self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
+        #self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
+        #self.current_graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
 
         rectF = self.graphicsView_main.geometry()
-        if (float(rectF.width())/mapSize.width() < float(rectF.height())/mapSize.height()):
-           scale = float(rectF.width())/mapSize.width()
+        if (float(rectF.width())/self.current_graphicsScene.mapSize.width() < float(rectF.height())/self.current_graphicsScene.mapSize.height()):
+           scale = float(rectF.width())/self.current_graphicsScene.mapSize.width()
         else:
-           scale = float(rectF.height())/mapSize.height()
+           scale = float(rectF.height())/self.current_graphicsScene.mapSize.height()
         transform = QTransform(scale, 0, 0.0, scale, 0, 0)
         self.graphicsView_main.setTransform(transform)
 
@@ -258,40 +263,41 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def on_button_RI_pressed(self):
         # Check if map is empty and remove items
-        graphicScene_item = self.current_graphicsScene.items()
-        if len(graphicScene_item) > 9:
-            for i in range(0, len(self.ellipse_items_RI)):
-                self.current_graphicsScene.removeItem(self.ellipse_items_RI[i])
-                self.current_graphicsScene.removeItem(self.ellipse_items_labels_RI[i])
-            for i in range(0, self.num_robots):
-                self.current_graphicsScene.removeItem(self.tab_list[i].initial_pose_textItem)
-            for i in range(0, len(self.line_dict)):
-                self.current_graphicsScene.removeItem(self.line_dict[self.line_dict.keys()[i]])
-            for i in range(0, len(self.arrow_list)):
-                self.current_graphicsScene.removeArrow(self.arrow_list[i])
-            for i in range(0, self.num_robots):
-                self.tab_list[i].robot_sufix_textbox.clear()
-                self.tab_list[i].robot_prefix_textbox.clear()
-                self.tab_list[i].robot_comboBox_init.clear()
+        #graphicScene_item = self.current_graphicsScene.items()
+        #if len(graphicScene_item) > 9:
+        #    for i in range(0, len(self.ellipse_items_RI)):
+        #        self.current_graphicsScene.removeItem(self.ellipse_items_RI[i])
+        #        self.current_graphicsScene.removeItem(self.ellipse_items_labels_RI[i])
+        #    for i in range(0, self.num_robots):
+        #        self.current_graphicsScene.removeItem(self.tab_list[i].initial_pose_textItem)
+        #    for i in range(0, len(self.line_dict)):
+        #        self.current_graphicsScene.removeItem(self.line_dict[self.line_dict.keys()[i]])
+        #    for i in range(0, len(self.arrow_list)):
+        #        self.current_graphicsScene.removeArrow(self.arrow_list[i])
+        #    for i in range(0, self.num_robots):
+        #        self.tab_list[i].robot_sufix_textbox.clear()
+        #        self.tab_list[i].robot_prefix_textbox.clear()
+        #        self.tab_list[i].robot_comboBox_init.clear()
 
         # Start map dialog
-        map_dialog = Map_dialog(self.world_comboBox.currentText(), self.current_graphicsScene)
+        map_dialog = Map_dialog(self.current_graphicsScene)
         map_dialog.exec_()
 
         # Copy selected ROIs and FTS
-        self.ellipse_items_RI = map_dialog.ellipse_items
-        self.ellipse_items_labels_RI = map_dialog.ellipse_items_labels
+        #self.ellipse_items_RI = map_dialog.ellipse_items
+        #self.ellipse_items_labels_RI = map_dialog.ellipse_items_labels
         self.region_of_interest = map_dialog.region_of_interest
-        self.pixel_coords = map_dialog.pixel_coords_list
+        #self.pixel_coords = map_dialog.pixel_coords_list
         self.region_list = map_dialog.region_list
         #self.add_region_marker(self.region_of_interest, False)
-        self.line_dict = map_dialog.line_dict
-        self.arrow_list = map_dialog.arrow_list
+        #self.line_dict = map_dialog.line_dict
+        #self.arrow_list = map_dialog.arrow_list
 
         # Add initial poses
-        if len(self.ellipse_items_RI) > 0:
+        if len(self.current_graphicsScene.ellipse_items) > 0:
             for i in range(0, self.num_robots):
-                self.current_graphicsScene.addItem(self.tab_list[i].initial_pose_textItem)
+                self.tab_list[i].robot_comboBox_init.clear()
+                #self.current_graphicsScene.addItem(self.tab_list[i].initial_pose_textItem)
                 for j in range(0, len(self.region_of_interest)):
                     self.tab_list[i].robot_comboBox_init.addItem(self.region_of_interest.keys()[j])
                 self.tab_list[i].robot_comboBox_init.model().sort(0)
@@ -314,11 +320,11 @@ class SimulationWidget(QWidget):
             self.green_ellipse_list[id-1] = index
             for i in range(0, len(self.region_list)):
                 if i in self.green_ellipse_list:
-                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('green')))
+                    self.current_graphicsScene.ellipse_items[i].setBrush(QBrush(QColor('green')))
                 else:
-                    self.ellipse_items_RI[i].setBrush(QBrush(QColor('red')))
+                    self.current_graphicsScene.ellipse_items[i].setBrush(QBrush(QColor('red')))
                 if i == index:
-                    rect = self.ellipse_items_RI[i].rect()
+                    rect = self.current_graphicsScene.ellipse_items[i].rect()
                     point = rect.topLeft()
                     self.tab_list[id -1].initial_pose_textItem.setPos(point.x() - 11, point.y() - 22)
 
@@ -530,7 +536,7 @@ class SimulationWidget(QWidget):
            for i in range(0, len(self.region_of_interest)):
                self.tab_list[self.num_robots-1].robot_comboBox_init.addItem(self.region_of_interest.keys()[i])
            self.tab_list[self.num_robots-1].robot_comboBox_init.model().sort(0)
-        if len(self.ellipse_items_RI) > 0:
+        if len(self.current_graphicsScene.ellipse_items) > 0:
            self.tab_list[self.num_robots-1].init_pose_msg.position.x = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['position'][0]
            self.tab_list[self.num_robots-1].init_pose_msg.position.y = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['position'][1]
            self.tab_list[self.num_robots-1].init_pose_msg.position.z = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['position'][2]
@@ -538,8 +544,8 @@ class SimulationWidget(QWidget):
            self.tab_list[self.num_robots-1].init_pose_msg.orientation.x = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['orientation'][1]
            self.tab_list[self.num_robots-1].init_pose_msg.orientation.y = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['orientation'][2]
            self.tab_list[self.num_robots-1].init_pose_msg.orientation.z = self.region_of_interest[self.region_of_interest.keys()[0]]['pose']['orientation'][3]
-           self.ellipse_items_RI[0].setBrush(QBrush(QColor('green')))
-           rect = self.ellipse_items_RI[0].rect()
+           self.current_graphicsScene.ellipse_items[0].setBrush(QBrush(QColor('green')))
+           rect = self.current_graphicsScene.ellipse_items[0].rect()
            point = rect.topLeft()
            self.tab_list[self.num_robots-1].initial_pose_textItem.setPos(point.x() - 11, point.y() - 22)
         self.tab_list[self.num_robots-1].robot_comboBox_init.signalIndexChanged.connect(self.set_init_pose_id)
