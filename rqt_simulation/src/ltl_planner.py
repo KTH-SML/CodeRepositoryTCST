@@ -61,7 +61,8 @@ class LtlPlannerNode(object):
         # Subscribers
         #------------
         if self.agent_type == 'ground':
-            localization_topic = 'amcl_pose'
+            #localization_topic = 'amcl_pose'
+            localization_topic = 'pose'
         elif self.agent_type == 'arial':
             localization_topic = 'ground_truth/pose_with_covariance'
         self.sub_amcl_pose = rospy.Subscriber(localization_topic, PoseWithCovarianceStamped, self.PoseCallback)
@@ -92,6 +93,7 @@ class LtlPlannerNode(object):
         self.SufixPlanPublisher.publish(sufix_msg)
         ### start up move_base
         self.navigation = actionlib.SimpleActionClient("move_base", MoveBaseAction)
+        self.navi_goal = GoalMsg = MoveBaseGoal()
         #rospy.loginfo("wait for the move_base action server to come up")
         #allow up to 5 seconds for the action server to come up
         #navigation.wait_for_server(rospy.Duration(5))
@@ -135,7 +137,7 @@ class LtlPlannerNode(object):
             if self.agent_type == 'ground':
                 #print('planner')
                 #if ((position_error < 0.15) and (orientation_error < 0.3)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
-                if ((position_error < 0.15)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
+                if ((position_error < 0.2)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
                     print('now')
                     print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
                     self.planner.find_next_move()

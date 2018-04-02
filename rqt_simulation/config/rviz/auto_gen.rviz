@@ -327,17 +327,6 @@ Visualization Manager:
         Value: true
       Enabled: true
       Name: Mapping
-    - Class: rviz/Camera
-      Enabled: true
-      Image Rendering: background and overlay
-      Image Topic: /robot1/camera/rgb/image_raw
-      Name: Camera
-      Overlay Alpha: 0.5
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      'Value ': true
-      Zoom Factor: 1
     Enabled: true
     Name: robot1
   - Class: rviz/Group
@@ -635,17 +624,6 @@ Visualization Manager:
         Value: true
       Enabled: true
       Name: Mapping
-    - Class: rviz/Camera
-      Enabled: true
-      Image Rendering: background and overlay
-      Image Topic: /robot2/camera/rgb/image_raw
-      Name: Camera
-      Overlay Alpha: 0.5
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      'Value ': true
-      Zoom Factor: 1
     Enabled: true
     Name: robot2
   - Class: rviz/MarkerArray

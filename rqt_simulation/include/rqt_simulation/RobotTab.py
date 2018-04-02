@@ -9,6 +9,7 @@ import time
 import codecs
 import roslaunch
 import numpy as np
+from copy import deepcopy
 from geometry_msgs.msg import Point, Pose, PoseArray, PoseWithCovarianceStamped, PoseStamped, PolygonStamped, PointStamped
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
@@ -120,8 +121,11 @@ class RobotTab(QWidget):
 
         self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
 
+        self.pose_msg = PoseWithCovarianceStamped()
+        self.pose_msg.pose.pose = self.init_pose_msg
         self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
         self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose', PoseWithCovarianceStamped, 15.0, self.pose_msg)
         self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
 
         self.simulation_started = False
@@ -133,10 +137,13 @@ class RobotTab(QWidget):
         self.robot_current_goal = MoveBaseActionGoal()
 
     def current_pose_amcl_callback(self, msg):
+        self.pose_msg.pose.pose = deepcopy(msg.pose.pose)
+
         if self.agent_type == 'ground':
             self.label_marker_msg.header = msg.header
             self.label_marker_msg.pose = msg.pose.pose
-            self.label_marker_msg.pose.position.z = msg.pose.pose.position.z + 1.0
+            self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1
+        #print(self.pose_msg)
 
     def current_pose_gazebo_ground_truth_callback(self, msg):
         if self.agent_type == 'arial':

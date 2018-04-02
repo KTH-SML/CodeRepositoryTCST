@@ -316,13 +316,14 @@ class RVIZFileGenerator:
 
         robot.append(dict_mapping_folder)
 
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
-            # Camera
-            if robot_model == 'tiago':
-                image_topic = '/' + self.robot_name + '/xtion/rgb/image_raw'
-            elif robot_model == 'turtlebot':
-                image_topic = '/' + self.robot_name + '/camera/rgb/image_raw'
-            robot.append(self.add_camera(image_topic))
+
+        #if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        #    # Camera
+        #    if robot_model == 'tiago':
+        #        image_topic = '/' + self.robot_name + '/xtion/rgb/image_raw'
+        #    elif robot_model == 'turtlebot':
+        #        image_topic = '/' + self.robot_name + '/camera/rgb/image_raw'
+        #    robot.append(self.add_camera(image_topic))
 
         dict_robot.update({'Displays' : robot})
         dict_robot.update({'Enabled' : True, 'Name' : self.robot_name})
