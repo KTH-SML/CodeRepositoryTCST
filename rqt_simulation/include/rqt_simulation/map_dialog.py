@@ -12,13 +12,13 @@ from pyquaternion import Quaternion
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QDialog, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QVBoxLayout, QGridLayout, QRadioButton, QGroupBox, QCheckBox, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsLineItem
+from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QDialog, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QVBoxLayout, QGridLayout, QRadioButton, QGroupBox, QCheckBox, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsLineItem, QFileDialog
 from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QRectF, QSizeF, QLineF, Slot, pyqtSlot, Qt
 from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont
 
 class Map_dialog(QDialog):
     signalCheckBoxIndex = pyqtSignal([int], [int])
-    def __init__(self, current_graphicsScene):
+    def __init__(self, current_graphicsScene, FTS):
 
         super(Map_dialog, self).__init__()
         self.setObjectName('Map_dialog')
@@ -29,16 +29,41 @@ class Map_dialog(QDialog):
         #main_widget = SimulationWidget()
         #print(self.scenario)
         self.graphicsScene = current_graphicsScene
+        self.FTS = FTS
 
         ui_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'resource', 'map.ui')
         loadUi(ui_file, self)
 
         self.grid = QGridLayout()
-        self.grid.addWidget(self.groupBox, 0, 0)
+        #self.grid.setColumnMinimumWidth(0, 50)
+        #self.grid.addWidget(self.groupBox_edges, 0, 0)
+
         self.groupBox_list = []
         self.FTS_matrix = []
         self.vbox_list = []
         self.vbox = QVBoxLayout()
+
+        for i in range(0, self.graphicsScene.regionCounter):
+            groupBox = QGroupBox(self.FTS.region_of_interest.keys()[i])
+            self.groupBox_list.append(groupBox)
+            #self.groupBox_list[self.graphicsScene.regionCounter-1].setMinimumWidth(50)
+            checkBox_list = []
+            self.FTS_matrix.append(checkBox_list)
+
+            vbox = QVBoxLayout()
+            self.vbox_list.append(vbox)
+            for j in range(0, self.graphicsScene.regionCounter):
+                self.FTS_matrix[i].append(QCheckBox('r' + str(j+1).zfill(2)))
+                self.FTS_matrix[i][j].stateChanged.connect(self.edge_both_ways)
+                self.vbox_list[i].addWidget(self.FTS_matrix[i][j])
+
+            self.groupBox_list[i].setLayout(self.vbox_list[i])
+            self.grid.addWidget(self.groupBox_list[i], 0, i+1, Qt.AlignRight)
+
+        for i in range(0, self.graphicsScene.regionCounter):
+            for j in range(0, self.graphicsScene.regionCounter):
+                if (str(i) + '-' + str(j)) in self.graphicsScene.line_dict.keys():
+                    self.FTS_matrix[i][j].setCheckState(2)
 
         self.clicked = False
         #self.arrow_list = []
@@ -46,7 +71,8 @@ class Map_dialog(QDialog):
         #self.grid.addWidget(self.graphicsView, 0, 0, 2, 1)
         #self.grid.addWidget(self.button_save_ROI, 0, 2)
         #self.grid.addWidget(self.button_reset, 1, 2)
-        self.setLayout(self.grid)
+        #self.groupBox_edges.setLayout(self.grid)
+        self.scrollAreaWidgetContents.setLayout(self.grid)
 
         #map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.graphicsScene.scenario, 'map.yaml')
         #self.loadConfig(map_yaml)
@@ -59,12 +85,13 @@ class Map_dialog(QDialog):
         self.button_ROI.clicked.connect(self.remove_last_ROI)
         self.button_ROI.setEnabled(False)
         self.button_delete_edges.clicked.connect(self.delete_edges)
+        self.button_load_FTS.clicked.connect(self.load_FTS)
         #self.button_set_edges.setEnabled(False)
 
         #self.graphicsScene.regionCounter = 0
-        self.region_list = []
+        #self.region_list = []
         #self.ellipse_items = []
-        self.region_of_interest = {}
+        #self.region_of_interest = {}
         #self.ellipse_items_labels = []
         #self.pixel_coords_list = []
         #self.line_dict = {}
@@ -74,42 +101,27 @@ class Map_dialog(QDialog):
         self.graphicsScene.signalMouseReleasedPos.connect(self.pointRelease)
         self.graphicsScene.signalMouseMovePos.connect(self.mouseMove)
 
-        #if self.scenario == 'pal_office' or self.scenario == 'sml':
-        #    map = 'map.pgm'
-        #else:
-        #    map = 'map.png'
-
-        #map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', self.scenario, map)
-        #print(map_file)
-        #pixmap = QPixmap(map_file)
-        #mapSize = pixmap.size()
-        #self.graphicsScene.addPixmap(pixmap)
-        #print('map_origin')
-        #print(self.map_origin)
-        #print('mapsize')
-        #print(mapSize.height())
-        #self.worldOrigin = QPointF(-self.map_origin[0]/self.map_resolution, self.map_origin[1]/self.map_resolution + mapSize.height())
-
-        #self.graphicsScene.addCoordinateSystem(self.worldOrigin, 0.0)
         self.graphicsView.setScene(self.graphicsScene)
 
     @Slot(bool)
     def on_button_FTS_save_pressed(self):
         self.button_save_FTS.setEnabled(False)
         for i in range(0, len(self.FTS_matrix)):
-            edges = []
+            #edges = []
 
             for j in range(0, len(self.FTS_matrix[0])):
                 if (self.FTS_matrix[i][j].checkState() == 2):
-                    edges.append({'cost' : 1.0, 'target': self.region_list[j]})
+                    self.FTS.add_edge(self.FTS.region_of_interest.keys()[i], self.FTS.region_of_interest.keys()[j], cost=1.0)
+                    #edges.append({'cost' : 1.0, 'target': self.FTS.region_of_interest.keys()[j]})
                     #edge.update({'target': self.region_list[j]})
-                    print(edges)
+                    #print('edges')
 
-            self.region_of_interest[self.region_list[i]].update({'edges' : edges})
+            #self.FTS.region_of_interest[self.FTS.region_list[i]].update({'edges' : edges})
+            #self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]]['edges'] = edges
 
         print('start saving')
         data = dict(
-            self.region_of_interest,
+            self.FTS.region_of_interest,
             #actions = 'TODO'
         )
         print(data)
@@ -142,8 +154,8 @@ class Map_dialog(QDialog):
         self.FTS_matrix = []
         #self.ellipse_items = []
         #self.ellipse_items_labels = []
-        self.region_of_interest = {}
-        self.region_list = []
+        self.FTS.region_of_interest = {}
+        #self.FTS.region_list = []
         #self.graphicsScene.regionCounter = 0
         #self.pixel_coords_list = []
         self.button_save_FTS.setEnabled(False)
@@ -162,8 +174,8 @@ class Map_dialog(QDialog):
         del self.FTS_matrix[self.graphicsScene.regionCounter-1]
         #del self.ellipse_items[self.graphicsScene.regionCounter-1]
         #del self.ellipse_items_labels[self.graphicsScene.regionCounter-1]
-        del self.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)]
-        del self.region_list[self.graphicsScene.regionCounter-1]
+        del self.FTS.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)]
+        #del self.FTS.region_list[self.graphicsScene.regionCounter-1]
         #del self.pixel_coords_list[self.graphicsScene.regionCounter-1]
         del self.vbox_list[self.graphicsScene.regionCounter-1]
 
@@ -213,10 +225,10 @@ class Map_dialog(QDialog):
         self.graphicsScene.add_ROI(pos)
         print(self.graphicsScene.regionCounter)
         #self.pixel_coords_list.append(pos)
-        position_of_interest = {'position' : self.graphicsScene.pixelToWorld(pos)}
+        self.pose_of_interest = {'position' : self.graphicsScene.pixelToWorld(pos)}
         print(self.graphicsScene.pixelToWorld(pos))
-        self.pose_of_interest = {'pose': position_of_interest}
-        self.region_list.append('r' + str(self.graphicsScene.regionCounter).zfill(2))
+        #self.pose_of_interest = position_of_interest
+        #self.FTS.region_list.append('r' + str(self.graphicsScene.regionCounter).zfill(2))
         #self.region_of_interest.update({'r' + str(self.graphicsScene.regionCounter).zfill(2) : position_of_interest})
 
         #markerSize = 13
@@ -238,6 +250,7 @@ class Map_dialog(QDialog):
 
         groupBox = QGroupBox(regionString)
         self.groupBox_list.append(groupBox)
+        #self.groupBox_list[self.graphicsScene.regionCounter-1].setMinimumWidth(50)
         checkBox_list = []
         self.FTS_matrix.append(checkBox_list)
 
@@ -269,11 +282,14 @@ class Map_dialog(QDialog):
         print(theta)
         quat = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
         print(quat)
-        self.pose_of_interest['pose'].update({'orientation' : (float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3]))})
-        self.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)] = self.pose_of_interest
+        self.pose_of_interest.update({'orientation' : (float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3]))})
+        #self.FTS.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)] = self.pose_of_interest
+        edges = []
+        self.FTS.add_region('r' + str(self.graphicsScene.regionCounter).zfill(2), edges, pose = self.pose_of_interest)
+        print(self.FTS)
         self.graphicsScene.arrow_list.append(self.current_arrow)
         self.button_ROI.setEnabled(True)
-        print(self.region_of_interest)
+        print(self.FTS.region_of_interest)
 
     def mouseMove(self, pos):
         arrow_length = 50
@@ -283,13 +299,6 @@ class Map_dialog(QDialog):
             if len(self.current_arrow) > 0:
                 self.graphicsScene.removeArrow(self.current_arrow)
             self.current_arrow = self.graphicsScene.addArrow(self.graphicsScene.pixel_coords_list[self.graphicsScene.regionCounter - 1], end_point)
-
-
-   # def pixelToWorld(self, pixel_coords = QPointF()):
-   #     print('origin')
-   #     print(self.graphicsScene.worldOrigin)
-   #     world_coords = ((pixel_coords.x() - self.graphicsScene.worldOrigin.x()) * self.graphicsScene.map_resolution, -(pixel_coords.y() - self.graphicsScene.worldOrigin.y()) * self.graphicsScene.map_resolution, 0.0)
-   #     return world_coords
 
     @Slot(bool)
     def edge_both_ways(self, state):        
@@ -301,12 +310,16 @@ class Map_dialog(QDialog):
                         if i < j:
                             if (str(i+1) + '-' + str(j+1)) not in self.graphicsScene.line_dict.keys():
                                 self.graphicsScene.add_edge(i+1, j+1)
+                                #self.FTS.add_edge('r' + str(i+1).zfill(2), 'r' + str(j+1).zfill(2), cost=1.0)
+                                #self.FTS.add_edge('r' + str(j+1).zfill(2), 'r' + str(i+1).zfill(2), cost=1.0)
                                 #self.line_dict[(str(j+1) + '-' + str(i+1))] = QGraphicsLineItem(QLineF(self.graphicsScene.pixel_coords_list[i], self.graphicsScene.pixel_coords_list[j]))
                                 #self.graphicsScene.addItem(self.line_dict[(str(j+1) + '-' + str(i+1))])
                                 print((str(i+1) + '-' + str(j+1)))
                         else:
                             if (str(j+1) + '-' + str(i+1)) not in self.graphicsScene.line_dict.keys():
                                 self.graphicsScene.add_edge(j+1, i+1)
+                                #self.FTS.add_edge('r' + str(i+1).zfill(2), 'r' + str(j+1).zfill(2), cost=1.0)
+                                #self.FTS.add_edge('r' + str(j+1).zfill(2), 'r' + str(i+1).zfill(2), cost=1.0)
                                 #self.line_dict[(str(j+1) + '-' + str(i+1))] = QGraphicsLineItem(QLineF(self.graphicsScene.pixel_coords_list[i], self.graphicsScene.pixel_coords_list[j]))
                                 #self.graphicsScene.addItem(self.line_dict[(str(j+1) + '-' + str(i+1))])
                                 print((str(j+1) + '-' + str(i+1)))
@@ -316,30 +329,62 @@ class Map_dialog(QDialog):
                         self.FTS_matrix[j][i].setCheckState(0)
                         if (str(i+1) + '-' + str(j+1)) in self.graphicsScene.line_dict.keys():
                             self.graphicsScene.remove_edge(str(i+1) + '-' + str(j+1))
+                            #self.FTS.remove_edge('r' + str(i+1).zfill(2), 'r' + str(j+1).zfill(2))
+                            #self.FTS.remove_edge('r' + str(j+1).zfill(2), 'r' + str(i+1).zfill(2))
                             #self.graphicsScene.removeItem(self.line_dict[(str(j+1) + '-' + str(i+1))])
-                            #del self.line_dict[(str(j+1) + '-' + str(i+1))]
 
     @Slot(bool)
     def on_button_cancel_pressed(self):
         self.on_button_reset_pressed()
         self.accept()
 
-    def loadConfig(self, filename):
-        stream = file(filename, 'r')
-        data = yaml.load(stream)
+    @Slot(bool)
+    def load_FTS(self):
+        directory = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS')
+        File_dialog = QFileDialog(directory=directory, filter='.yaml')
+        FTS_file = File_dialog.getOpenFileName()
+        print(FTS_file[0])
+        stream = file(FTS_file[0], 'r')
+        self.FTS.region_of_interest = yaml.load(stream)
+        sorted_keys = self.FTS.region_of_interest.keys()
+        sorted_keys.sort()
         stream.close()
-        self.map_image = data['image']
-        self.map_resolution = data['resolution']
-        self.map_origin = tuple(data['origin'])
-        self.map_negate = data['negate']
-        self.map_occupied_thresh = data['occupied_thresh']
-        self.map_free_thresh = data['free_thresh']
-        rospy.loginfo('rqt_simulation map : %s' % (self.scenario))
-        rospy.loginfo('rqt_simulation map resolution : %.6f' % (self.map_resolution))
-        rospy.loginfo('rqt_simulation map origin : %s' % (self.map_origin,))
-        rospy.loginfo('rqt_simulation map negate : %s' % (self.map_negate))
-        rospy.loginfo('rqt_simulation map occupied threshold : %s' % (self.map_occupied_thresh))
-        rospy.loginfo('rqt_simulation map free threshold : %s' % (self.map_free_thresh))
 
+        self.graphicsScene.reset()
 
+        arrow_length = 50
 
+        for i in range(0, len(self.FTS.region_of_interest)):
+            pixel_coords = self.graphicsScene.worldToPixel(self.FTS.region_of_interest[sorted_keys[i]]['pose']['position'])
+            self.graphicsScene.add_ROI(pixel_coords)
+
+            quaternion = Quaternion(self.FTS.region_of_interest[sorted_keys[i]]['pose']['orientation'])
+            rot_axis = quaternion.axis
+            theta = quaternion.angle * rot_axis[2]
+            end_point = QPointF(pixel_coords.x() + arrow_length * cos(theta), pixel_coords.y() - arrow_length * sin(theta))
+            arrow = self.graphicsScene.addArrow(pixel_coords, end_point)
+            self.graphicsScene.arrow_list.append(arrow)
+
+            groupBox = QGroupBox(sorted_keys[i])
+            self.groupBox_list.append(groupBox)
+            #self.groupBox_list[self.graphicsScene.regionCounter-1].setMinimumWidth(50)
+            checkBox_list = []
+            self.FTS_matrix.append(checkBox_list)
+
+            vbox = QVBoxLayout()
+            self.vbox_list.append(vbox)
+
+            for j in range(0, len(self.FTS.region_of_interest)):
+                    self.FTS_matrix[i].append(QCheckBox(sorted_keys[j]))
+                    self.FTS_matrix[i][j].stateChanged.connect(self.edge_both_ways)
+                    self.vbox_list[i].addWidget(self.FTS_matrix[i][j])
+
+            self.groupBox_list[i].setLayout(self.vbox_list[i])
+            self.grid.addWidget(self.groupBox_list[i], 0, i+1, Qt.AlignRight)
+
+        for i in range(0, len(self.FTS.region_of_interest)):
+            for j in range(0, len(self.FTS.region_of_interest[sorted_keys[i]]['edges'])):
+                index = sorted_keys.index(self.FTS.region_of_interest[sorted_keys[i]]['edges'][j]['target'])
+                self.FTS_matrix[i][index].setCheckState(2)
+
+        #self.graphicsScene.regionCounter = len(sorted_keys)

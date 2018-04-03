@@ -3,52 +3,78 @@ r01:
   - cost: 1.0
     target: r01
   - cost: 1.0
+    target: r03
+  - cost: 1.0
     target: r02
   - cost: 1.0
-    target: r03
+    target: r04
   pose:
     orientation:
-    - 0.5537478323882297
+    - 0.5923364782216495
     - 0.0
     - 0.0
-    - 0.8326844168863359
+    - 0.8056906953465289
     position:
-    - 13.18
-    - 9.42
+    - 0.2
+    - -7.8500000000000005
     - 0.0
 r02:
   edges:
   - cost: 1.0
     target: r01
   - cost: 1.0
+    target: r03
+  - cost: 1.0
     target: r02
   - cost: 1.0
-    target: r03
+    target: r04
   pose:
     orientation:
-    - 0.639331333927513
-    - -0.0
-    - -0.0
-    - -0.7689313658958561
+    - 0.6511308684688735
+    - 0.0
+    - 0.0
+    - 0.7589654749242356
     position:
-    - 11.52
-    - 13.44
+    - -5.800000000000001
+    - -8.75
     - 0.0
 r03:
   edges:
   - cost: 1.0
     target: r01
   - cost: 1.0
+    target: r03
+  - cost: 1.0
     target: r02
   - cost: 1.0
-    target: r03
+    target: r04
   pose:
     orientation:
-    - 0.5402604845887837
+    - 0.502643817451784
     - 0.0
     - 0.0
-    - 0.8414978364748733
+    - 0.8644936048216306
     position:
-    - 16.56
-    - 10.3
+    - 3.6
+    - -6.4
+    - 0.0
+r04:
+  edges:
+  - cost: 1.0
+    target: r01
+  - cost: 1.0
+    target: r03
+  - cost: 1.0
+    target: r02
+  - cost: 1.0
+    target: r04
+  pose:
+    orientation:
+    - 0.6269073616696567
+    - 0.0
+    - 0.0
+    - 0.7790938068579356
+    position:
+    - -2.45
+    - -1.4000000000000001
     - 0.0

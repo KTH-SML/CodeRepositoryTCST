@@ -28,6 +28,10 @@ class MapGraphicsScene(QGraphicsScene):
         world_coords = ((pixel_coords.x() - self.worldOrigin.x()) * self.map_resolution, -(pixel_coords.y() - self.worldOrigin.y()) * self.map_resolution, 0.0)
         return world_coords
 
+    def worldToPixel(self, world_coords):
+        pixel_coords = QPointF(world_coords[0] / self.map_resolution + self.worldOrigin.x(), -world_coords[1] / self.map_resolution + self.worldOrigin.y())
+        return pixel_coords
+
     def add_ROI(self, pixel_coords):
         self.regionCounter += 1
         self.pixel_coords_list.append(pixel_coords)
