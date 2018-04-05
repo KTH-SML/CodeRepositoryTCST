@@ -1,6 +1,6 @@
-tiago1:
-  hard_task: ([]<> r01) && ([]<> r02)
-  soft_task: ''
-tiago2:
-  hard_task: ([]<> r01) && ([]<> r02)
-  soft_task: ''
+robot1:
+  initial_pose: r01
+  robot_model: None
+  tasks:
+    hard_task: ([]<> r01) && ([]<> r02)
+    soft_task: ''

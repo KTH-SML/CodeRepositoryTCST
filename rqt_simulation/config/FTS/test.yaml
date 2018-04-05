@@ -1,0 +1,131 @@
+FTS:
+  r01:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r05
+    - cost: 1.0
+      target: r04
+    pose:
+      orientation:
+      - 0.5554210012682123
+      - 0.0
+      - 0.0
+      - 0.8315693064021883
+      position:
+      - -5.050000000000001
+      - -8.9
+      - 0.0
+  r02:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r05
+    - cost: 1.0
+      target: r04
+    pose:
+      orientation:
+      - 0.5807267260095248
+      - 0.0
+      - 0.0
+      - 0.8140985626435281
+      position:
+      - -0.8
+      - -7.3500000000000005
+      - 0.0
+  r03:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r05
+    - cost: 1.0
+      target: r04
+    pose:
+      orientation:
+      - 0.5642658043570655
+      - 0.0
+      - 0.0
+      - 0.8255931819202929
+      position:
+      - 3.6
+      - -6.4
+      - 0.0
+  r04:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r05
+    - cost: 1.0
+      target: r04
+    pose:
+      orientation:
+      - 0.5213843843095632
+      - 0.0
+      - 0.0
+      - 0.8533219344410043
+      position:
+      - -1.4500000000000002
+      - -0.15000000000000002
+      - 0.0
+  r05:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r05
+    - cost: 1.0
+      target: r04
+    pose:
+      orientation:
+      - 0.582278827865696
+      - 0.0
+      - 0.0
+      - 0.8129891552901252
+      position:
+      - -7.65
+      - -2.0
+      - 0.0
+Map: pal_office
+Tasks:
+  robot1:
+    initial_pose: r01
+    robot_model: Turtlebot
+    tasks:
+      hard_task: ([]<> r01) && ([]<> r02)
+      soft_task: ''
+  robot2:
+    initial_pose: r02
+    robot_model: Turtlebot
+    tasks:
+      hard_task: ([]<> r01) && ([]<> r02)
+      soft_task: ''
+  robot3:
+    initial_pose: r03
+    robot_model: Turtlebot
+    tasks:
+      hard_task: ([]<> r01) && ([]<> r02)
+      soft_task: ''

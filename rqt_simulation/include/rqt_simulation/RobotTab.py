@@ -57,8 +57,10 @@ class RobotTab(QWidget):
         self.robot_comboBox_init = CustomComboBox(self.num_robots)
         self.layout.addWidget(self.robot_comboBox_init)
 
-        self.initial_pose_label = 'start_' + str(self.num_robots).zfill(2)
-        self.initial_pose_textItem = QGraphicsTextItem(self.initial_pose_label)
+        initial_pose_textItem = QGraphicsTextItem('start_' + str(self.num_robots).zfill(2))
+        self.initial_pose = {'start_' + str(self.num_robots).zfill(2) : {'label' : 'r01', 'text_item' : initial_pose_textItem}}
+        #self.initial_pose_label = 'start_' + str(self.num_robots).zfill(2)
+        #self.initial_pose_textItem = QGraphicsTextItem(self.initial_pose_label)
 
         self.robot_label_task_title = QLabel('Task robot ' + str(self.num_robots))
         self.robot_label_task_title.setFont(font)
@@ -155,9 +157,9 @@ class RobotTab(QWidget):
         if self.simulation_started:
             if self.agent_type == 'ground':
                 msg_point_rounded = Point()
-                msg_point_rounded.x = round(msg.polygon.points[0].x, 3)
-                msg_point_rounded.y = round(msg.polygon.points[0].y, 3)
-                msg_point_rounded.z = round(msg.polygon.points[0].z, 3)
+                msg_point_rounded.x = round(msg.polygon.points[0].x, 2)
+                msg_point_rounded.y = round(msg.polygon.points[0].y, 2)
+                msg_point_rounded.z = round(msg.polygon.points[0].z, 2)
 
                 if msg_point_rounded != self.last_footprint_point.point:
                     self.last_footprint_point.header = msg.header
