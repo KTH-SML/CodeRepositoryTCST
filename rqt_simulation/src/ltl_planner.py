@@ -29,14 +29,14 @@ from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
 
 
-from ltl_tools.fts_loader import robot_model, compute_poly
+from ltl_tools.FTSLoader import FTSLoader
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
 from ltl_tools.planner import ltl_planner
 import visualize_fts
 
 class LtlPlannerNode(object):
     def __init__(self):
-        [self.robot_motion, self.init_pose, self.robot_action, self.robot_task] = robot_model
+        #[self.robot_motion, self.init_pose, self.robot_action, self.robot_task] = robot_model
         self.node_name = "LTL Planner"
         self.active = False
         self.robot_pose = PoseWithCovarianceStamped()
@@ -44,6 +44,10 @@ class LtlPlannerNode(object):
         self.soft_task = ''
         self.robot_name = rospy.get_param('robot_name')
         self.agent_type = rospy.get_param('agent_type')
+        scenario_file = rospy.get_param('scenario_file')
+
+        robot_model = FTSLoader(scenario_file)
+        [self.robot_motion, self.init_pose, self.robot_action, self.robot_task] = robot_model.robot_model
 
         #-----------
         # Publishers

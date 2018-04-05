@@ -17,13 +17,12 @@ from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QRectF
 from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont
 
 class Map_dialog(QDialog):
-    signalCheckBoxIndex = pyqtSignal([int], [int])
+    #signalCheckBoxIndex = pyqtSignal([int], [int])
     def __init__(self, current_graphicsScene, FTS):
-
         super(Map_dialog, self).__init__()
         self.setObjectName('Map_dialog')
 
-        checkBoxChanged = pyqtSignal([int], [int])
+        #checkBoxChanged = pyqtSignal([int], [int])
 
         self.graphicsScene = current_graphicsScene
         self.FTS = FTS
@@ -65,7 +64,6 @@ class Map_dialog(QDialog):
         self.clicked = False
 
         self.scrollAreaWidgetContents.setLayout(self.grid)
-
 
         self.button_save_FTS.pressed.connect(self.on_button_FTS_save_pressed)
         #self.button_save_FTS.setEnabled(False)
@@ -194,23 +192,16 @@ class Map_dialog(QDialog):
 
     def pointRelease(self, pos):
         self.clicked = False
-        print('release')
-        print(pos)
         pixel_coords = self.graphicsScene.items_dict['r' + str(self.graphicsScene.regionCounter).zfill(2)]['pixel_coords']
         deltay = -pos.y() + pixel_coords.y()
         deltax = pos.x() - pixel_coords.x()
         theta = atan2(deltay, deltax)
-        print('theta selected')
-        print(theta)
         quat = Quaternion(axis=(0.0, 0.0, 1.0), radians=theta)
-        print(quat)
         self.pose_of_interest.update({'orientation' : (float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3]))})
         edges = []
         self.FTS.add_region('r' + str(self.graphicsScene.regionCounter).zfill(2), edges, pose = self.pose_of_interest)
-        print(self.FTS)
         self.graphicsScene.items_dict['r' + str(self.graphicsScene.regionCounter).zfill(2)].update({'arrow' : self.current_arrow})
         self.button_ROI.setEnabled(True)
-        print(self.FTS.region_of_interest)
 
     def mouseMove(self, pos):
         arrow_length = 50

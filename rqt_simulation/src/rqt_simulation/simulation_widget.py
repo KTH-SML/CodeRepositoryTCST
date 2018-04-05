@@ -73,6 +73,8 @@ class SimulationWidget(QWidget):
         # Initialize FTS
         self.FTS = FTS()
 
+        self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
+
         # Variables for ROS Publisher
         self.ros_publisher = ROS_Publisher()
 
@@ -160,13 +162,16 @@ class SimulationWidget(QWidget):
             self.tab_list[i].robot_comboBox_init.clear()
             self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'] = QGraphicsTextItem('start_' + str(i+1).zfill(2))
             self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'].setPos(0.0, 0.0)
-            #print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'])
             self.current_graphicsScene.addItem(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'])
             self.tab_list[i].robot_sufix_textbox.clear()
             self.tab_list[i].robot_prefix_textbox.clear()
 
         self.prefix_string = ''
         self.sufix_string = ''
+
+        self.FTS = FTS()
+
+        self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
 
         # Reinitialize ROI marker msg
         self.region_pose_marker_array_msg = MarkerArray()
@@ -210,6 +215,7 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_sufix_textbox.insertPlainText(self.sufix_string)
         self.sufix_string = ''
 
+    # Callback for current goal
     def goal_callback(self, msg, source):
         for i in range(0, len(self.FTS.region_of_interest)):
             if self.position_msg_to_tuple(msg.goal.target_pose.pose.position) == tuple(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]]['pose']['position']):
@@ -219,6 +225,7 @@ class SimulationWidget(QWidget):
         self.current_goal_subscriber_list[index].received.emit(index)
         self.tab_list[index].robot_current_goal = msg
 
+    # Fill current goal in textbox
     @pyqtSlot(int)
     def received_goal(self, index):
         self.tab_list[index].robot_current_goal_textbox.clear()
@@ -227,7 +234,6 @@ class SimulationWidget(QWidget):
 
     @Slot(bool)
     def on_button_RI_pressed(self):
-
         # Start map dialog
         map_dialog = Map_dialog(self.current_graphicsScene, self.FTS)
         map_dialog.exec_()
@@ -236,20 +242,24 @@ class SimulationWidget(QWidget):
         if len(self.current_graphicsScene.items_dict) > 0:
             for i in range(0, self.num_robots):
                 self.tab_list[i].robot_comboBox_init.clear()
-                #self.current_graphicsScene.addItem(self.tab_list[i].initial_pose_textItem)
                 for j in range(0, len(self.FTS.region_of_interest)):
                     self.tab_list[i].robot_comboBox_init.addItem(self.FTS.region_of_interest.keys()[j])
                 self.tab_list[i].robot_comboBox_init.model().sort(0)
 
             self.button_execute_task.setEnabled(True)
 
+    # Change initial pose if checkBox entry changed
+    # index: Is Checkbox index to set initial pose
+    # id: Is the ID of the robot tab, for changing the initial pose of the right robot
     @pyqtSlot(int, int)
     def set_init_pose_id(self, index, id):
-        print(self.tab_list[self.num_robots-1].initial_pose['start_' + str(self.num_robots).zfill(2)]['text_item'])
         if self.tab_list[id -1].robot_comboBox_init.count() > 0:
+
+            # Get the initial pose
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose'] = self.FTS.region_of_interest[self.tab_list[id -1].robot_comboBox_init.currentText()]['pose']
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['label'] = self.tab_list[id -1].robot_comboBox_init.currentText()
 
+            # Save it in initial pose message
             self.tab_list[id -1].init_pose_msg.position.x = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['position'][0]
             self.tab_list[id -1].init_pose_msg.position.y = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['position'][1]
             self.tab_list[id -1].init_pose_msg.position.z = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['position'][2]
@@ -258,6 +268,7 @@ class SimulationWidget(QWidget):
             self.tab_list[id -1].init_pose_msg.orientation.y = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][2]
             self.tab_list[id -1].init_pose_msg.orientation.z = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][3]
 
+            # Update graphics scene
             for i in range(0, len(self.current_graphicsScene.items_dict)):
                 self.current_graphicsScene.items_dict[self.current_graphicsScene.items_dict.keys()[i]]['ellipse_item'].setBrush(QBrush(QColor('red')))
 
@@ -314,19 +325,21 @@ class SimulationWidget(QWidget):
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
+
+            # Get orientation from pose
             quaternion = Quaternion(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
-            print('theta launch')
-            print(rot_axis)
-            print(theta)
-            print(quaternion)
+
+            # Get robot model
             if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
                 sys.argv.append('robot_model:=tiago_steel')
             elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
                 sys.argv.append('robot_model:=turtlebot')
             elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
                 sys.argv.append('robot_model:=srd250')
+
+            # Set arguments for launch file
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             sys.argv.append('initial_pose_x:=' + str(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['position'][1]))
@@ -348,7 +361,6 @@ class SimulationWidget(QWidget):
 
         # Publish region marker
         self.add_region_marker(self.FTS.region_of_interest, False)
-        #self.add_region_marker(self.initial_pose, True)
         self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
 
     @Slot(bool)
@@ -394,6 +406,8 @@ class SimulationWidget(QWidget):
         launch_robot_list = []
         for i in range(0, self.num_robots):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot_exp.launch')]))
+
+            # Get orientation from pose
             quaternion = Quaternion(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
@@ -401,6 +415,8 @@ class SimulationWidget(QWidget):
             #    sys.argv.append('robot_model:=tiago_steel')
             #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
             #    sys.argv.append('robot_model:=turtlebot')
+
+            # Set arguments for launch file
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             sys.argv.append('initial_pose_x:=' + str(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['position'][0]))
             sys.argv.append('initial_pose_y:=' + str(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['position'][1]))
@@ -422,7 +438,6 @@ class SimulationWidget(QWidget):
 
         # Publish region marker
         self.add_region_marker(self.FTS.region_of_interest, False)
-
         self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
 
     @Slot(bool)
@@ -450,6 +465,7 @@ class SimulationWidget(QWidget):
             roslaunch_task_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')]))
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
             sys.argv.append('agent_type:=' + self.tab_list[i].agent_type)
+            sys.argv.append('scenario_file:=' + self.scenario_file)
             roslaunch_task_list[i].start()
             del sys.argv[2:len(sys.argv)]
 
@@ -458,14 +474,16 @@ class SimulationWidget(QWidget):
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
 
+    # Enable LTL-planner
     @Slot(bool)
-    def on_button_start_sim_pressed(self):
+    def on_button_start_sim_pressed(self):      
         start_msg = Bool()
         start_msg.data = True
         self.start_publisher.publish(start_msg)
         for i in range(0, self.num_robots):
             self.tab_list[i].simulation_started = True
 
+    # Enable and disable logger
     @Slot(bool)
     def on_button_rosbag_clicked(self):
         if self.logger_active_msg.data == False:
@@ -475,18 +493,22 @@ class SimulationWidget(QWidget):
             self.logger_active_msg.data = False
             self.button_record_rosbag.setText('Continue recording')
 
+    # Convert position message to position tuple
     def position_msg_to_tuple(self, position_msg):
         position = (position_msg.x, position_msg.y, position_msg.z)
         return position
 
+    # Add robot tab
     @Slot(bool)
     def add_robot(self):
+        # Add tab
         self.num_robots += 1
         self.tab_list.append(RobotTab(self.num_robots))
         self.tabWidget.addTab(self.tab_list[self.num_robots-1], ('Robot ' + str(self.num_robots)))
         self.button_remove_robot.setEnabled(True)
         self.current_graphicsScene.addItem(self.tab_list[self.num_robots-1].initial_pose['start_' + str(self.num_robots).zfill(2)]['text_item'])
 
+        # Set initial pose
         if self.num_robots > 1:
            for i in range(0, len(self.FTS.region_of_interest)):
                self.tab_list[self.num_robots-1].robot_comboBox_init.addItem(self.FTS.region_of_interest.keys()[i])
@@ -505,8 +527,10 @@ class SimulationWidget(QWidget):
            point = rect.topLeft()
            self.tab_list[self.num_robots-1].initial_pose['start_' + str(self.num_robots).zfill(2)]['text_item'].setPos(point.x() - 11, point.y() - 22)
 
+        # Connect initial pose comboBox with set_init_pose_id function
         self.tab_list[self.num_robots-1].robot_comboBox_init.signalIndexChanged.connect(self.set_init_pose_id)
 
+        # Add plan topics and subscriber
         self.prefix_plan_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/prefix_plan')
         self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[self.num_robots-1], PoseArray, self.prefix_callback))
         self.sufix_plan_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/sufix_plan')
@@ -515,10 +539,12 @@ class SimulationWidget(QWidget):
         self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
         self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
 
+        # Add current goal subscriber
         self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/goal')
         self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], MoveBaseActionGoal, self.goal_callback))
         self.current_goal_subscriber_list[self.num_robots-1].received.connect(self.received_goal)
 
+    # Remove last robot
     @Slot(bool)
     def remove_robot(self):
         if self.num_robots > 1:
@@ -542,14 +568,13 @@ class SimulationWidget(QWidget):
                 point = rect.topLeft()
                 self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'].setPos(point.x() - 11, point.y() - 22)
 
-
-
             self.tabWidget.removeTab(self.num_robots)
             del self.tab_list[self.num_robots]
 
             if self.num_robots == 1:
                 self.button_remove_robot.setEnabled(False)
 
+    # Load scenario from a yaml file
     @Slot(bool)
     def load_scenario(self):
         directory = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS')
@@ -558,18 +583,21 @@ class SimulationWidget(QWidget):
         stream = file(scenario_file[0], 'r')
         data = yaml.load(stream)
 
+        # Load FTS
+        # Sort the keys is needed for the edge matrix in the map_dialog
         self.FTS.region_of_interest = data['FTS']
         sorted_keys = self.FTS.region_of_interest.keys()
         sorted_keys.sort()
-        print(sorted_keys)
         stream.close()
 
+        # Load map
         self.world_comboBox.setCurrentIndex(self.world_comboBox.findText(data['Map']))
 
-        #self.current_graphicsScene.reset()
+        self.scenario_file = scenario_file[0]
 
         arrow_length = 50
 
+        # Add all region of interest to graphics scene
         for i in range(0, len(self.FTS.region_of_interest)):
             region_string = 'r' + str(i+1).zfill(2)
             pixel_coords = self.current_graphicsScene.worldToPixel(self.FTS.region_of_interest[sorted_keys[i]]['pose']['position'])
@@ -583,6 +611,7 @@ class SimulationWidget(QWidget):
             self.current_graphicsScene.items_dict[region_string]['arrow'] = arrow
 
 
+        # Add all edges to graphics scene
         for i in range(0, len(self.FTS.region_of_interest)):
             for j in range(0, len(self.FTS.region_of_interest[sorted_keys[i]]['edges'])):
                 index = sorted_keys.index(self.FTS.region_of_interest[sorted_keys[i]]['edges'][j]['target'])
@@ -593,6 +622,7 @@ class SimulationWidget(QWidget):
                     if (str(index+1) + '-' + str(i+1)) not in self.current_graphicsScene.line_dict.keys():
                         self.current_graphicsScene.add_edge(index+1, i+1)
 
+        # Load robot tabs
         robot_tabs = data['Tasks']
 
         for i in range(0, len(self.FTS.region_of_interest)):
@@ -610,9 +640,9 @@ class SimulationWidget(QWidget):
 
         self.button_execute_task.setEnabled(True)
 
-
-
-
+    # Add region markers for RVIZ
+    # Red marker: General ROI
+    # Green marker : Start ROI
     def add_region_marker(self, region, initial):
 
         for i in range(0, len(region)):
