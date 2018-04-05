@@ -54,7 +54,8 @@ regions = {   (10.36, -6.19, 0.0): set(['r1',]),
 
 env_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
 stream = file(env_file, 'r')
-data = yaml.load(stream)
+data_file = yaml.load(stream)
+data = data_file['FTS']
 stream.close()
 test = {}
 test_ap = set()

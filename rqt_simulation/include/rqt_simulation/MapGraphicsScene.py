@@ -18,11 +18,13 @@ class MapGraphicsScene(QGraphicsScene):
     def __init__(self):
         super(MapGraphicsScene, self).__init__()
         self.regionCounter = 0
-        self.ellipse_items = []
-        self.ellipse_items_labels = []
-        self.pixel_coords_list = []
+        #self.ellipse_items = []
+        #self.ellipse_items_labels = []
+        #self.pixel_coords_list = []
         self.line_dict = {}
-        self.arrow_list = []
+        #self.arrow_list = []
+
+        self.items_dict = {}
 
     def pixelToWorld(self, pixel_coords = QPointF()):
         world_coords = ((pixel_coords.x() - self.worldOrigin.x()) * self.map_resolution, -(pixel_coords.y() - self.worldOrigin.y()) * self.map_resolution, 0.0)
@@ -34,33 +36,50 @@ class MapGraphicsScene(QGraphicsScene):
 
     def add_ROI(self, pixel_coords):
         self.regionCounter += 1
-        self.pixel_coords_list.append(pixel_coords)
+        #self.pixel_coords_list.append(pixel_coords)
+
         markerSize = 13
-        self.ellipse_items.append(QGraphicsEllipseItem(QRectF(QPointF(pixel_coords.x() - markerSize/2, pixel_coords.y() - markerSize/2), QSizeF(markerSize, markerSize))))
-        self.ellipse_items[self.regionCounter - 1].setBrush(QBrush(QColor('red')))
-        self.addItem(self.ellipse_items[self.regionCounter - 1])
+        #self.ellipse_items.append(QGraphicsEllipseItem(QRectF(QPointF(pixel_coords.x() - markerSize/2, pixel_coords.y() - markerSize/2), QSizeF(markerSize, markerSize))))
+        ellipse_item = QGraphicsEllipseItem(QRectF(QPointF(pixel_coords.x() - markerSize/2, pixel_coords.y() - markerSize/2), QSizeF(markerSize, markerSize)))
+        #self.ellipse_items[self.regionCounter - 1].setBrush(QBrush(QColor('red')))
+        ellipse_item.setBrush(QBrush(QColor('red')))
+        #self.addItem(self.ellipse_items[self.regionCounter - 1])
+        self.addItem(ellipse_item)
 
         label_font = QFont()
         label_font.setPointSize(15)
-        regionString = 'r' + str(self.regionCounter).zfill(2)
-        self.ellipse_items_labels.append(QGraphicsTextItem(regionString))
-        self.ellipse_items_labels[self.regionCounter - 1].setPos(pixel_coords)
-        self.ellipse_items_labels[self.regionCounter - 1].setFont(label_font)
-        self.addItem(self.ellipse_items_labels[self.regionCounter - 1])
+        region_string = 'r' + str(self.regionCounter).zfill(2)
+        #self.ellipse_items_labels.append(QGraphicsTextItem(regionString))
+        ellipse_item_label = QGraphicsTextItem(region_string)
+        #self.ellipse_items_labels[self.regionCounter - 1].setPos(pixel_coords)
+        ellipse_item_label.setPos(pixel_coords)
+        #self.ellipse_items_labels[self.regionCounter - 1].setFont(label_font)
+        ellipse_item_label.setFont(label_font)
+        self.addItem(ellipse_item_label)
+
+        self.items_dict.update({region_string : {'ellipse_item' : ellipse_item, 'ellipse_item_label' : ellipse_item_label, 'pixel_coords' : pixel_coords}})
 
     def remove_ROI(self):
-        self.removeItem(self.ellipse_items[self.regionCounter-1])
-        self.removeItem(self.ellipse_items_labels[self.regionCounter-1])
-        self.removeArrow(self.arrow_list[self.regionCounter-1])
-        del self.arrow_list[self.regionCounter-1]
-        del self.ellipse_items[self.regionCounter-1]
-        del self.ellipse_items_labels[self.regionCounter-1]
-        del self.pixel_coords_list[self.regionCounter-1]
+        #self.removeItem(self.ellipse_items[self.regionCounter-1])
+        #self.removeItem(self.ellipse_items_labels[self.regionCounter-1])
+        #self.removeArrow(self.arrow_list[self.regionCounter-1])
+        #del self.arrow_list[self.regionCounter-1]
+        #del self.ellipse_items[self.regionCounter-1]
+        #del self.ellipse_items_labels[self.regionCounter-1]
+        #del self.pixel_coords_list[self.regionCounter-1]
+        region_string = 'r' + str(self.regionCounter).zfill(2)
+        self.removeItem(self.items_dict[region_string]['ellipse_item'])
+        self.removeItem(self.items_dict[region_string]['ellipse_item_label'])
+        self.removeArrow(self.items_dict[region_string]['arrow'])
+
+        del self.items_dict[region_string]
 
         self.regionCounter = self.regionCounter - 1
 
     def add_edge(self, roi_num_1, roi_num_2):
-        self.line_dict[(str(roi_num_1) + '-' + str(roi_num_2))] = QGraphicsLineItem(QLineF(self.pixel_coords_list[roi_num_2 - 1], self.pixel_coords_list[roi_num_1 - 1]))
+        pixel_coords_1 = self.items_dict['r' + str(roi_num_1).zfill(2)]['pixel_coords']
+        pixel_coords_2 = self.items_dict['r' + str(roi_num_2).zfill(2)]['pixel_coords']
+        self.line_dict[(str(roi_num_1) + '-' + str(roi_num_2))] = QGraphicsLineItem(QLineF(pixel_coords_2, pixel_coords_1))
         self.addItem(self.line_dict[(str(roi_num_1) + '-' + str(roi_num_2))])
 
     def remove_edge(self, edge):
@@ -78,7 +97,7 @@ class MapGraphicsScene(QGraphicsScene):
         self.ellipse_items_labels = []
         self.pixel_coords_list = []
         self.line_dict = {}
-        self.arrow_list = []
+        #self.arrow_list = []
 
     def load_map(self, scenario):
         self.scenario = scenario
