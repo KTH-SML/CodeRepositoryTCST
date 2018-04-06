@@ -30,11 +30,12 @@ from actionlib_msgs.msg import GoalStatus
 from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal, MoveBaseGoal
 
 class RobotTab(QWidget):
-    def __init__(self, num_robots):
+    def __init__(self, num_robots, robots):
         super(RobotTab, self).__init__()
 
         # Variables for ROS Publisher
         self.ros_publisher = ROS_Publisher()
+        self.robots = robots
         self.agent_type = 'ground'
 
         self.num_robots = num_robots
@@ -48,7 +49,7 @@ class RobotTab(QWidget):
         self.robot_label_name.setFont(font)
         self.layout.addWidget(self.robot_label_name)
         self.robot_comboBox = CustomComboBox(self.num_robots-1)
-        self.robot_comboBox.addItems(['None', 'TiaGo', 'Turtlebot', 'srd250'])
+        self.robot_comboBox.addItems(self.robots['Models'].keys())
         self.layout.addWidget(self.robot_comboBox)
         self.robot_comboBox.signalIndexChanged.connect(self.set_agent_type)
 
@@ -59,8 +60,6 @@ class RobotTab(QWidget):
 
         initial_pose_textItem = QGraphicsTextItem('start_' + str(self.num_robots).zfill(2))
         self.initial_pose = {'start_' + str(self.num_robots).zfill(2) : {'label' : 'r01', 'text_item' : initial_pose_textItem}}
-        #self.initial_pose_label = 'start_' + str(self.num_robots).zfill(2)
-        #self.initial_pose_textItem = QGraphicsTextItem(self.initial_pose_label)
 
         self.robot_label_task_title = QLabel('Task robot ' + str(self.num_robots))
         self.robot_label_task_title.setFont(font)
@@ -172,7 +171,6 @@ class RobotTab(QWidget):
                     self.move_base_ac.send_goal(self.robot_current_goal.goal)
                     self.last_footprint_point.header = msg.header
                 self.last_footprint_point.point = msg_point_rounded
-            #print(self.last_footprint_point)
 
     @Slot(bool)
     def call_clear_costmap_srvs(self):
@@ -184,7 +182,7 @@ class RobotTab(QWidget):
             print('Costmap cleared')
 
     def set_agent_type(self):
-        if self.robot_comboBox.currentText() == 'srd250':
+        if self.robot_comboBox.currentText() in self.robots['robot_types']['arial']:
             self.agent_type = 'arial'
         else:
             self.agent_type = 'ground'

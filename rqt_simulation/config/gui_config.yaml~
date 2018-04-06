@@ -1,0 +1,25 @@
+Robots:
+    TiaGo:
+        robot_model: tiago_steel
+        localization_topic: amcl_pose
+    Turtlebot:
+        robot_model: turtlebot
+        localization_topic: amcl_pose
+    srd250:
+        robot_model: srd250
+        localization_topic: ground_truth/pose_with_covariance
+    robot_types:
+        ground:
+            - TiaGo
+            - Turtlebot
+        arial:
+            - srd250
+
+Worlds:
+    - pal_office
+    - hospital
+    - factory
+    - hotel
+    - kth
+    - rng
+    - sml

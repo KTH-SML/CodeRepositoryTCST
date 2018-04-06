@@ -122,19 +122,19 @@ class RVIZFileGenerator:
         robot_folder = []
 
         # Robot model
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
             tf_prefix = self.robot_name
         elif robot_model == 'srd250':
             tf_prefix = ''
         robot_folder.append(self.add_robot_model(self.robot_name, tf_prefix))
 
         # Robot odometry
-        if robot_model == 'tiago':
+        if robot_model == 'tiago_steel':
             odom_topic = '/' + self.robot_name + '/mobile_base_controller/odom'
             robot_folder.append(self.add_robot_odometry(odom_topic))
 
         # Robot footprint
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
             footprint_topic = '/' + self.robot_name + '/move_base/local_costmap/footprint'
             robot_folder.append(self.add_robot_footprint(footprint_topic))
 
@@ -142,7 +142,7 @@ class RVIZFileGenerator:
         label_marker_topic = '/' + self.robot_name + '/label_marker'
         robot_folder.append(self.add_marker(label_marker_topic))
 
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
             # Folder with robot sensors
             dict_robot_sensors = {'Class' : 'rviz/Group'}
             robot_sensors_folder = []
@@ -152,19 +152,19 @@ class RVIZFileGenerator:
             robot_sensors_folder.append(self.add_robot_laser(laser_topic))
 
             # Robot RGBD scan
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 RGBD_scan_topic = '/' + self.robot_name + '/rgbd_scan'
                 robot_sensors_folder.append(self.add_robot_RGBD_scan(RGBD_scan_topic))
 
             # Robot depth cloud
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 depth_cloud_topic = '/' + self.robot_name + '/xtion/depth_registered/points'
             elif robot_model == 'turtlebot':
                 depth_cloud_topic = '/' + self.robot_name + '/camera/depth/points'
             robot_sensors_folder.append(self.add_robot_depth_cloud(depth_cloud_topic))
 
             # Sonar cloud
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 sonar_topic = '/' + self.robot_name + '/sonar_cloud'
                 robot_sensors_folder.append(self.add_robot_sonar_cloud(sonar_topic))
 
@@ -185,7 +185,7 @@ class RVIZFileGenerator:
         dict_base_folder = {'Class' : 'rviz/Group'}
         base_folder = []
 
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
             # Global planner folder
             dict_global_folder = {'Class' : 'rviz/Group'}
             global_folder = []
@@ -195,14 +195,14 @@ class RVIZFileGenerator:
             global_plan_folder = []
 
             # Global NavfnROS planner
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 Navfn_topic = '/' + self.robot_name + '/move_base/NavfnROS/plan'
             elif robot_model == 'turtlebot':
                 Navfn_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/plan'
             global_plan_folder.append(self.add_path(Navfn_topic, 'Navfn'))
 
             # Global EBandPlannerROS planner
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 global_plan_topic = '/' + self.robot_name + '/move_base/EBandPlannerROS/global_plan'
             elif robot_model == 'turtlebot':
                 global_plan_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/global_plan'
@@ -214,7 +214,7 @@ class RVIZFileGenerator:
             global_folder.append(dict_global_plan_folder)
 
             # Global potential costmap
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 global_potential_topic = '/' + self.robot_name + '/move_base/global_costmap/costmap'
             elif robot_model == 'turtlebot':
                 global_potential_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/potential'
@@ -238,7 +238,7 @@ class RVIZFileGenerator:
             local_plan_folder = []
 
             # Local EBandPlannerROS
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 local_eband_topic = '/' + self.robot_name + '/move_base/EBandPlannerROS/local_plan'
                 local_plan_folder.append(self.add_path(local_eband_topic, 'EBand'))
 
@@ -247,7 +247,7 @@ class RVIZFileGenerator:
             local_plan_folder.append(self.add_path(dwa_plan_topic, 'DWA'))
 
             # Local PalPlannerROS
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 local_pal_topic = '/' + self.robot_name + '/move_base/PalPlannerROS/local_plan'
                 local_plan_folder.append(self.add_path(local_pal_topic, 'Pal'))
 
@@ -261,7 +261,7 @@ class RVIZFileGenerator:
             local_folder.append(self.add_costmap(local_costmap_topic))
 
             # Local costcloud
-            if robot_model == 'tiago':
+            if robot_model == 'tiago_steel':
                 local_costcloud_topic = '/' + self.robot_name + '/move_base/TrajectoryPlannerROS/cost_cloud'
             elif robot_model == 'turtlebot':
                 local_costcloud_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/cost_cloud'
@@ -273,7 +273,7 @@ class RVIZFileGenerator:
             base_folder.append(dict_local_folder)
 
         # Goal marker
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
             goal_topic = '/' + self.robot_name + '/move_base/current_goal'
         elif robot_model == 'srd250':
             goal_topic = '/' + self.robot_name + '/command/pose'
@@ -289,7 +289,7 @@ class RVIZFileGenerator:
 
         robot.append(dict_planning_folder)
 
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
             dict_localization_folder = {'Class' : 'rviz/Group'}
             localization_folder = []
 
@@ -308,7 +308,7 @@ class RVIZFileGenerator:
         mapping_folder.append(self.add_map(self.robot_name))
 
         # Trajectory
-        if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
             mapping_folder.append(self.add_slam_trajectory(self.robot_name))
 
         dict_mapping_folder.update({'Displays' : mapping_folder})
@@ -317,9 +317,9 @@ class RVIZFileGenerator:
         robot.append(dict_mapping_folder)
 
 
-        #if (robot_model == 'tiago') or (robot_model == 'turtlebot'):
+        #if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
         #    # Camera
-        #    if robot_model == 'tiago':
+        #    if robot_model == 'tiago_steel':
         #        image_topic = '/' + self.robot_name + '/xtion/rgb/image_raw'
         #    elif robot_model == 'turtlebot':
         #        image_topic = '/' + self.robot_name + '/camera/rgb/image_raw'

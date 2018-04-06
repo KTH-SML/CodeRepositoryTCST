@@ -105,41 +105,6 @@
       <height>41</height>
      </rect>
     </property>
-    <item>
-     <property name="text">
-      <string>pal_office</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>hospital</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>factory</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>hotel</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>kth</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>rng</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>sml</string>
-     </property>
-    </item>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">

@@ -4,97 +4,37 @@ FTS:
     - cost: 1.0
       target: r01
     - cost: 1.0
-      target: r03
-    - cost: 1.0
       target: r02
-    - cost: 1.0
-      target: r04
     pose:
       orientation:
-      - 0.4753807645925144
+      - 0.1101901717632508
       - 0.0
       - 0.0
-      - 0.879780159275848
+      - 0.9939105221531691
       position:
-      - 12.620000000000001
-      - 9.98
+      - 1.4000000000000015
+      - 0.7000000000000001
       - 0.0
   r02:
     edges:
     - cost: 1.0
       target: r01
     - cost: 1.0
-      target: r03
-    - cost: 1.0
       target: r02
-    - cost: 1.0
-      target: r04
     pose:
       orientation:
-      - 0.4034803548051122
-      - 0.0
-      - 0.0
-      - 0.9149883077320391
+      - 0.34042526375301824
+      - -0.0
+      - -0.0
+      - -0.9402715776831118
       position:
-      - 14.74
-      - 11.32
+      - 1.6000000000000014
+      - -1.1
       - 0.0
-  r03:
-    edges:
-    - cost: 1.0
-      target: r01
-    - cost: 1.0
-      target: r03
-    - cost: 1.0
-      target: r02
-    - cost: 1.0
-      target: r04
-    pose:
-      orientation:
-      - 0.4000377709581803
-      - 0.0
-      - 0.0
-      - 0.9164986534669926
-      position:
-      - 11.72
-      - 13.24
-      - 0.0
-  r04:
-    edges:
-    - cost: 1.0
-      target: r01
-    - cost: 1.0
-      target: r03
-    - cost: 1.0
-      target: r02
-    - cost: 1.0
-      target: r04
-    pose:
-      orientation:
-      - 0.39484906198493624
-      - 0.0
-      - 0.0
-      - 0.9187460031203488
-      position:
-      - 17.66
-      - 11.52
-      - 0.0
-Map: pal_office
+Map: sml
 Tasks:
   robot1:
     initial_pose: r01
-    robot_model: Turtlebot
-    tasks:
-      hard_task: ([]<> r01) && ([]<> r02)
-      soft_task: ''
-  robot2:
-    initial_pose: r02
-    robot_model: Turtlebot
-    tasks:
-      hard_task: ([]<> r01) && ([]<> r02)
-      soft_task: ''
-  robot3:
-    initial_pose: r03
     robot_model: Turtlebot
     tasks:
       hard_task: ([]<> r01) && ([]<> r02)

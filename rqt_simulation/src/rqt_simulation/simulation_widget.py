@@ -70,6 +70,14 @@ class SimulationWidget(QWidget):
         self.button_execute_task.setEnabled(False)
         self.button_record_rosbag.setEnabled(False)
 
+        # Load configuration available robots and worlds
+        config_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'gui_config.yaml')
+        stream = file(config_file, 'r')
+        data = yaml.load(stream)
+
+        self.robots = data['Robots']
+        worlds = data['Worlds']
+
         # Initialize FTS
         self.FTS = FTS()
 
@@ -81,6 +89,8 @@ class SimulationWidget(QWidget):
         # Robot tab variables
         self.num_robots = 0
         self.tab_list = []
+
+        self.world_comboBox.addItems(worlds)
 
         self.rosbag_active = False
 
@@ -298,12 +308,13 @@ class SimulationWidget(QWidget):
         # Get robot types to generate RVIZ file
         robot_list = []
         for i in range(0, self.num_robots):
-            if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-                robot_list.append('tiago')
-            elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-                robot_list.append('turtlebot')
-            elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
-                robot_list.append('srd250')
+            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
+            #    robot_list.append('tiago')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
+            #    robot_list.append('turtlebot')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
+            #    robot_list.append('srd250')
+            robot_list.append(self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
         file = RVIZFileGenerator(robot_list)
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
@@ -332,12 +343,14 @@ class SimulationWidget(QWidget):
             theta = quaternion.angle * rot_axis[2]
 
             # Get robot model
-            if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-                sys.argv.append('robot_model:=tiago_steel')
-            elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-                sys.argv.append('robot_model:=turtlebot')
-            elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
-                sys.argv.append('robot_model:=srd250')
+            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
+            #    sys.argv.append('robot_model:=tiago_steel')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
+            #    sys.argv.append('robot_model:=turtlebot')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
+            #    sys.argv.append('robot_model:=srd250')
+
+            sys.argv.append('robot_model:=' + self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
 
             # Set arguments for launch file
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
@@ -383,10 +396,13 @@ class SimulationWidget(QWidget):
         #Get robot types to generate RVIZ file
         robot_list = []
         for i in range(0, self.num_robots):
-            if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-                robot_list.append('tiago')
-            elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-                robot_list.append('turtlebot')
+            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
+            #    robot_list.append('tiago')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
+            #    robot_list.append('turtlebot')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
+            #    robot_list.append('srd250')
+            robot_list.append(self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
         file = RVIZFileGenerator(robot_list)
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
@@ -415,6 +431,10 @@ class SimulationWidget(QWidget):
             #    sys.argv.append('robot_model:=tiago_steel')
             #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
             #    sys.argv.append('robot_model:=turtlebot')
+            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
+            #    sys.argv.append('robot_model:=srd250')
+
+            sys.argv.append('robot_model:=' + self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
 
             # Set arguments for launch file
             sys.argv.append('robot_name:=' + self.tab_list[i].robot_name)
@@ -503,7 +523,7 @@ class SimulationWidget(QWidget):
     def add_robot(self):
         # Add tab
         self.num_robots += 1
-        self.tab_list.append(RobotTab(self.num_robots))
+        self.tab_list.append(RobotTab(self.num_robots, self.robots))
         self.tabWidget.addTab(self.tab_list[self.num_robots-1], ('Robot ' + str(self.num_robots)))
         self.button_remove_robot.setEnabled(True)
         self.current_graphicsScene.addItem(self.tab_list[self.num_robots-1].initial_pose['start_' + str(self.num_robots).zfill(2)]['text_item'])

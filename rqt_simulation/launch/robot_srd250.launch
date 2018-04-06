@@ -23,19 +23,19 @@
 
     <arg name="scenario"       default="pal_office" />
     <arg name="scenario_path"  default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
-	
+
 	<!---->
     <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 world /map 100"/>
-    
+
         <!-- Map server-->
     <arg name="map_file" default="$(find rqt_simulation)/scenarios/$(arg scenario)/map.yaml"/>
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
       <param name="frame_id" value="/map"/>
     </node>
-    
 
-    <!-- UAV Group - copy this group N times if you want to spawn N drones. Change respectively the names and starting positions 
+
+    <!-- UAV Group - copy this group N times if you want to spawn N drones. Change respectively the names and starting positions
       <include file="$(find uavs_simulation_gazebo)/launch/spawn_mav.launch">
         <arg name="mav_name" value="$(arg mav_name)" />
         <arg name="model" value="$(find uavs_simulation_gazebo)/models/$(arg mav_name)/$(arg mav_name)_generic_odometry_sensor.gazebo" />
@@ -43,19 +43,19 @@
         <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
         <arg name="log_file" value="$(arg log_file)"/>
         <arg name="enable_mavlink_interface" value="true" />
-        <arg name="namespace" value="$(arg robot_name)" /> 
-        
+        <arg name="namespace" value="$(arg robot_name)" />
+
         <arg name="x" value="$(arg initial_pose_x)" />
         <arg name="y" value="$(arg initial_pose_y)" />
       </include> -->
-  
-  <!-- -->   
+
+  <!-- -->
 	  <arg name="namespace" default="$(arg robot_name)"/>
 	  <arg name="model" value="$(find uavs_simulation_gazebo)/models/$(arg mav_name)/$(arg mav_name)_generic_odometry_sensor.gazebo" />
 	  <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
 	  <arg name="wait_to_record_bag" default="false"/>
 	  <arg name="enable_mavlink_interface" default="false"/>
-	  
+
 
   <!-- send the robot XML to param server -->
   <param name="robot_description" command="
@@ -67,7 +67,7 @@
     wait_to_record_bag:=$(arg wait_to_record_bag)
     mav_name:=$(arg namespace)
     namespace:=$(arg namespace)"
-  /> 
+  />
   <param name="tf_prefix" type="string" value="$(arg tf_prefix)" />
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
@@ -80,15 +80,15 @@
          -model $(arg namespace)"
    respawn="false" output="screen">
   </node>
-      
-      
-      <!-- controller interface -->
+
+
+      <!-- controller interface
       <include file="$(find uavs_simulation_gazebo)/launch/$(arg mav_name)_control.launch">
       	<arg name="x" value="$(arg initial_pose_x)" />
-      	<arg name="y" value="$(arg initial_pose_y)" />
-      <!--	<arg name="yaw" value="$(arg initial_pose_a)" /> -->
-      </include>
- <!--    
+      	<arg name="y" value="$(arg initial_pose_y)" /> -->
+      <!--	<arg name="yaw" value="$(arg initial_pose_a)" />
+      </include> -->
+ <!--  -->  
     <node name="lee_position_controller_node" pkg="rotors_control" type="lee_position_controller_node" output="screen">
       <rosparam command="load" file="$(find uav_controllers)/resource/lee_controller_$(arg mav_name).yaml" />
       <rosparam command="load" file="$(find uav_controllers)/resource/$(arg mav_name).yaml" />
@@ -100,7 +100,7 @@
 			<param name="z" value="$(arg initial_pose_z)"/>
 			<param name="yaw" value="0"/>
 		</node>
--->	  
+
       <!-- state publishers -->
       <node name="robot_state_publisher" pkg="robot_state_publisher" clear_params="true" type="robot_state_publisher" />
       <node name="joint_state_publisher" pkg="joint_state_publisher" clear_params="true" type="joint_state_publisher" />
