@@ -11,12 +11,16 @@
 
 
 	<!-- controllers: -->
-	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" >
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
 		<remap from="/cmdvel" to="/cmdvel0" />
+		<remap from="/c" to="/c0" />
+		<remap from="/controller_params" to="/controller_params0" />
 		<param name="~robot_id" type="int" value="0"/>
 	</node>
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
 		<remap from="/cmdvel" to="/cmdvel1" />
+		<remap from="/c" to="/c1" />
+		<remap from="/controller_params" to="/controller_params1" />
 		<param name="~robot_id" type="int" value="1"/>
 	</node>
 	<!--
