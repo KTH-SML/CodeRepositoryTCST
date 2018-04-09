@@ -28,6 +28,8 @@ import actionlib
 from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
 
+from pyquaternion import Quaternion
+
 
 from ltl_tools.FTSLoader import FTSLoader
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
@@ -221,6 +223,30 @@ class LtlPlannerNode(object):
             pose.position.z = n[0][0][2]
             plan_msg.poses.append(pose)
         return plan_msg
+
+    def convert_pose_from_map_to_mocap(self, pose, tf_mocap_to_map):
+        M_trans_M_R = Quaternion([0, pose.position.x, pose.position.y, pose.position.z])
+        M_quat_M_R = Quaternion([pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z])
+
+        Q_trans_Q_M = Quaternion([0, tf_mocap_to_map.position.x, tf_mocap_to_map.position.y, tf_mocap_to_map.position.z])
+        Q_quat_Q_M = Quaternion([tf_mocap_to_map.orientation.w, tf_mocap_to_map.orientation.x, tf_mocap_to_map.orientation.y, tf_mocap_to_map.orientation.z])
+
+        Q_trans_Q_R = Q_quat_Q_M * M_trans_M_R * Q_quat_Q_M.inversion
+        Q_quat_Q_R = Q_quat_Q_M * M_quat_M_R
+
+        Q_pose_Q_R = Pose()
+        Q_pose_Q_R.position.x = Q_trans_Q_R[1]
+        Q_pose_Q_R.position.y = Q_trans_Q_R[2]
+        Q_pose_Q_R.position.z = Q_trans_Q_R[3]
+        Q_pose_Q_R.orientation.w = Q_quat_Q_R[0]
+        Q_pose_Q_R.orientation.x = Q_quat_Q_R[1]
+        Q_pose_Q_R.orientation.y = Q_quat_Q_R[2]
+        Q_pose_Q_R.orientation.z = Q_quat_Q_R[3]
+
+        return Q_pose_Q_R
+
+
+
 
 if __name__ == '__main__':
     rospy.init_node('ltl_planner',anonymous=False)

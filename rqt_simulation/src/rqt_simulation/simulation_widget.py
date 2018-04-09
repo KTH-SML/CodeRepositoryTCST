@@ -603,6 +603,9 @@ class SimulationWidget(QWidget):
         stream = file(scenario_file[0], 'r')
         data = yaml.load(stream)
 
+        # Load map
+        self.world_comboBox.setCurrentIndex(self.world_comboBox.findText(data['Map']))
+
         # Load FTS
         # Sort the keys is needed for the edge matrix in the map_dialog
         self.FTS.region_of_interest = data['FTS']
@@ -610,8 +613,7 @@ class SimulationWidget(QWidget):
         sorted_keys.sort()
         stream.close()
 
-        # Load map
-        self.world_comboBox.setCurrentIndex(self.world_comboBox.findText(data['Map']))
+        #print(self.FTS.region_of_interest)
 
         self.scenario_file = scenario_file[0]
 

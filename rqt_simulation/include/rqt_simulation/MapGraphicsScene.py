@@ -101,14 +101,14 @@ class MapGraphicsScene(QGraphicsScene):
 
     def load_map(self, scenario):
         self.scenario = scenario
-        map_yaml = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', scenario, 'map.yaml')
+        map_yaml = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'scenarios', scenario, 'map.yaml')
         self.loadConfig(map_yaml)
         if scenario == 'pal_office' or scenario == 'sml':
             map = 'map.pgm'
         else:
             map = 'map.png'
 
-        map_file = os.path.join(rospkg.RosPack().get_path('c4r_simulation'), 'scenarios', scenario, map)
+        map_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'scenarios', scenario, map)
         pixmap = QPixmap(map_file)
         self.mapSize = pixmap.size()
         self.addPixmap(pixmap)
