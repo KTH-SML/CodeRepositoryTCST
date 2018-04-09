@@ -156,9 +156,9 @@ class RobotTab(QWidget):
         if self.simulation_started:
             if self.agent_type == 'ground':
                 msg_point_rounded = Point()
-                msg_point_rounded.x = round(msg.polygon.points[0].x, 2)
-                msg_point_rounded.y = round(msg.polygon.points[0].y, 2)
-                msg_point_rounded.z = round(msg.polygon.points[0].z, 2)
+                msg_point_rounded.x = round(msg.polygon.points[0].x, 3)
+                msg_point_rounded.y = round(msg.polygon.points[0].y, 3)
+                msg_point_rounded.z = round(msg.polygon.points[0].z, 3)
 
                 if msg_point_rounded != self.last_footprint_point.point:
                     self.last_footprint_point.header = msg.header
