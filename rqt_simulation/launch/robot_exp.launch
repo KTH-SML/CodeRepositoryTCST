@@ -9,7 +9,7 @@
     <arg name="initial_pose_x" default="0" />
     <arg name="initial_pose_y" default="0" />
     <arg name="initial_pose_a" default="0" />
-    <arg name="robot_model" default="turtlebot" />
+    <arg name="robot_model" default="nexus" />
 
     <!-- The given behavior is automatically executed on start -->
     <arg name="behavior_name" default="Example Behavior" />
