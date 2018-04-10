@@ -6,4 +6,7 @@ struct CollaborationRequestParam{
         gamma_0(gamma_0), gamma_inf(gamma_inf),  
         l(l), t_star(t_star){
         }
+
+    CollaborationRequestParam(int c): c(c){
+    }
 };

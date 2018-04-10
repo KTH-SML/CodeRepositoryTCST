@@ -4,11 +4,13 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define ABS(a) ((a)>0?(a):(-a))
 
-PPC::PPC(int robot_id, std::vector<double> a, std::vector<double> b, std::vector<std::string> formula_type, std::string formula, 
-    std::vector<std::string> dformula, double rho_opt, int K, arma::vec u_max, std::vector<int> robots_in_cluster): 
+PPC::PPC(int robot_id, std::vector<double> a, std::vector<double> b, 
+    std::vector<std::string> formula_type, std::vector<std::string> formula, 
+    std::vector<std::vector<std::string>> dformula, std::vector<double> rho_opt, 
+    int K, arma::vec u_max, std::vector<int> robots_in_cluster): 
         robot_id(robot_id), a(a), b(b),
         formula_type(formula_type), formula(formula), dformula(dformula),
-        rho_opt(rho_opt), K(K), u_max(u_max), drho_fp(std::vector<FormulaParser<double>>(dformula.size())),
+        rho_opt(rho_opt), K(K), u_max(u_max), drho_fp(std::vector<FormulaParser<double>>(dformula[robot_id].size())),
         robots_in_cluster(robots_in_cluster){
             for(int i=0; i<robots_in_cluster.size(); i++){
                 c[robots_in_cluster[i]] = (int)RobotTask::Own;
@@ -20,14 +22,11 @@ void PPC::init(double t_0, arma::vec x, arma::vec X){
     this->X_std = arma::conv_to<std::vector<double>>::from(X);
     this->t_0 = t_0;
 
-    rho_fp = FormulaParser<double>(formula, "x", X_std);
-    for(int i=0; i<dformula.size(); i++){
-        drho_fp[i] = FormulaParser<double>(dformula[i], "x", X_std);
-    }
+    setFormulaParsers(robot_id);
 
     double rho_0 = rho_psi(X_std);
-    rho_max = MAX(0, rho_0) + (rho_opt - MAX(0, rho_0))*0.9;
-    zeta_u = (rho_opt - rho_max)/K; 
+    rho_max = MAX(0, rho_0) + (rho_opt[robot_id] - MAX(0, rho_0))*0.9;
+    zeta_u = (rho_opt[robot_id] - rho_max)/K; 
     r = rho_max * arma::randu() / 2;
 
     if(formula_type[robot_id] == "G"){
@@ -70,8 +69,8 @@ double PPC::rho_psi(std::vector<double> X){
 }
 
 arma::vec PPC::drho_psi(std::vector<double> X){
-    arma::vec drho(dformula.size());
-    for(int i=0; i<dformula.size(); i++){
+    arma::vec drho(dformula[robot_id].size());
+    for(int i=0; i<dformula[robot_id].size(); i++){
         drho(i) = drho_fp[i].value(X);
     }
     if(!drho.is_finite()){
@@ -95,9 +94,9 @@ double PPC::e(std::vector<double> X, double t){
             criticalEventCallback(ce);
         }
         else{
-            if(detect_stage_two()){ // stage 2
+            if(detectStageTwo()){ // stage 2
                 c[robot_id] = robot_id;
-                collaborationRequest(CollaborationRequestParam(c[robot_id], t_star, r, rho_max, gamma_0, gamma_inf, l));
+                requestCollaboration(CollaborationRequestParam(c[robot_id], t_star, r, rho_max, gamma_0, gamma_inf, l));
             }
             else{ //stage 3
             }
@@ -111,8 +110,18 @@ double PPC::e(std::vector<double> X, double t){
 
 arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
     
-    if(formula_satisfied(X, t-t_0)){
-        c[robot_id] = (int)RobotTask::Free;
+    if(c[robot_id] == (int)RobotTask::Own){
+        if(formulaSatisfied(X, t-t_0)){
+            c[robot_id] = (int)RobotTask::Free;
+            formula_satisfied = true;
+        }
+    }
+    else if(c[robot_id] == robot_id){
+        if(formulaSatisfied(X, t-t_0)){
+            c[robot_id] = (int)RobotTask::Free;
+            formula_satisfied = true;
+            requestCollaboration(CollaborationRequestParam((int)RobotTask::Free));
+        }
     }
     if(c[robot_id] == (int)RobotTask::Free){
         return arma::zeros<arma::vec>(3);
@@ -170,7 +179,7 @@ void PPC::repair(std::vector<double> X, double t){
     gamma_0 = (gamma_tr - gamma_inf)*exp(l*t) + gamma_inf;
 }
 
-bool PPC::formula_satisfied(std::vector<double> X, double t){
+bool PPC::formulaSatisfied(std::vector<double> X, double t){
     double rho = rho_psi(X);
     if(formula_type[robot_id] == "F" && t >= a[robot_id] && t <= b[robot_id]  
     || formula_type[robot_id] == "G" && t >= b[robot_id]){
@@ -189,20 +198,38 @@ void PPC::setCollaborationParameters(double t_star, double r, double rho_max, do
     this->l = l;
 }
 
-void PPC::externalTaskChangeCallback(int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l){
+void PPC::externalCollaborationRequest(int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l){
     c[i] = c_i;
     if(c_i == i){ // collaborative control incoming request
         c[robot_id] = c_i;
+        setFormulaParsers(c_i);
         setCollaborationParameters(t_star, r, rho_max, gamma_0, gamma_inf, l);
+    }
+    else if (c_i == (int)RobotTask::Free){
+        if(formula_satisfied){
+            c[robot_id] = (int)RobotTask::Free;
+        }
+        else{
+            c[robot_id] = (int)RobotTask::Own;
+            setFormulaParsers(robot_id);
+            //reinitialize for own task and current time
+        }
     }
 }
 
-bool PPC::detect_stage_two(){
+bool PPC::detectStageTwo(){
     if(std::all_of(robots_in_cluster.begin(), robots_in_cluster.end(),
             [&](int r){
-                return c[r]==(int)RobotTask::Free || c[r]==(int)RobotTask::Own;// && formula_type[r]=="F"?b[r]:a[r] > b[robot_id];
+                return c[r]==(int)RobotTask::Free || c[r]==(int)RobotTask::Own && formula_type[r]=="F"?b[r]:a[r] > b[robot_id];
             })){
         return true;
     }
     return false;
+}
+
+void PPC::setFormulaParsers(int c){
+    rho_fp = FormulaParser<double>(formula[c], "x", X_std);
+    for(int i=0; i<dformula[c].size(); i++){
+       drho_fp[i] = FormulaParser<double>(dformula[c][i], "x", X_std);
+    }
 }

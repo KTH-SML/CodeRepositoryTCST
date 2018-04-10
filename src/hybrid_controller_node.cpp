@@ -55,7 +55,7 @@ public:
 	}
 
 	void externalCollaborationRequestCallback(const hybrid_controller::Params::ConstPtr& msg, int i){
-		prescribed_performance_controller.externalTaskChangeCallback(
+		prescribed_performance_controller.externalCollaborationRequest(
 			i, msg->c,
 			msg->t_star, msg->r, msg->rho_max,
 			msg->gamma_0, msg->gamma_inf, msg->l);
@@ -80,7 +80,6 @@ public:
 	void update(){
 		if(std::any_of(state_was_read.cbegin(), state_was_read.cend(), [](bool v){return !v;})) return;
 		arma::vec u = prescribed_performance_controller.u(arma::conv_to<std::vector<double>>::from(X), pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
-
 		geometry_msgs::Twist u_msg;
 		double c = cos(X(robot_id*3+2));
 		double s = sin(X(robot_id*3+2));
@@ -94,7 +93,7 @@ public:
 	}
 
 	void setCollaborationRequestCallback(void (*callback)(CollaborationRequestParam)){
-		prescribed_performance_controller.collaborationRequest = callback;
+		prescribed_performance_controller.requestCollaboration = callback;
 	}
 
 	void publishCriticalEvent(CriticalEventParam critical_event_param){
@@ -112,6 +111,7 @@ public:
 	void publishCollaborationRequest(CollaborationRequestParam collaboration_request_param){
 		hybrid_controller::Params msg;
 		msg.stamp = ros::Time::now();
+		msg.c = collaboration_request_param.c;
 		msg.rho_max = collaboration_request_param.rho_max;
 		msg.r = collaboration_request_param.r;
 		msg.gamma_0 = collaboration_request_param.gamma_0;
@@ -195,12 +195,12 @@ int main(int argc, char* argv[]){
 		formula, formula_type, dformula, cluster, robots_in_cluster, a, b, rho_opt, u_max);
 
 	PPC ppc(robot_id, a, b, 
-			formula_type, formula[robot_id],
-			dformula[robot_id], rho_opt[robot_id], K, u_max,
+			formula_type, formula,
+			dformula, rho_opt, K, u_max,
 			robots_in_cluster);
 
 	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, robots_in_cluster, u_max);
-
+	
 	CriticalEvent::controller_node = &controller_node;
 	controller_node.setCriticalEventCallback(CriticalEvent::criticalEventCallback);
 	controller_node.setCollaborationRequestCallback(CriticalEvent::collaborationRequestCallback);

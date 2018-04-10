@@ -19,14 +19,14 @@ class PPC{
 
     double gamma_0, gamma_inf, l, rho_max, r, t_0, t_star;
     double zeta_u, zeta_l;
-    double rho_opt;
+    std::vector<double> rho_opt;
     arma::vec u_max;
     int K, k=0;
 
     std::vector<double> a, b;
     std::vector<std::string> formula_type;
-    std::string formula;
-    std::vector<std::string> dformula;
+    std::vector<std::string> formula;
+    std::vector<std::vector<std::string>> dformula;
 
     std::vector<int> robots_in_cluster;
     std::map<int, int> c;
@@ -34,17 +34,19 @@ class PPC{
     FormulaParser<double> rho_fp;
     std::vector<FormulaParser<double>> drho_fp;
 
+    bool formula_satisfied = false;
+
 public:
     void (*criticalEventCallback)(CriticalEventParam);
-    void (*collaborationRequest)(CollaborationRequestParam);
+    void (*requestCollaboration)(CollaborationRequestParam);
 
     PPC(int robot_id,
         std::vector<double> a, 
         std::vector<double> b, 
         std::vector<std::string> formula_type, 
-        std::string formula, 
-        std::vector<std::string> dformula,
-        double rho_opt,
+        std::vector<std::string> formula, 
+        std::vector<std::vector<std::string>> dformula,
+        std::vector<double> rho_opt,
         int K,
         arma::vec u_max,
         std::vector<int> robots_in_cluster);
@@ -53,7 +55,7 @@ public:
 
     void setCollaborationParameters(double, double, double, double, double, double); 
 
-    void externalTaskChangeCallback(int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l);
+    void externalCollaborationRequest(int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l);
 
     arma::vec u(std::vector<double> X, std::vector<double> x, double t);
 
@@ -73,9 +75,11 @@ private:
 
     void repair(std::vector<double> X, double t);
 
-    bool formula_satisfied(std::vector<double> X, double t);
+    bool formulaSatisfied(std::vector<double> X, double t);
 
-    bool detect_stage_two();
+    bool detectStageTwo();
+
+    void setFormulaParsers(int c);
 };
     
 #endif   
