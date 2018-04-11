@@ -9,10 +9,14 @@ Robots:
         srd250:
             robot_model: srd250
             localization_topic: ground_truth/pose_with_covariance
+        nexus:
+            robot_model: nexus
+            localization_topic: pose
     robot_types:
         ground:
             - TiaGo
             - Turtlebot
+            - nexus
         arial:
             - srd250
 

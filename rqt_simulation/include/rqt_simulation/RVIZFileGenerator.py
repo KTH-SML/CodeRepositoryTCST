@@ -122,7 +122,7 @@ class RVIZFileGenerator:
         robot_folder = []
 
         # Robot model
-        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot') or (robot_model == 'nexus'):
             tf_prefix = self.robot_name
         elif robot_model == 'srd250':
             tf_prefix = ''
@@ -185,7 +185,7 @@ class RVIZFileGenerator:
         dict_base_folder = {'Class' : 'rviz/Group'}
         base_folder = []
 
-        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot') or (robot_model == 'nexus'):
             # Global planner folder
             dict_global_folder = {'Class' : 'rviz/Group'}
             global_folder = []
@@ -197,14 +197,14 @@ class RVIZFileGenerator:
             # Global NavfnROS planner
             if robot_model == 'tiago_steel':
                 Navfn_topic = '/' + self.robot_name + '/move_base/NavfnROS/plan'
-            elif robot_model == 'turtlebot':
+            elif robot_model == 'turtlebot' or (robot_model == 'nexus'):
                 Navfn_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/plan'
             global_plan_folder.append(self.add_path(Navfn_topic, 'Navfn'))
 
             # Global EBandPlannerROS planner
             if robot_model == 'tiago_steel':
                 global_plan_topic = '/' + self.robot_name + '/move_base/EBandPlannerROS/global_plan'
-            elif robot_model == 'turtlebot':
+            elif robot_model == 'turtlebot' or (robot_model == 'nexus'):
                 global_plan_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/global_plan'
             global_plan_folder.append(self.add_path(global_plan_topic, 'Global'))
 
@@ -216,7 +216,7 @@ class RVIZFileGenerator:
             # Global potential costmap
             if robot_model == 'tiago_steel':
                 global_potential_topic = '/' + self.robot_name + '/move_base/global_costmap/costmap'
-            elif robot_model == 'turtlebot':
+            elif robot_model == 'turtlebot' or (robot_model == 'nexus'):
                 global_potential_topic = '/' + self.robot_name + '/move_base/GlobalPlanner/potential'
             global_folder.append(self.add_costmap(global_potential_topic))
 
@@ -263,7 +263,7 @@ class RVIZFileGenerator:
             # Local costcloud
             if robot_model == 'tiago_steel':
                 local_costcloud_topic = '/' + self.robot_name + '/move_base/TrajectoryPlannerROS/cost_cloud'
-            elif robot_model == 'turtlebot':
+            elif robot_model == 'turtlebot' or (robot_model == 'nexus'):
                 local_costcloud_topic = '/' + self.robot_name + '/move_base/DWAPlannerROS/cost_cloud'
             local_folder.append(self.add_costcloud(local_costcloud_topic))
 
@@ -273,7 +273,7 @@ class RVIZFileGenerator:
             base_folder.append(dict_local_folder)
 
         # Goal marker
-        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot') or (robot_model == 'nexus'):
             goal_topic = '/' + self.robot_name + '/move_base/current_goal'
         elif robot_model == 'srd250':
             goal_topic = '/' + self.robot_name + '/command/pose'
@@ -289,7 +289,7 @@ class RVIZFileGenerator:
 
         robot.append(dict_planning_folder)
 
-        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot') or (robot_model == 'nexus'):
             dict_localization_folder = {'Class' : 'rviz/Group'}
             localization_folder = []
 
@@ -308,7 +308,7 @@ class RVIZFileGenerator:
         mapping_folder.append(self.add_map(self.robot_name))
 
         # Trajectory
-        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot'):
+        if (robot_model == 'tiago_steel') or (robot_model == 'turtlebot') or (robot_model == 'nexus'):
             mapping_folder.append(self.add_slam_trajectory(self.robot_name))
 
         dict_mapping_folder.update({'Displays' : mapping_folder})

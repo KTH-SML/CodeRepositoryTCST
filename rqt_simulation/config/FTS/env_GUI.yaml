@@ -7,13 +7,13 @@ FTS:
       target: r02
     pose:
       orientation:
-      - 0.6474601300810215
+      - 0.9998648425716602
       - 0.0
       - 0.0
-      - 0.7620993242061475
+      - 0.01644069916850297
       position:
-      - -5.5
-      - -8.4
+      - 0.05
+      - -0.04999999999999858
       - 0.0
   r02:
     edges:
@@ -23,19 +23,19 @@ FTS:
       target: r02
     pose:
       orientation:
-      - 0.6480466192513998
+      - 0.6842148221774584
       - 0.0
       - 0.0
-      - 0.7616006691677938
+      - 0.7292805201790796
       position:
-      - -1.3
-      - -7.45
+      - -0.65
+      - 0.5000000000000014
       - 0.0
-Map: pal_office
+Map: sml
 Tasks:
   robot1:
     initial_pose: r01
-    robot_model: Turtlebot
+    robot_model: nexus
     tasks:
       hard_task: ([]<> r01) && ([]<> r02)
       soft_task: ''
