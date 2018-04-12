@@ -20,7 +20,7 @@
 		<arg name="world" value="$(arg scenario)" />
 		<arg name="headless" value="$(arg headless)" />
 	</include>
-	
+
 	<!--
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find uavs_simulation_gazebo)/worlds/basic.world" />

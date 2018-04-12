@@ -415,8 +415,12 @@ class SimulationWidget(QWidget):
         del sys.argv[2:len(sys.argv)]
 
         # Launch rviz
-        launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rviz.launch')])
-        launch_world.start()
+        launch_rviz = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rviz.launch')])
+        launch_rviz.start()
+
+        # Launch qualysis mapper
+        launch_qualisys = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'qualisys_mapper.launch')])
+        launch_qualisys.start()
 
         # Launch robots
         launch_robot_list = []

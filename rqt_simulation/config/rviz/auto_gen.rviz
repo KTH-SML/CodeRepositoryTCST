@@ -46,6 +46,14 @@ Visualization Manager:
         Update Interval: 0
         Value: true
         Visual Enabled: true
+      - Alpha: 1
+        Class: rviz/Polygon
+        Color: 255; 255; 0
+        Enabled: true
+        Name: Footprint
+        Topic: /robot1/move_base/local_costmap/footprint
+        Unreliable: false
+        Value: true
       - Class: rviz/Marker
         Enabled: true
         Marker Topic: /robot1/label_marker
@@ -55,6 +63,70 @@ Visualization Manager:
           : true
         Queue Size: 100
         Value: true
+      - Class: rviz/Group
+        Displays:
+        - Alpha: 0.5
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 0; 0; 255
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 0
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Laser
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /robot1/scan
+          Unreliable: false
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: Intensity
+          Decay Time: 0
+          Enabled: false
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Depth Cloud
+          Position Transformer: XYZ
+          Queue Size: 1
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.01
+          Style: Points
+          Topic: /robot1/camera/depth/points
+          Unreliable: false
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: false
+        Enabled: true
+        Name: Sensors
       Enabled: true
       Name: Robot
     - Class: rviz/Group
