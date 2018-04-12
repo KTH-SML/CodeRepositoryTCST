@@ -46,6 +46,11 @@ class QualisysMapTfNode(object):
         roslaunch.configure_logging(uuid)
         roslaunch_qualisys_odom_list = []
 
+        self.first_pose = True
+        self.odom = Pose()
+
+        #tf_br_list = []
+
         for i in range(0, len(models)):
             roslaunch_qualisys_odom_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('qualisys'), 'launch', 'qualisys_odom.launch')]))
             sys.argv.append('model:=' + models[i])
@@ -54,17 +59,33 @@ class QualisysMapTfNode(object):
             #self.publisher_pose_dict.update({models[i] : rospy.Publisher(models[i] + '/map_pose', PoseStamped, queue_size = 1)})
             roslaunch_qualisys_odom_list[i].start()
             del sys.argv[2:len(sys.argv)]
+            #tf_br_list.append(tf.TransformBroadcaster())
+            #tf_br_list[i].sendTransform((0.0, 0.0, -self.tf_qualisys_map.translation.z), (0.0, 0.0, 0.0, 1.0), rospy.Time.now(), models[i] + '/qualisys_odom', models[i])
+
+        #tf_br = tf.TransformBroadcaster()
+        #tf_br.sendTransform((0.0, 0.0, -self.tf_qualisys_map.translation.z), (0.0, 0.0, 0.0, 1.0), rospy.Time.now(), source + '/qualisys_odom', models[i])
 
     def pose_cb(self, msg, source):
         tf_br = tf.TransformBroadcaster()
         M_pose_M_R = PoseStamped()
         M_pose_M_R.header = msg.header
-        M_pose_M_R.header.frame_id = source + '/qualisys_odom'
+        M_pose_M_R.header.frame_id = 'map'
         M_pose_M_R.pose = self.convert_pose_from_frame1_to_frame2(msg.pose, self.tf_qualisys_map)
+        M_pose_M_R.pose.position.z = 0.0
         #self.pub_map_pose.publish(M_pose_M_R)
         self.publisher_pose_dict[source].publish(M_pose_M_R)
-        tf_br.sendTransform((M_pose_M_R.pose.position.x, M_pose_M_R.pose.position.y,M_pose_M_R.pose.position.z), (M_pose_M_R.pose.orientation.x, M_pose_M_R.pose.orientation.y, M_pose_M_R.pose.orientation.z, M_pose_M_R.pose.orientation.w), rospy.Time.now(), source + '/qualisys_odom', source)
+
+        if self.first_pose:
+            self.odom = M_pose_M_R.pose
+            self.first_pose = False
+
+        tf_br.sendTransform((M_pose_M_R.pose.position.x, M_pose_M_R.pose.position.y, M_pose_M_R.pose.position.z), (M_pose_M_R.pose.orientation.x, M_pose_M_R.pose.orientation.y, M_pose_M_R.pose.orientation.z, M_pose_M_R.pose.orientation.w), rospy.Time.now(), source + '/qualisys_footprint', 'map')
+        #tf_br.sendTransform((self.tf_qualisys_map.translation.x, self.tf_qualisys_map.translation.y, self.tf_qualisys_map.translation.z, M_pose_M_R.pose.position.z), (self.tf_qualisys_map.rotation.x, self.tf_qualisys_map.rotation.y, self.tf_qualisys_map.rotation.z, self.tf_qualisys_map.rotation.w), rospy.Time.now(), source + '/qualisys_footprint', 'map')
+        tf_br.sendTransform((self.odom.position.x, self.odom.position.y, self.odom.position.z), (self.odom.orientation.x, self.odom.orientation.y, self.odom.orientation.z, self.odom.orientation.w), rospy.Time.now(), source + '/qualisys_odom', 'map')
         #print('now')
+
+        odom = Odometry()
+
 
 
     def convert_pose_from_frame1_to_frame2(self, pose, tf_frame1_to_frame2):
