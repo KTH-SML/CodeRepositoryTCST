@@ -28,7 +28,7 @@ class PPC{
     std::vector<std::string> formula;
     std::vector<std::vector<std::string>> dformula;
 
-    std::vector<int> robots_in_cluster;
+    std::vector<int> V;
     std::map<int, int> c;
 
     FormulaParser<double> rho_fp;
@@ -49,7 +49,7 @@ public:
         std::vector<double> rho_opt,
         int K,
         arma::vec u_max,
-        std::vector<int> robots_in_cluster);
+        std::vector<int> V);
 
     void init(double t_0, arma::vec x, arma::vec X);
 

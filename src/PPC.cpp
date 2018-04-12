@@ -1,5 +1,5 @@
 #include "PPC.hpp"
-
+#include <iostream>
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define ABS(a) ((a)>0?(a):(-a))
@@ -7,13 +7,13 @@
 PPC::PPC(int robot_id, std::vector<double> a, std::vector<double> b, 
     std::vector<std::string> formula_type, std::vector<std::string> formula, 
     std::vector<std::vector<std::string>> dformula, std::vector<double> rho_opt, 
-    int K, arma::vec u_max, std::vector<int> robots_in_cluster): 
+    int K, arma::vec u_max, std::vector<int> V): 
         robot_id(robot_id), a(a), b(b),
         formula_type(formula_type), formula(formula), dformula(dformula),
         rho_opt(rho_opt), K(K), u_max(u_max), drho_fp(std::vector<FormulaParser<double>>(dformula[robot_id].size())),
-        robots_in_cluster(robots_in_cluster){
-            for(int i=0; i<robots_in_cluster.size(); i++){
-                c[robots_in_cluster[i]] = (int)RobotTask::Own;
+        V(V){
+            for(int i=0; i<V.size(); i++){
+                c[V[i]] = (int)RobotTask::Own;
             }
     }
 
@@ -23,7 +23,7 @@ void PPC::init(double t_0, arma::vec x, arma::vec X){
     this->t_0 = t_0;
 
     setFormulaParsers(robot_id);
-
+    
     double rho_0 = rho_psi(X_std);
     rho_max = MAX(0, rho_0) + (rho_opt[robot_id] - MAX(0, rho_0))*0.9;
     zeta_u = (rho_opt[robot_id] - rho_max)/K; 
@@ -76,7 +76,7 @@ arma::vec PPC::drho_psi(std::vector<double> X){
     if(!drho.is_finite()){
         drho.zeros();
     }
-    return drho;
+    return drho/arma::norm(drho);
 }
 
 double PPC::gamma(double t){
@@ -86,6 +86,7 @@ double PPC::gamma(double t){
 double PPC::e(std::vector<double> X, double t){
     double epsilon = (rho_psi(X) - rho_max) / gamma(t);
     if(detect(epsilon)){
+        std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<std::endl;
         if(k++ < K){ // stage 1
             CriticalEventParam ce;
             ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
@@ -96,6 +97,7 @@ double PPC::e(std::vector<double> X, double t){
         else{
             if(detectStageTwo()){ // stage 2
                 c[robot_id] = robot_id;
+                std::cout<<"Robot "<<robot_id<<" requested collaboration."<<std::endl;
                 requestCollaboration(CollaborationRequestParam(c[robot_id], t_star, r, rho_max, gamma_0, gamma_inf, l));
             }
             else{ //stage 3
@@ -203,6 +205,7 @@ void PPC::externalCollaborationRequest(int i, int c_i, double t_star, double r, 
     if(c_i == i){ // collaborative control incoming request
         c[robot_id] = c_i;
         setFormulaParsers(c_i);
+        std::cout<<"Robot "<<robot_id<<" received collaboration request from robot "<<c_i<<std::endl;
         setCollaborationParameters(t_star, r, rho_max, gamma_0, gamma_inf, l);
     }
     else if (c_i == (int)RobotTask::Free){
@@ -218,9 +221,9 @@ void PPC::externalCollaborationRequest(int i, int c_i, double t_star, double r, 
 }
 
 bool PPC::detectStageTwo(){
-    if(std::all_of(robots_in_cluster.begin(), robots_in_cluster.end(),
-            [&](int r){
-                return c[r]==(int)RobotTask::Free || c[r]==(int)RobotTask::Own && formula_type[r]=="F"?b[r]:a[r] > b[robot_id];
+    if(std::all_of(V.begin(), V.end(),
+            [&](int v){
+                return c[v]==(int)RobotTask::Free || c[v]==(int)RobotTask::Own && (formula_type[v]=="F"?b[v]:a[v]) > b[robot_id] || v==robot_id;
             })){
         return true;
     }

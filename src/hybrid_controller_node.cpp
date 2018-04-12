@@ -28,7 +28,7 @@ class ControllerNode{
 	std::vector<bool> state_was_read;
 
 public:
-	ControllerNode(ros::NodeHandle nh, ros::NodeHandle priv_nh, PPC ppc, int n_robots, int robot_id, std::vector<int> robots_in_cluster, arma::vec u_max): prescribed_performance_controller(ppc), robot_id(robot_id){
+	ControllerNode(ros::NodeHandle nh, ros::NodeHandle priv_nh, PPC ppc, int n_robots, int robot_id, std::vector<int> V, arma::vec u_max): prescribed_performance_controller(ppc), robot_id(robot_id){
 		state_was_read = std::vector<bool>(n_robots, false);
 		X = arma::vec(3*n_robots);
 
@@ -45,12 +45,12 @@ public:
 					100,
 					boost::bind(&ControllerNode::poseCallback, this, _1, i)));
 		}
-		for(int i=0; i<robots_in_cluster.size(); i++){
+		for(int i=0; i<V.size(); i++){
 			collaboration_params_subs.push_back(
 				nh.subscribe<hybrid_controller::Params>(
-					"/collaboration_params"+std::to_string(robots_in_cluster[i]), 
+					"/collaboration_params"+std::to_string(V[i]), 
 					100, 
-					boost::bind(&ControllerNode::externalCollaborationRequestCallback, this, _1, robots_in_cluster[i])));
+					boost::bind(&ControllerNode::externalCollaborationRequestCallback, this, _1, V[i])));
 		}
 	}
 
@@ -59,6 +59,7 @@ public:
 			i, msg->c,
 			msg->t_star, msg->r, msg->rho_max,
 			msg->gamma_0, msg->gamma_inf, msg->l);
+		ROS_INFO("v%d, c=%d", i, msg->c);
 	}
 
 	void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg, int i){
@@ -137,7 +138,7 @@ ControllerNode* CriticalEvent::controller_node;
 void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, int& robot_id, int& K, int& freq,
 		std::vector<std::string>& formula, std::vector<std::string>& formula_type,
 		std::vector<std::vector<std::string>>& dformula,
-		std::vector<int>& cluster, std::vector<int>& robots_in_cluster,
+		std::vector<int>& cluster, std::vector<int>& V,
 		std::vector<double>& a, std::vector<double>& b, std::vector<double>& rho_opt,
 		arma::vec& u_max){
 	nh.param<int>("control_freq", freq, 100);
@@ -172,11 +173,7 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 	nh.getParam("u_max", u_max_stdvec);
 	u_max = arma::vec(u_max_stdvec);
 
-	for(int i=0; i<cluster.size(); i++){
-		if(cluster[robot_id] == cluster[i]){
-			robots_in_cluster.push_back(i);
-		}
-	}
+	nh.getParam("V"+std::to_string(robot_id), V);
 }
 
 int main(int argc, char* argv[]){
@@ -187,19 +184,19 @@ int main(int argc, char* argv[]){
 	int n_robots, robot_id, K, freq;
 	std::vector<std::string> formula, formula_type;
 	std::vector<std::vector<std::string>> dformula;
-	std::vector<int> cluster, robots_in_cluster;
+	std::vector<int> cluster, V;
 	std::vector<double> a, b, rho_opt;
 	arma::vec u_max;
 
 	readParameters(nh, priv_nh, n_robots, robot_id, K, freq, 
-		formula, formula_type, dformula, cluster, robots_in_cluster, a, b, rho_opt, u_max);
+		formula, formula_type, dformula, cluster, V, a, b, rho_opt, u_max);
 
 	PPC ppc(robot_id, a, b, 
 			formula_type, formula,
 			dformula, rho_opt, K, u_max,
-			robots_in_cluster);
-
-	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, robots_in_cluster, u_max);
+			V);
+			
+	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, V, u_max);
 	
 	CriticalEvent::controller_node = &controller_node;
 	controller_node.setCriticalEventCallback(CriticalEvent::criticalEventCallback);

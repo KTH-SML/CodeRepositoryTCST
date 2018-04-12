@@ -5,21 +5,21 @@
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives.yaml" />
 
 
-	<rosparam param="u_max">[10.0, 6.28]</rosparam>
-	<param name="K" type="int" value="10"/>
+	<rosparam param="u_max">[0.1, 6.28]</rosparam>
+	<param name="K" type="int" value="1"/>
 	<param name="n_robots" type="int" value="2"/>
 
 
 	<!-- controllers: -->
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
 		<remap from="/cmdvel" to="/cmdvel0" />
-		<remap from="/c" to="/c0" />
+		<remap from="/collaboration_params" to="/collaboration_params0" />
 		<remap from="/controller_params" to="/controller_params0" />
 		<param name="~robot_id" type="int" value="0"/>
 	</node>
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
 		<remap from="/cmdvel" to="/cmdvel1" />
-		<remap from="/c" to="/c1" />
+		<remap from="/collaboration_params" to="/collaboration_params1" />
 		<remap from="/controller_params" to="/controller_params1" />
 		<param name="~robot_id" type="int" value="1"/>
 	</node>
