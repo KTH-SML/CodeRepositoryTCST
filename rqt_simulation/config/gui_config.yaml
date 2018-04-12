@@ -19,7 +19,6 @@ Robots:
             - nexus
         arial:
             - srd250
-
 Worlds:
     - pal_office
     - hospital
