@@ -56,7 +56,7 @@
           <param name="odom_frame" value="$(arg odom)"/>
           <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
           -->
-          <param name="odom_frame" value="turtlebot1/qualisys_odom"/>
+          <param name="odom_frame" value="turtlebot1_qualisys/odom"/>
           <param name="base_frame" value="open_loop/base_footprint"/>
 
           <remap from="mobile_base/odom" to="odom"/>

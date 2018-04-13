@@ -32,7 +32,9 @@
     <arg name="gzpose" value="-x $(arg initial_pose_x) -y $(arg initial_pose_y) -z 0.0 -R 0.0 -P 0.0 -Y $(arg initial_pose_a)"/>
     <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_qualisys" args="$(arg trans_x) $(arg trans_y) $(arg trans_z) $(arg orient_x) $(arg orient_y) $(arg orient_z) $(arg orient_w) qualisys /map 100"/>
     <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 map $(arg robot_name)/map 100"/>
-
+    <!--
+    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_mapping" args="0 0 0 0 0 0 1 turtlebo1_qualisys/footprint $(arg robot_name)/footprint 100"/>
+    -->
         <!-- Map server -->
         <arg name="map_file" default="$(arg scenario_path)/map.yaml"/>
         <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
