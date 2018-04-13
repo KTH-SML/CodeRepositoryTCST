@@ -57,7 +57,7 @@
           <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
           -->
           <param name="odom_frame" value="turtlebot1/qualisys_odom"/>
-          <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
+          <param name="base_frame" value="open_loop/base_footprint"/>
 
           <remap from="mobile_base/odom" to="odom"/>
           <!-- Don't do this - force applications to use a velocity mux for redirection
