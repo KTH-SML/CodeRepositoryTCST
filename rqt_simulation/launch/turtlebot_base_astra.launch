@@ -43,7 +43,7 @@
 
         <!-- mobile base nodelet manager -->
         <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager">
-          <param name="tf_prefix" value="$(arg robot_name)"/>
+          <param name="tf_prefix" value="turtlebot1_qualisys"/>
         </node>
 
         <arg name="manager" value="mobile_base_nodelet_manager"/>
