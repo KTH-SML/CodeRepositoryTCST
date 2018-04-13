@@ -49,7 +49,11 @@
           <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
           <param name="device_port" value="$(arg serialport)" />
           <param name="tf_prefix" value="$(arg robot_name)" />
+          <!--
           <param name="odom_frame" value="$(arg odom)"/>
+          <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
+          -->
+          <param name="odom_frame" value="turtlebot1/qualisys_odom"/>
           <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
 
           <remap from="mobile_base/odom" to="odom"/>

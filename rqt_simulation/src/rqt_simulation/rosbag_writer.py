@@ -40,7 +40,7 @@ def rosbag_writer():
     global active
     active = False
     rospy.Subscriber('/logger_active', Bool, active_cb)
-    bag = rosbag.Bag('/home/lukas/catin_ws/rqt_simulation.bag', 'w')
+    bag = rosbag.Bag('/home/sml/tiago_public_ws/rqt_simulation.bag', 'w')
     num_robots = rospy.get_param('num_robots')
     for i in range(0, num_robots):
         rospy.Subscriber('/robot' + str(i+1) + '/pose', PoseWithCovarianceStamped, amcl_pose_cb, '/robot' + str(i+1))

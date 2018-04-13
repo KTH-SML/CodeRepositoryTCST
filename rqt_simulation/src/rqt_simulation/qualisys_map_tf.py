@@ -28,7 +28,9 @@ class QualisysMapTfNode(object):
         data = yaml.load(stream)
         models = data['models']
 
-        #print(models)
+        print(models)
+
+        self.start_stamp = rospy.Time.now().to_sec()
 
         self.tf_qualisys_map = Transform()
         self.tf_qualisys_map.translation.x = 0.111
@@ -75,11 +77,23 @@ class QualisysMapTfNode(object):
         #self.pub_map_pose.publish(M_pose_M_R)
         self.publisher_pose_dict[source].publish(M_pose_M_R)
 
-        if self.first_pose:
+        if self.first_pose and (msg.header.stamp.to_sec() > self.start_stamp):
             self.odom = M_pose_M_R.pose
             self.first_pose = False
 
-        tf_br.sendTransform((M_pose_M_R.pose.position.x, M_pose_M_R.pose.position.y, M_pose_M_R.pose.position.z), (M_pose_M_R.pose.orientation.x, M_pose_M_R.pose.orientation.y, M_pose_M_R.pose.orientation.z, M_pose_M_R.pose.orientation.w), rospy.Time.now(), source + '/qualisys_footprint', 'map')
+
+
+        tf_map_odom = Transform()
+        tf_map_odom.translation = self.odom.position
+        tf_map_odom.rotation = self.odom.orientation
+
+        #print(tf_map_odom)
+
+        O_pose_O_R = PoseStamped()
+        O_pose_O_R.header = msg.header
+        O_pose_O_R.header.frame_id = 'map'
+        O_pose_O_R.pose = self.convert_pose_from_frame1_to_frame2(M_pose_M_R.pose, tf_map_odom)
+        tf_br.sendTransform((O_pose_O_R.pose.position.x, O_pose_O_R.pose.position.y, O_pose_O_R.pose.position.z), (O_pose_O_R.pose.orientation.x, O_pose_O_R.pose.orientation.y, O_pose_O_R.pose.orientation.z, O_pose_O_R.pose.orientation.w), rospy.Time.now(), source + '/qualisys_footprint', source + '/qualisys_odom')
         #tf_br.sendTransform((self.tf_qualisys_map.translation.x, self.tf_qualisys_map.translation.y, self.tf_qualisys_map.translation.z, M_pose_M_R.pose.position.z), (self.tf_qualisys_map.rotation.x, self.tf_qualisys_map.rotation.y, self.tf_qualisys_map.rotation.z, self.tf_qualisys_map.rotation.w), rospy.Time.now(), source + '/qualisys_footprint', 'map')
         tf_br.sendTransform((self.odom.position.x, self.odom.position.y, self.odom.position.z), (self.odom.orientation.x, self.odom.orientation.y, self.odom.orientation.z, self.odom.orientation.w), rospy.Time.now(), source + '/qualisys_odom', 'map')
         #print('now')
@@ -133,4 +147,3 @@ if __name__ == '__main__':
     rospy.init_node('qualisys_to_map_tf', anonymous=False)
     qualisys_to_map_tf_node = QualisysMapTfNode()
     rospy.spin()
-

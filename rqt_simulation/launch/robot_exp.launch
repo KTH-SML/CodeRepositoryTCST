@@ -9,7 +9,7 @@
     <arg name="initial_pose_x" default="0" />
     <arg name="initial_pose_y" default="0" />
     <arg name="initial_pose_a" default="0" />
-    <arg name="robot_model" default="nexus" />
+    <arg name="robot_model" default="turtlebot" />
 
     <!-- TF from qualisys to map -->
     <arg name="trans_x" default="0.111"/>
