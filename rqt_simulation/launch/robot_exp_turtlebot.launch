@@ -59,7 +59,7 @@
 
         <!--<arg name="odom_frame_id"   default="$(arg robot_name)/odom"/>-->
         <arg name="odom_frame_id"   default="turtlebot1_qualisys/odom"/>
-        <arg name="base_frame_id"   default="turtlebot1_qualisys/footprint"/>
+        <arg name="base_frame_id"   default="turtlebot1_qualisys/base_footprint"/>
         <arg name="global_frame_id" default="$(arg robot_name)/map"/>
         <arg name="odom_topic" default="odom" />
         <arg name="laser_topic" default="scan" />
