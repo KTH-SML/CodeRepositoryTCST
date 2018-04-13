@@ -32,10 +32,7 @@
 
         <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
           <param name="publish_frequency" type="double" value="5.0" />
-          <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
-          <rosparam param="mappings">
-            [{old: base_footprint, new: turtlebot1/qualisys_footprint}]
-          </rosparam>
+          <param name="tf_prefix" type="string" value="turtlebot1_qualisys"/>
         </node>
         <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
           <rosparam command="load" file="$(find turtlebot_bringup)/param/$(arg base)/diagnostics.yaml" />
@@ -43,7 +40,7 @@
 
         <!-- mobile base nodelet manager -->
         <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager">
-          <param name="tf_prefix" value="turtlebot1_qualisys"/>
+          <param name="tf_prefix" value="$(arg robot_name)"/>
         </node>
 
         <arg name="manager" value="mobile_base_nodelet_manager"/>
