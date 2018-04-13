@@ -1,5 +1,7 @@
 #include "PPC.hpp"
 #include <iostream>
+#include <typeinfo>
+#include <unistd.h>
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define ABS(a) ((a)>0?(a):(-a))
@@ -17,7 +19,7 @@ PPC::PPC(int robot_id, std::vector<double> a, std::vector<double> b,
             }
     }
 
-void PPC::init(double t_0, arma::vec x, arma::vec X){
+void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
 
     this->X_std = arma::conv_to<std::vector<double>>::from(X);
     this->t_0 = t_0;
@@ -30,10 +32,10 @@ void PPC::init(double t_0, arma::vec x, arma::vec X){
     r = rho_max * arma::randu() / 2;
 
     if(formula_type[robot_id] == "G"){
-        t_star = a[robot_id];
+        t_star = a[robot_id] - (t_r - t_0);
     }
     else if(formula_type[robot_id] == "F"){
-        t_star = a[robot_id] + (b[robot_id]-a[robot_id])/3;
+        t_star = a[robot_id] + (b[robot_id]-a[robot_id])/3 - (t_r - t_0);
     }
     else{
         throw std::runtime_error("Incorrect formula type");
@@ -97,7 +99,7 @@ double PPC::e(std::vector<double> X, double t){
         else{
             if(detectStageTwo()){ // stage 2
                 c[robot_id] = robot_id;
-                std::cout<<"Robot "<<robot_id<<" requested collaboration."<<std::endl;
+                std::cout<<"Robot "<<robot_id<<" requested collaboration, c:{ " <<c[0]<<c[1]<<" }."<<std::endl;
                 requestCollaboration(CollaborationRequestParam(c[robot_id], t_star, r, rho_max, gamma_0, gamma_inf, l));
             }
             else{ //stage 3
@@ -200,27 +202,35 @@ void PPC::setCollaborationParameters(double t_star, double r, double rho_max, do
     this->l = l;
 }
 
-void PPC::externalCollaborationRequest(int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l){
+void PPC::externalCollaborationRequest(arma::vec X, double t, int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l){
+    if(i == robot_id) return;
+
     c[i] = c_i;
     if(c_i == i){ // collaborative control incoming request
-        c[robot_id] = c_i;
+        setc(robot_id, c_i);
+        sendc(c_i);
+        std::cout<<"setc ok"<<std::endl;
         setFormulaParsers(c_i);
-        std::cout<<"Robot "<<robot_id<<" received collaboration request from robot "<<c_i<<std::endl;
+        std::cout<<"Robot "<<robot_id<<" received collaboration request from robot "<<c_i<<", c: { "<<c[0]<<c[1]<<" }."<<std::endl;
         setCollaborationParameters(t_star, r, rho_max, gamma_0, gamma_inf, l);
     }
     else if (c_i == (int)RobotTask::Free){
         if(formula_satisfied){
-            c[robot_id] = (int)RobotTask::Free;
+            setc(robot_id, (int)RobotTask::Free);
+            sendc((int)RobotTask::Free);
         }
         else{
-            c[robot_id] = (int)RobotTask::Own;
-            setFormulaParsers(robot_id);
-            //reinitialize for own task and current time
+            setc(robot_id, (int)RobotTask::Own);
+            sendc((int)RobotTask::Own);
+            //init(t_0, t, X(arma::span(3*robot_id, 3*robot_id+2)), X);
         }
     }
 }
 
 bool PPC::detectStageTwo(){
+    if(V.size() == 1 && V[0] == robot_id || c[robot_id]==robot_id){
+        return false;
+    }
     if(std::all_of(V.begin(), V.end(),
             [&](int v){
                 return c[v]==(int)RobotTask::Free || c[v]==(int)RobotTask::Own && (formula_type[v]=="F"?b[v]:a[v]) > b[robot_id] || v==robot_id;
@@ -235,4 +245,15 @@ void PPC::setFormulaParsers(int c){
     for(int i=0; i<dformula[c].size(); i++){
        drho_fp[i] = FormulaParser<double>(dformula[c][i], "x", X_std);
     }
+}
+
+void PPC::setc(int i, int c_i){
+    c[i] = c_i;
+    /*if(c_i!=robot_id && i==robot_id){
+        sendc(c_i);
+        std::cout<<"Robot "<<robot_id<<" updated c["<< i <<"] to"<< c_i<<" and sent it."<<std::endl;
+    }
+    else{
+        std::cout<<"Robot "<<robot_id<<" updated c["<< i <<"] to"<< c_i<<std::endl;
+    }*/
 }

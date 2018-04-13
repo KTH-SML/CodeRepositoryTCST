@@ -39,6 +39,7 @@ class PPC{
 public:
     void (*criticalEventCallback)(CriticalEventParam);
     void (*requestCollaboration)(CollaborationRequestParam);
+    void (*sendc)(int);
 
     PPC(int robot_id,
         std::vector<double> a, 
@@ -51,13 +52,15 @@ public:
         arma::vec u_max,
         std::vector<int> V);
 
-    void init(double t_0, arma::vec x, arma::vec X);
+    void init(double t_0, double t_r, arma::vec x, arma::vec X);
 
     void setCollaborationParameters(double, double, double, double, double, double); 
 
-    void externalCollaborationRequest(int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l);
+    void externalCollaborationRequest(arma::vec X, double t, int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l);
 
     arma::vec u(std::vector<double> X, std::vector<double> x, double t);
+
+    void setc(int i, int c_i);
 
 private:
     arma::mat g(arma::vec x);
