@@ -38,12 +38,12 @@
 
     <!-- Velocity muxer -->
     <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager">
-    	<remap from="mobile_base/commands/velocity" to="mobile_base/commands/velocity_raw"/>
+    	<remap from="mobile_base/commands/velocity" to="mobile_base/commands/velocity"/>
     </node>
     <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
           args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
       <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
-      <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity_raw"/>
+      <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity"/>
     </node>
 
     <!-- Bumper/cliff to pointcloud (not working, as it needs sensors/core messages) -->
@@ -54,7 +54,7 @@
       <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
     </node>
 
-    <!-- TF lookup 
+    <!-- TF lookup
     <node pkg="tf_lookup" type="tf_lookup" name="tf_lookup" output="screen"/>
     -->
 
@@ -138,7 +138,7 @@
      <remap from="scan" to="$(arg laser_topic)"/>
      <remap from="map" to="$(arg map_topic)"/>
    </node>
-   
+
    <node pkg="rqt_simulation" type="RVOController.py" name="RVOController" output="screen">
    </node>
 

@@ -11,6 +11,8 @@
     <arg name="initial_pose_a" default="0" />
     <arg name="robot_model" default="turtlebot" />
 
+    <arg name="use_qualisys" default="false" />
+
     <!-- TF from qualisys to map -->
     <arg name="trans_x" default="0.111"/>
     <arg name="trans_y" default="0.105"/>
@@ -34,6 +36,7 @@
             <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
             <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
             <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
+            <arg name="use_qualisys" value="$(arg use_qualisys)" />
             <!--
             <arg name="trans_x" value="$(arg trans_x)"/>
             <arg name="trans_y" value="$(arg trans_y)"/>

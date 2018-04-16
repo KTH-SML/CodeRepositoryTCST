@@ -15,6 +15,8 @@
     <arg name="initial_pose_y" default="0" />
     <arg name="initial_pose_a" default="0" />
 
+    <arg name="use_qualisys" default="false" />
+
     <!-- TF from qualisys to map -->
     <arg name="trans_x" default="0.111"/>
     <arg name="trans_y" default="0.105"/>
@@ -57,9 +59,16 @@
         <include file="$(find turtlebot_navigation)/launch/includes/velocity_smoother.launch.xml"/>
         <include file="$(find turtlebot_navigation)/launch/includes/safety_controller.launch.xml"/>
 
-        <!--<arg name="odom_frame_id"   default="$(arg robot_name)/odom"/>-->
-        <arg name="odom_frame_id"   default="turtlebot1_qualisys/odom"/>
-        <arg name="base_frame_id"   default="turtlebot1_qualisys/base_footprint"/>
+        <group if="$(arg use_qualisys)">
+          <arg name="odom_frame_id"   default="$(arg robot_name)/qualisys_odom"/>
+          <arg name="base_frame_id"   default="$(arg robot_name)/qualisys_base_footprint"/>
+        </group>
+
+        <group unless="$(arg use_qualisys)">
+          <arg name="odom_frame_id"   default="$(arg robot_name)/odom"/>
+          <arg name="base_frame_id"   default="$(arg robot_name)/base_footprint"/>
+        </group>
+
         <arg name="global_frame_id" default="$(arg robot_name)/map"/>
         <arg name="odom_topic" default="odom" />
         <arg name="laser_topic" default="scan" />

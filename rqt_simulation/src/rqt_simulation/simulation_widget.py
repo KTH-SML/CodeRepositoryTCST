@@ -189,11 +189,15 @@ class SimulationWidget(QWidget):
 
     # Callback for prefix from ltl_planner
     def prefix_callback(self, msg, source):
+        #print('----------')
+        #print(msg)
         for n in msg.poses:
             for i in range(0, len(self.FTS.region_of_interest)):
                 if self.position_msg_to_tuple(n.position) == tuple(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]]['pose']['position']):
                     self.prefix_string =  self.prefix_string + self.FTS.region_of_interest.keys()[i] + ' --> '
+                    #print('match')
         index = self.prefix_plan_topic_list.index(source)
+        #print(index)
         # Send signal for received msg
         self.prefix_plan_subscriber_list[index].received.emit(index)
 
@@ -307,6 +311,7 @@ class SimulationWidget(QWidget):
 
         # Get robot types to generate RVIZ file
         robot_list = []
+        tf_prefixes = []
         for i in range(0, self.num_robots):
             #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
             #    robot_list.append('tiago')
@@ -315,7 +320,9 @@ class SimulationWidget(QWidget):
             #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
             #    robot_list.append('srd250')
             robot_list.append(self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
-        file = RVIZFileGenerator(robot_list)
+            tf_prefixes.append(self.tab_list[i].robot_name)
+
+        file = RVIZFileGenerator(robot_list, tf_prefixes)
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
@@ -395,6 +402,7 @@ class SimulationWidget(QWidget):
 
         #Get robot types to generate RVIZ file
         robot_list = []
+        tf_prefixes = []
         for i in range(0, self.num_robots):
             #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
             #    robot_list.append('tiago')
@@ -403,7 +411,9 @@ class SimulationWidget(QWidget):
             #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
             #    robot_list.append('srd250')
             robot_list.append(self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
-        file = RVIZFileGenerator(robot_list)
+            tf_prefixes.append(self.tab_list[i].robot_name)
+
+        file = RVIZFileGenerator(robot_list, tf_prefixes)
 
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
@@ -528,6 +538,7 @@ class SimulationWidget(QWidget):
         # Add tab
         self.num_robots += 1
         self.tab_list.append(RobotTab(self.num_robots, self.robots))
+        self.tab_list[self.num_robots-1].signalRobotNameChanged.connect(self.robot_name_changed)
         self.tabWidget.addTab(self.tab_list[self.num_robots-1], ('Robot ' + str(self.num_robots)))
         self.button_remove_robot.setEnabled(True)
         self.current_graphicsScene.addItem(self.tab_list[self.num_robots-1].initial_pose['start_' + str(self.num_robots).zfill(2)]['text_item'])
@@ -567,6 +578,33 @@ class SimulationWidget(QWidget):
         self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/goal')
         self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], MoveBaseActionGoal, self.goal_callback))
         self.current_goal_subscriber_list[self.num_robots-1].received.connect(self.received_goal)
+
+    @pyqtSlot(int)
+    def robot_name_changed(self, id):
+        print(self.tab_list[id-1].robot_name)
+        # Remove plan topics and subscriber
+        del self.prefix_plan_topic_list[id-1]
+        del self.prefix_plan_subscriber_list[id-1]
+        del self.sufix_plan_topic_list[id-1]
+        del self.sufix_plan_subscriber_list[id-1]
+
+        # Remove current goal subscriber
+        del self.current_goal_topic_list[id-1]
+        del self.current_goal_subscriber_list[id-1]
+
+        # Add plan topics and subscriber
+        self.prefix_plan_topic_list.append('/' + self.tab_list[id-1].robot_name + '/prefix_plan')
+        self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[id-1], PoseArray, self.prefix_callback))
+        self.sufix_plan_topic_list.append('/' + self.tab_list[id-1].robot_name + '/sufix_plan')
+        self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[id-1], PoseArray, self.sufix_callback))
+
+        self.prefix_plan_subscriber_list[id-1].received.connect(self.received_prefix)
+        self.sufix_plan_subscriber_list[id-1].received.connect(self.received_sufix)
+
+        # Add current goal subscriber
+        self.current_goal_topic_list.append('/' + self.tab_list[id-1].robot_name + '/move_base/goal')
+        self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[id-1], MoveBaseActionGoal, self.goal_callback))
+        self.current_goal_subscriber_list[id-1].received.connect(self.received_goal)
 
     # Remove last robot
     @Slot(bool)
@@ -659,10 +697,12 @@ class SimulationWidget(QWidget):
         for i in range(0, len(robot_tabs)):
             if i > 0:
                 self.add_robot()
-            self.tab_list[i].robot_comboBox.setCurrentIndex(self.tab_list[i].robot_comboBox.findText(robot_tabs['robot' + str(i+1)]['robot_model']))
-            self.tab_list[i].robot_comboBox_init.setCurrentIndex(self.tab_list[i].robot_comboBox_init.findText(robot_tabs['robot' + str(i+1)]['initial_pose']))
-            self.tab_list[i].robot_hard_task_input.setText(robot_tabs['robot' + str(i+1)]['tasks']['hard_task'])
-            self.tab_list[i].robot_soft_task_input.setText(robot_tabs['robot' + str(i+1)]['tasks']['soft_task'])
+            self.tab_list[i].robot_name_input.setText(robot_tabs.keys()[i])
+            print(robot_tabs[robot_tabs.keys()[i]])
+            self.tab_list[i].robot_comboBox.setCurrentIndex(self.tab_list[i].robot_comboBox.findText(robot_tabs[robot_tabs.keys()[i]]['robot_model']))
+            self.tab_list[i].robot_comboBox_init.setCurrentIndex(self.tab_list[i].robot_comboBox_init.findText(robot_tabs[robot_tabs.keys()[i]]['initial_pose']))
+            self.tab_list[i].robot_hard_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['hard_task'])
+            self.tab_list[i].robot_soft_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['soft_task'])
 
         self.button_execute_task.setEnabled(True)
 

@@ -7,7 +7,7 @@ import rospy
 import rospkg
 
 class RVIZFileGenerator:
-    def __init__(self, robot_list):
+    def __init__(self, robot_list, tf_prefixes):
         dict = {}
 
         self.robot_name = 'robot1'
@@ -42,7 +42,7 @@ class RVIZFileGenerator:
         self.vis_manager_displays.append(self.add_grid())
 
         for i in range(0, len(robot_list)):
-            self.robot_name = 'robot' + str(1+i)
+            self.robot_name = tf_prefixes[i]
             self.add_robot(robot_list[i])
 
         # Region of interest marker
