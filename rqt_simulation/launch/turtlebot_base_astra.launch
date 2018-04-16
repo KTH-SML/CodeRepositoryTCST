@@ -58,8 +58,24 @@
 
         <!-- -->
         <group unless="$(arg use_qualisys)">
-          <arg name="odom_frame"   value="$(arg robot_name)/odom"/>
-          <arg name="base_frame"   value="$(arg robot_name)/base_footprint"/>
+          <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet $(arg manager)">
+            <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
+            <param name="device_port" value="$(arg serialport)" />
+            <param name="tf_prefix" value="$(arg robot_name)" />
+            <!---->
+            <param name="odom_frame" value="$(arg odom)"/>
+            <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
+            <param name="odom_frame" value="$(arg odom_frame)"/>
+            <param name="base_frame" value="$(arg base_frame)"/>
+
+            <remap from="mobile_base/odom" to="odom"/>
+            <!-- Don't do this - force applications to use a velocity mux for redirection
+              <remap from="mobile_base/commands/velocity" to="cmd_vel"/>
+            -->
+            <remap from="mobile_base/enable" to="enable"/>
+            <remap from="mobile_base/disable" to="disable"/>
+            <remap from="mobile_base/joint_states" to="joint_states"/>
+          </node>
         </group>
 
 
