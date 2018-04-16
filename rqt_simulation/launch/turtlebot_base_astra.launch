@@ -6,6 +6,7 @@
     <arg name="robot_name" default="robot1" />
 
     <arg name="odom" default="$(arg robot_name)/odom" />
+    <arg name="use_qualisys" default="false" />
 
     <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
 
