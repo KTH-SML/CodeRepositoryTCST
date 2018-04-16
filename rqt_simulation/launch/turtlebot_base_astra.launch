@@ -44,21 +44,24 @@
           <param name="tf_prefix" value="$(arg robot_name)"/>
         </node>
 
+
         <arg name="manager" value="mobile_base_nodelet_manager"/>
+        <!--
         <arg name="odom_frame"   default="$(arg robot_name)/odom"/>
         <arg name="base_frame"   default="$(arg robot_name)/base_footprint"/>
+        -->
 
         <group if="$(arg use_qualisys)">
           <arg name="odom_frame"   value="$(arg robot_name)/qualisys_odom"/>
           <arg name="base_frame"   value="$(arg robot_name)/open_loop_base_footprint"/>
         </group>
 
-        <!--
+        <!-- -->
         <group unless="$(arg use_qualisys)">
-          <arg name="odom_frame"   default="$(arg robot_name)/odom"/>
-          <arg name="base_frame"   default="$(arg robot_name)/base_footprint"/>
+          <arg name="odom_frame"   value="$(arg robot_name)/odom"/>
+          <arg name="base_frame"   value="$(arg robot_name)/base_footprint"/>
         </group>
-        -->
+
 
         <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet $(arg manager)">
           <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
