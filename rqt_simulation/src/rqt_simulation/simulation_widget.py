@@ -456,6 +456,10 @@ class SimulationWidget(QWidget):
             sys.argv.append('initial_pose_y:=' + str(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['position'][1]))
             sys.argv.append('initial_pose_a:=' + str(theta))
             sys.argv.append('scenario:=' + scenario)
+            if self.tab_list[i].robot_localization_checkBox.checkState() == 2:
+                sys.argv.append('use_qualisys:=true')
+            else:
+                sys.argv.append('use_qualisys:=false')
 
             launch_robot_list[i].start()
             #navigation = actionlib.SimpleActionClient('/' + self.tab_list[i].robot_name + '/move_base', MoveBaseAction)

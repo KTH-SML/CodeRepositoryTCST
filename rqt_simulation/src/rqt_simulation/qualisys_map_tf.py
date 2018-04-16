@@ -54,9 +54,9 @@ class QualisysMapTfNode(object):
         #tf_br_list = []
 
         for i in range(0, len(models)):
-            roslaunch_qualisys_odom_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('qualisys'), 'launch', 'qualisys_odom.launch')]))
+            roslaunch_qualisys_odom_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'qualisys_odom.launch')]))
             sys.argv.append('model:=' + models[i])
-            self.sub_qualysis_pose = rospy.Subscriber(models[i] + '/pose', PoseStamped, self.pose_cb, models[i])
+            self.sub_qualysis_pose = rospy.Subscriber(models[i] + '/qualisys_pose', PoseStamped, self.pose_cb, models[i])
             self.publisher_pose_dict.update({models[i] : rospy.Publisher(models[i] + '/map_pose', PoseStamped, queue_size = 1)})
             #self.publisher_pose_dict.update({models[i] : rospy.Publisher(models[i] + '/map_pose', PoseStamped, queue_size = 1)})
             roslaunch_qualisys_odom_list[i].start()

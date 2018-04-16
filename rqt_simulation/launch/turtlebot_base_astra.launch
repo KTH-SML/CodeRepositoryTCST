@@ -49,8 +49,8 @@
         <arg name="base_frame"   default="$(arg robot_name)/base_footprint"/>
 
         <group if="$(arg use_qualisys)">
-          <arg name="odom_frame"   default="$(arg robot_name)/qualisys_odom"/>
-          <arg name="base_frame"   default="$(arg robot_name)/open_loop_base_footprint"/>
+          <arg name="odom_frame"   value="$(arg robot_name)/qualisys_odom"/>
+          <arg name="base_frame"   value="$(arg robot_name)/open_loop_base_footprint"/>
         </group>
 
         <!--

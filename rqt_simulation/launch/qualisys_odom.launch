@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <arg name="qualisys_fps" default="100"/>
+  <arg name="model"/>
+  <arg name="publish_tf" default="False"/>
+  <arg name="child_frame_id" default="odom"/>
+  <arg name="output" default="screen"/>
+
+  <node pkg="qualisys" type="qualisys_odom_node" name="$(arg model)"
+    output="$(arg output)">
+    <param name="qualisys_fps" type="double" value="$(arg qualisys_fps)"/>
+    <remap from="~qualisys_subject" to="qualisys/$(arg model)"/>
+    <remap from="$(arg model)/odom" to="$(arg model)/qualisys_odom"/>
+    <remap from="$(arg model)/pose" to="$(arg model)/qualisys_pose"/>
+
+  </node>
+
+</launch>
