@@ -68,7 +68,7 @@ class LtlPlannerNode(object):
         #------------
         if self.agent_type == 'ground':
             #localization_topic = 'amcl_pose'
-            localization_topic = 'pose'
+            localization_topic = 'pose_gui'
         elif self.agent_type == 'arial':
             localization_topic = 'ground_truth/pose_with_covariance'
         self.sub_amcl_pose = rospy.Subscriber(localization_topic, PoseWithCovarianceStamped, self.PoseCallback)

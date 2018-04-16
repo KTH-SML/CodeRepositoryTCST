@@ -139,7 +139,7 @@ class RobotTab(QWidget):
         self.pose_msg.pose.pose = self.init_pose_msg
         self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
         self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose', PoseWithCovarianceStamped, 15.0, self.pose_msg)
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
         self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
 
         self.simulation_started = False
