@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-  <node pkg="rqt_simulation" type="qualisys_map_tf.py" name="qualisys_map_tf" />
+  <node pkg="rqt_simulation" type="qualisys_map_tf.py" name="qualisys_map_tf" output="screen" />
 
 </launch>

@@ -138,6 +138,7 @@ class RobotTab(QWidget):
         self.pose_msg = PoseWithCovarianceStamped()
         self.pose_msg.pose.pose = self.init_pose_msg
         self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
+        self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
         self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
         self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
@@ -158,6 +159,15 @@ class RobotTab(QWidget):
             self.label_marker_msg.pose = msg.pose.pose
             self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1
         #print(self.pose_msg)
+
+    def current_pose_qualisys_callback(self, msg):
+        #print('got it')
+        self.pose_msg.pose.pose = deepcopy(msg.pose)
+
+        if self.agent_type == 'ground':
+            self.label_marker_msg.header = msg.header
+            self.label_marker_msg.pose = msg.pose
+            self.label_marker_msg.pose.position.z = deepcopy(msg.pose.position.z) + 1
 
     def current_pose_gazebo_ground_truth_callback(self, msg):
         if self.agent_type == 'arial':
@@ -197,6 +207,7 @@ class RobotTab(QWidget):
     def robot_name_changed(self):
         del self.ros_publisher
         del self.current_pose_amcl_subscriber
+        del self.current_pose_qualisys_subscriber
         del self.current_pose_gazebo_ground_truth_subscriber
         del self.local_footprint_subscriber
         del self.clear_costmap
@@ -210,8 +221,9 @@ class RobotTab(QWidget):
         self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
         self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
+        self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
         self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose', PoseWithCovarianceStamped, 15.0, self.pose_msg)
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
         self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
         self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
         self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
