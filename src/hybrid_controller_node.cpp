@@ -69,7 +69,7 @@ public:
 
 	void externalCollaborationRequestCallback(const hybrid_controller::Params::ConstPtr& msg, int i){
 		prescribed_performance_controller.externalCollaborationRequest(
-			X, ros::Time::now().toSec(), i, msg->c,
+			pose_to_vec(poses[robot_id]), X, ros::Time::now().toSec(), i, msg->c,
 			msg->t_star, msg->r, msg->rho_max,
 			msg->gamma_0, msg->gamma_inf, msg->l);
 	}
@@ -81,15 +81,12 @@ public:
 	void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg, int i){
 		poses[i] = *msg;
 		X(arma::span(3*i, 3*i+2)) = pose_to_vec(poses[i]);
-
+		
 		if(!state_was_read[i]){
-			arma::vec x;
-			if(i == robot_id){
-				x = pose_to_vec(poses[robot_id]);
-			}
 			state_was_read[i] = true;
 			if(std::all_of(state_was_read.cbegin(), state_was_read.cend(), [](bool v){return v;})){
 				double t = ros::Time::now().toSec();
+				arma::vec x = X(arma::span(3*robot_id, 3*robot_id+2));
 				prescribed_performance_controller.init(t, t, x, X);
 			}
 		}

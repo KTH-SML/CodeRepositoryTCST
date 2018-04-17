@@ -48,6 +48,6 @@
 	-->
 
 
-	<!--<node pkg="rviz" type="rviz" name="rviz" />-->
+	<node pkg="rviz" type="rviz" name="rviz" />
 	
 </launch>

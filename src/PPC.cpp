@@ -1,7 +1,5 @@
 #include "PPC.hpp"
-#include <iostream>
-#include <typeinfo>
-#include <unistd.h>
+
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define ABS(a) ((a)>0?(a):(-a))
@@ -12,19 +10,19 @@ PPC::PPC(int robot_id, std::vector<double> a, std::vector<double> b,
     int K, arma::vec u_max, std::vector<int> V): 
         robot_id(robot_id), a(a), b(b),
         formula_type(formula_type), formula(formula), dformula(dformula),
-        rho_opt(rho_opt), K(K), u_max(u_max), drho_fp(std::vector<FormulaParser<double>>(dformula[robot_id].size())),
+        rho_opt(rho_opt), K(K), u_max(u_max), drho_fp(std::vector<FormulaParser<double>>(3)),
         V(V){
             for(int i=0; i<V.size(); i++){
                 c[V[i]] = (int)RobotTask::Own;
             }
-    }
+}
 
 void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
 
     this->X_std = arma::conv_to<std::vector<double>>::from(X);
     this->t_0 = t_0;
 
-    setFormulaParsers(robot_id);
+    setFormulaParsers(robot_id, x.n_elem);
     
     double rho_0 = rho_psi(X_std);
     rho_max = MAX(0, rho_0) + (rho_opt[robot_id] - MAX(0, rho_0))*0.9;
@@ -70,9 +68,9 @@ double PPC::rho_psi(std::vector<double> X){
     return rho_fp.value(X);
 }
 
-arma::vec PPC::drho_psi(std::vector<double> X){
-    arma::vec drho(dformula[robot_id].size());
-    for(int i=0; i<dformula[robot_id].size(); i++){
+arma::vec PPC::drho_psi(std::vector<double> X, int n){
+    arma::vec drho(n);
+    for(int i=0; i<n; i++){
         drho(i) = drho_fp[i].value(X);
     }
     if(!drho.is_finite()){
@@ -88,7 +86,7 @@ double PPC::gamma(double t){
 double PPC::e(std::vector<double> X, double t){
     double epsilon = (rho_psi(X) - rho_max) / gamma(t);
     if(detect(epsilon)){
-        std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<std::endl;
+        //std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<std::endl;
         if(k++ < K){ // stage 1
             CriticalEventParam ce;
             ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
@@ -136,7 +134,7 @@ arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
     if(std::isinf(e_)){
         e_ = e_>0 ? u_max(0) : -u_max(0);
     }
-    u_ = -e_*g(x).t()*drho_psi(X);
+    u_ = -e_*g(x).t()*drho_psi(X, x.size());
 
     double c = arma::as_scalar(u_.rows(0,1).t()*u_.rows(0,1));
     if(c > u_max(0)){ 
@@ -202,15 +200,14 @@ void PPC::setCollaborationParameters(double t_star, double r, double rho_max, do
     this->l = l;
 }
 
-void PPC::externalCollaborationRequest(arma::vec X, double t, int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l){
+void PPC::externalCollaborationRequest(arma::vec x, arma::vec X, double t, int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l){
     if(i == robot_id) return;
 
     c[i] = c_i;
     if(c_i == i){ // collaborative control incoming request
         setc(robot_id, c_i);
         sendc(c_i);
-        std::cout<<"setc ok"<<std::endl;
-        setFormulaParsers(c_i);
+        setFormulaParsers(c_i, x.n_elem);
         std::cout<<"Robot "<<robot_id<<" received collaboration request from robot "<<c_i<<", c: { "<<c[0]<<c[1]<<" }."<<std::endl;
         setCollaborationParameters(t_star, r, rho_max, gamma_0, gamma_inf, l);
     }
@@ -240,10 +237,10 @@ bool PPC::detectStageTwo(){
     return false;
 }
 
-void PPC::setFormulaParsers(int c){
+void PPC::setFormulaParsers(int c, int n){
     rho_fp = FormulaParser<double>(formula[c], "x", X_std);
-    for(int i=0; i<dformula[c].size(); i++){
-       drho_fp[i] = FormulaParser<double>(dformula[c][i], "x", X_std);
+    for(int i=0; i<n; i++){
+       drho_fp[i] = FormulaParser<double>(dformula[c][n*robot_id+i], "x", X_std);
     }
 }
 

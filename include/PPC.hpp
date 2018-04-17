@@ -56,7 +56,7 @@ public:
 
     void setCollaborationParameters(double, double, double, double, double, double); 
 
-    void externalCollaborationRequest(arma::vec X, double t, int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l);
+    void externalCollaborationRequest(arma::vec x, arma::vec X, double t, int i, int c_i, double t_star, double r, double rho_max, double gamma_0, double gamma_inf, double l);
 
     arma::vec u(std::vector<double> X, std::vector<double> x, double t);
 
@@ -68,7 +68,7 @@ private:
     arma::vec f_c(arma::vec X);
 
     double rho_psi(std::vector<double> X);
-    arma::vec drho_psi(std::vector<double> X);
+    arma::vec drho_psi(std::vector<double> X, int n);
 
     double gamma(double t);
 
@@ -82,7 +82,7 @@ private:
 
     bool detectStageTwo();
 
-    void setFormulaParsers(int c);
+    void setFormulaParsers(int c, int n);
 };
     
 #endif   
