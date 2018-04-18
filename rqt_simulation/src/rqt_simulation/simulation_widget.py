@@ -396,7 +396,7 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
         self.button_record_rosbag.setEnabled(True)
-        self.tabWidget.setEnabled(False)
+        #self.tabWidget.setEnabled(False)
         self.button_load_scenario.setEnabled(False)
         self.button_execute_task.setEnabled(False)
 
@@ -708,6 +708,7 @@ class SimulationWidget(QWidget):
             self.tab_list[i].robot_comboBox_init.setCurrentIndex(self.tab_list[i].robot_comboBox_init.findText(robot_tabs[robot_tabs.keys()[i]]['initial_pose']))
             self.tab_list[i].robot_hard_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['hard_task'])
             self.tab_list[i].robot_soft_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['soft_task'])
+            self.tab_list[i].robot_name_changed()
 
         self.button_execute_task.setEnabled(True)
 

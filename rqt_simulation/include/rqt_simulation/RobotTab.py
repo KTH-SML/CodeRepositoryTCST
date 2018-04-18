@@ -35,7 +35,7 @@ class RobotTab(QWidget):
         super(RobotTab, self).__init__()
 
         # Variables for ROS Publisher
-        self.ros_publisher = ROS_Publisher()
+        #self.ros_publisher = ROS_Publisher()
         self.robots = robots
         self.agent_type = 'ground'
 
@@ -109,9 +109,9 @@ class RobotTab(QWidget):
         self.init_pose_msg = Pose()
         self.soft_task_msg = String()
         self.hard_task_msg = String()
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
+        #self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
+        #self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
+        #self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
 
         self.prefix_string = ''
         self.sufix_string = ''
@@ -131,43 +131,51 @@ class RobotTab(QWidget):
         self.label_marker_msg.header.frame_id = '/map'
 
         self.last_current_pose = PoseStamped()
-        self.last_footprint_point = PointStamped()
+        #self.last_footprint_point = PointStamped()
 
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
+        #self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
 
         self.pose_msg = PoseWithCovarianceStamped()
         self.pose_msg.pose.pose = self.init_pose_msg
-        self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
-        self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
-        self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
-        self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
+        #self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
+        #self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
+        #self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
+        #self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
+        #self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
 
         self.simulation_started = False
 
-        self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
+        #self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
         self.robot_resend_goal_button.clicked.connect(self.call_clear_costmap_srvs)
 
-        self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
+        #self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
         self.robot_current_goal = MoveBaseActionGoal()
 
-    def current_pose_amcl_callback(self, msg):
-        self.pose_msg.pose.pose = deepcopy(msg.pose.pose)
+        self.start_publisher_and_subscriber()
 
-        if self.agent_type == 'ground':
-            self.label_marker_msg.header = msg.header
-            self.label_marker_msg.pose = msg.pose.pose
-            self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1
+    def current_pose_amcl_callback(self, msg):
+        if self.robot_localization_checkBox.checkState() != 2:
+            self.pose_msg.pose.pose = deepcopy(msg.pose.pose)
+            self.pose_msg.header = deepcopy(msg.header)
+            self.pose_msg.header.stamp = rospy.Time.now()
+
+            if self.agent_type == 'ground':
+                self.label_marker_msg.header = msg.header
+                self.label_marker_msg.pose = msg.pose.pose
+                self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1
         #print(self.pose_msg)
 
     def current_pose_qualisys_callback(self, msg):
         #print('got it')
-        self.pose_msg.pose.pose = deepcopy(msg.pose)
+        if self.robot_localization_checkBox.checkState() == 2:
+            self.pose_msg.header = deepcopy(msg.header)
+            self.pose_msg.pose.pose = deepcopy(msg.pose)
+            self.pose_msg.header.stamp = rospy.Time.now()
 
-        if self.agent_type == 'ground':
-            self.label_marker_msg.header = msg.header
-            self.label_marker_msg.pose = msg.pose
-            self.label_marker_msg.pose.position.z = deepcopy(msg.pose.position.z) + 1
+            if self.agent_type == 'ground':
+                self.label_marker_msg.header = msg.header
+                self.label_marker_msg.pose = msg.pose
+                self.label_marker_msg.pose.position.z = deepcopy(msg.pose.position.z) + 1
 
     def current_pose_gazebo_ground_truth_callback(self, msg):
         if self.agent_type == 'arial':
@@ -175,25 +183,43 @@ class RobotTab(QWidget):
             self.label_marker_msg.pose = msg.pose.pose
             self.label_marker_msg.pose.position.z = msg.pose.pose.position.z + 1.0
 
-    def local_footprint_callback(self, msg):
+    def current_pose_gui_callback(self, msg):
         if self.simulation_started:
             if self.agent_type == 'ground':
-                msg_point_rounded = Point()
-                msg_point_rounded.x = round(msg.polygon.points[0].x, 3)
-                msg_point_rounded.y = round(msg.polygon.points[0].y, 3)
-                msg_point_rounded.z = round(msg.polygon.points[0].z, 3)
+                msg_pose_rounded = Pose()
+                msg_pose_rounded.position.x = round(msg.pose.pose.position.x, 3)
+                msg_pose_rounded.position.y = round(msg.pose.pose.position.y, 3)
+                msg_pose_rounded.position.z = round(msg.pose.pose.position.z, 3)
 
-                if msg_point_rounded != self.last_footprint_point.point:
-                    self.last_footprint_point.header = msg.header
+                msg_pose_rounded.orientation.w = round(msg.pose.pose.orientation.w, 3)
+                msg_pose_rounded.orientation.x = round(msg.pose.pose.orientation.x, 3)
+                msg_pose_rounded.orientation.y = round(msg.pose.pose.orientation.y, 3)
+                msg_pose_rounded.orientation.z = round(msg.pose.pose.orientation.z, 3)
 
-                if (msg.header.stamp - self.last_footprint_point.header.stamp).to_sec() > 5.0:
+                same_pose = self.two_poses(msg_pose_rounded, self.last_current_pose.pose)
+                if not same_pose:
+                    self.last_current_pose.header.stamp = rospy.Time.now()
+
+                if (rospy.Time.now() - self.last_current_pose.header.stamp).to_sec() > 5.0:
                     print('clear')
                     self.clear_costmap()
                     usleep = lambda x: time.sleep(x)
                     usleep(1)
                     self.move_base_ac.send_goal(self.robot_current_goal.goal)
-                    self.last_footprint_point.header = msg.header
-                self.last_footprint_point.point = msg_point_rounded
+                    self.last_current_pose.header.stamp = rospy.Time.now()
+                self.last_current_pose.pose = deepcopy(msg_pose_rounded)
+
+    def two_poses(self, pose1, pose2):
+        if pose1.position.x == pose2.position.x and \
+        pose1.position.y == pose2.position.y and \
+        pose1.position.z == pose2.position.z and \
+        pose1.orientation.x == pose2.orientation.x and \
+        pose1.orientation.y == pose2.orientation.y and \
+        pose1.orientation.z == pose2.orientation.z and \
+        pose1.orientation.w == pose2.orientation.w:
+            return True
+        else:
+            return False
 
     @Slot(bool)
     def call_clear_costmap_srvs(self):
@@ -205,6 +231,7 @@ class RobotTab(QWidget):
             print('Costmap cleared')
 
     def robot_name_changed(self):
+        '''
         del self.ros_publisher
         del self.current_pose_amcl_subscriber
         del self.current_pose_qualisys_subscriber
@@ -212,9 +239,13 @@ class RobotTab(QWidget):
         del self.local_footprint_subscriber
         del self.clear_costmap
         del self.move_base_ac
+        '''
+
+        self.remove_publisher_and_subscriber()
 
         self.robot_name = self.robot_name_input.text()
 
+        '''
         self.ros_publisher = ROS_Publisher()
         self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
@@ -227,10 +258,38 @@ class RobotTab(QWidget):
         self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
         self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
         self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
+        '''
+
+        self.start_publisher_and_subscriber()
 
         self.label_marker_msg.text = self.robot_name
 
         self.signalRobotNameChanged.emit(self.num_robots)
+
+    def start_publisher_and_subscriber(self):
+        self.ros_publisher = ROS_Publisher()
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
+        self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
+        self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
+        self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
+        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
+        self.current_pose_gui_subscriber = rospy.Subscriber('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, self.current_pose_gui_callback)
+        self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
+        self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
+
+        self.label_marker_msg.text = self.robot_name
+
+    def remove_publisher_and_subscriber(self):
+        del self.ros_publisher
+        del self.current_pose_amcl_subscriber
+        del self.current_pose_qualisys_subscriber
+        del self.current_pose_gazebo_ground_truth_subscriber
+        del self.current_pose_gui_subscriber
+        del self.clear_costmap
+        del self.move_base_ac
 
 
 
