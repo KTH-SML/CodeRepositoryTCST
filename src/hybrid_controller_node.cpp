@@ -2,6 +2,7 @@
 #include "std_msgs/Int32.h"
 #include "hybrid_controller/CriticalEvent.h"
 #include "hybrid_controller/Params.h"
+#include "hybrid_controller/Robustness.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/Twist.h"
 #include <boost/bind.hpp>
@@ -13,7 +14,7 @@
 #include "arma_ros_std_conversions.h"
 
 class ControllerNode{
-	ros::Publisher control_input_pub, critical_event_pub, collaboration_request_pub, c_pub;
+	ros::Publisher control_input_pub, critical_event_pub, collaboration_request_pub, c_pub, rho_pub;
 	std::vector<ros::Subscriber> pose_subs, collaboration_params_subs, c_subs;
 
 	std::vector<geometry_msgs::PoseStamped> poses;
@@ -41,6 +42,7 @@ public:
 		critical_event_pub = nh.advertise<hybrid_controller::CriticalEvent>("/critical_event"+std::to_string(robot_id), 100);
 		collaboration_request_pub = nh.advertise<hybrid_controller::Params>("/collaboration_params", 100);
 		c_pub = nh.advertise<std_msgs::Int32>("/c"+std::to_string(robot_id), 100);
+		rho_pub = nh.advertise<hybrid_controller::Robustness>("/robustness"+std::to_string(robot_id), 100);
 
 		poses = std::vector<geometry_msgs::PoseStamped>(n_robots);
 
@@ -101,6 +103,12 @@ public:
 		u_msg.linear.x = (u(0)*c + u(1)*s)*1000.0;
 		u_msg.linear.y = (-u(0)*s + u(1)*c)*1000.0;
 		control_input_pub.publish(u_msg);
+
+		double rho = prescribed_performance_controller.rho_psi(arma::conv_to<std::vector<double>>::from(X));
+		hybrid_controller::Robustness rho_msg;
+		rho_msg.stamp = ros::Time::now();
+		rho_msg.rho = rho;
+		rho_pub.publish(rho_msg);
 	}
 
 	void setCriticalEventCallback(void (*callback)(CriticalEventParam)){
@@ -167,7 +175,8 @@ public:
 };
 ControllerNode* CriticalEvent::controller_node;
 
-void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, int& robot_id, int& K, int& freq,
+void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, int& robot_id, int& K, int& freq, 
+		double& delta, double& zeta_l,
 		std::vector<std::string>& formula, std::vector<std::string>& formula_type,
 		std::vector<std::vector<std::string>>& dformula,
 		std::vector<int>& cluster, std::vector<int>& V, std::vector<int>& robots_in_cluster,
@@ -200,6 +209,8 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 	}
 
 	nh.getParam("K", K);
+	nh.getParam("delta", delta);
+	nh.getParam("zeta_l", zeta_l);
 
 	std::vector<double> u_max_stdvec;
 	nh.getParam("u_max", u_max_stdvec);
@@ -221,19 +232,19 @@ int main(int argc, char* argv[]){
 	ros::NodeHandle priv_nh("~");
 
 	int n_robots, robot_id, K, freq;
+	double delta, zeta_l;
 	std::vector<std::string> formula, formula_type;
 	std::vector<std::vector<std::string>> dformula;
 	std::vector<int> cluster, V, robots_in_cluster;
 	std::vector<double> a, b, rho_opt;
 	arma::vec u_max;
 
-	readParameters(nh, priv_nh, n_robots, robot_id, K, freq, 
+	readParameters(nh, priv_nh, n_robots, robot_id, K, freq, delta, zeta_l,
 		formula, formula_type, dformula, cluster, V, robots_in_cluster, a, b, rho_opt, u_max);
 
 	PPC ppc(robot_id, a, b, 
 			formula_type, formula,
-			dformula, rho_opt, K, u_max,
-			V);
+			dformula, rho_opt, K, u_max, delta, zeta_l,	V);
 
 	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, V, robots_in_cluster, u_max);
 	

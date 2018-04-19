@@ -5,9 +5,14 @@
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives.yaml" />
 
 
-	<rosparam param="u_max">[0.1, 6.28]</rosparam>
-	<param name="K" type="int" value="1"/>
+	<rosparam param="u_max">[0.2, 6.28]</rosparam>
+	<param name="K" type="int" value="2"/>
 	<param name="n_robots" type="int" value="2"/>
+	<param name="delta" type="double" value="0.01"/>
+	<param name="zeta_l" type="double" value="0.1"/>
+
+
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node" output="screen"/>
 
 
 	<!-- controllers: -->

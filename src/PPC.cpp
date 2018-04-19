@@ -7,10 +7,10 @@
 PPC::PPC(int robot_id, std::vector<double> a, std::vector<double> b, 
     std::vector<std::string> formula_type, std::vector<std::string> formula, 
     std::vector<std::vector<std::string>> dformula, std::vector<double> rho_opt, 
-    int K, arma::vec u_max, std::vector<int> V): 
+    int K, arma::vec u_max, double delta, double zeta_l, std::vector<int> V): 
         robot_id(robot_id), a(a), b(b),
         formula_type(formula_type), formula(formula), dformula(dformula),
-        rho_opt(rho_opt), K(K), u_max(u_max), drho_fp(std::vector<FormulaParser<double>>(3)),
+        rho_opt(rho_opt), K(K), u_max(u_max), delta(delta), zeta_l(zeta_l), drho_fp(std::vector<FormulaParser<double>>(3)),
         V(V){
             for(int i=0; i<V.size(); i++){
                 c[V[i]] = (int)RobotTask::Own;
@@ -26,7 +26,7 @@ void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
     
     double rho_0 = rho_psi(X_std);
     rho_max = MAX(0, rho_0) + (rho_opt[robot_id] - MAX(0, rho_0))*0.9;
-    zeta_u = (rho_opt[robot_id] - rho_max)/K; 
+    zeta_u = (rho_opt[robot_id] - rho_max)/(K>1?K:2); 
     r = rho_max * arma::randu() / 2;
 
     if(formula_type[robot_id] == "G"){
@@ -86,11 +86,11 @@ double PPC::gamma(double t){
 double PPC::e(std::vector<double> X, double t){
     double epsilon = (rho_psi(X) - rho_max) / gamma(t);
     if(detect(epsilon)){
-        //std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<std::endl;
+        std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<std::endl;
         if(k++ < K){ // stage 1
             CriticalEventParam ce;
             ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
-            repair(X, t);
+            repair(X, t, Stage::One);
             ce.r[1] = r; ce.rho_max[1] = rho_max; ce.gamma_0[1] = gamma_0; ce.gamma_inf[1] = gamma_inf; ce.l[1] = l; ce.t_star[1] = t_star;
             criticalEventCallback(ce);
         }
@@ -99,8 +99,20 @@ double PPC::e(std::vector<double> X, double t){
                 c[robot_id] = robot_id;
                 std::cout<<"Robot "<<robot_id<<" requested collaboration, c:{ " <<c[0]<<c[1]<<" }."<<std::endl;
                 requestCollaboration(CollaborationRequestParam(c[robot_id], t_star, r, rho_max, gamma_0, gamma_inf, l));
+                
+                CriticalEventParam ce;
+                ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
+                repair(X, t, Stage::Two);
+                ce.r[1] = r; ce.rho_max[1] = rho_max; ce.gamma_0[1] = gamma_0; ce.gamma_inf[1] = gamma_inf; ce.l[1] = l; ce.t_star[1] = t_star;
+                criticalEventCallback(ce);
             }
             else{ //stage 3
+                // decrease r, increase rho_max, gamma = rho_max - rho + delta_i
+                CriticalEventParam ce;
+                ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
+                repair(X, t, Stage::Three);
+                ce.r[1] = r; ce.rho_max[1] = rho_max; ce.gamma_0[1] = gamma_0; ce.gamma_inf[1] = gamma_inf; ce.l[1] = l; ce.t_star[1] = t_star;
+                criticalEventCallback(ce);
             }
         }
 
@@ -112,6 +124,10 @@ double PPC::e(std::vector<double> X, double t){
 
 arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
     
+    if(rho_psi(X) > r){
+        return arma::zeros<arma::vec>(x.size()); 
+    }
+
     if(c[robot_id] == (int)RobotTask::Own){
         if(formulaSatisfied(X, t-t_0)){
             c[robot_id] = (int)RobotTask::Free;
@@ -149,7 +165,12 @@ bool PPC::detect(double epsilon){
     return !(-1<epsilon && epsilon<0);
 }
 
-void PPC::repair(std::vector<double> X, double t){
+void PPC::repair(std::vector<double> X, double t, Stage stage){
+
+    if(stage == Stage::Three){
+        repairStageThree(X, t);
+        return;
+    }
 
     double rho = rho_psi(X);
 
@@ -159,10 +180,21 @@ void PPC::repair(std::vector<double> X, double t){
     
     rho_max += zeta_u; // rho_max must always be < rho_opt
 
-    r *= 0.5;
+    if(stage == Stage::One){
+        if(r>0){
+            r *= 0.5;
+        }
+        else{
+            r -= delta;
+        }
+    }
+    else if(stage == Stage::Two){
+        r -= delta;
+    }
 
+    double zeta_l;
     if(t_star - t > 0.01){
-        zeta_l = 1.0; // change this
+        zeta_l = this->zeta_l;
     }
     else{
         zeta_l = (rho - r)*arma::randu();
@@ -179,6 +211,10 @@ void PPC::repair(std::vector<double> X, double t){
     }
 
     gamma_0 = (gamma_tr - gamma_inf)*exp(l*t) + gamma_inf;
+}
+
+void PPC::repairStageThree(std::vector<double> X, double t){
+
 }
 
 bool PPC::formulaSatisfied(std::vector<double> X, double t){
@@ -210,6 +246,7 @@ void PPC::externalCollaborationRequest(arma::vec x, arma::vec X, double t, int i
         setFormulaParsers(c_i, x.n_elem);
         std::cout<<"Robot "<<robot_id<<" received collaboration request from robot "<<c_i<<", c: { "<<c[0]<<c[1]<<" }."<<std::endl;
         setCollaborationParameters(t_star, r, rho_max, gamma_0, gamma_inf, l);
+        //repair? (parameters would change and no longer be the ones sent from that agent)
     }
     else if (c_i == (int)RobotTask::Free){
         if(formula_satisfied){
@@ -246,11 +283,4 @@ void PPC::setFormulaParsers(int c, int n){
 
 void PPC::setc(int i, int c_i){
     c[i] = c_i;
-    /*if(c_i!=robot_id && i==robot_id){
-        sendc(c_i);
-        std::cout<<"Robot "<<robot_id<<" updated c["<< i <<"] to"<< c_i<<" and sent it."<<std::endl;
-    }
-    else{
-        std::cout<<"Robot "<<robot_id<<" updated c["<< i <<"] to"<< c_i<<std::endl;
-    }*/
 }

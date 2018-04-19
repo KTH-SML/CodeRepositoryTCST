@@ -11,6 +11,7 @@
 #include "formula_parser.hpp"
 
 enum class RobotTask{Free = -2, Own = -1};
+enum class Stage{One = 1, Two = 2, Three = 3};
 
 class PPC{
     std::vector<double> X_std;
@@ -22,6 +23,7 @@ class PPC{
     std::vector<double> rho_opt;
     arma::vec u_max;
     int K, k=0;
+    double delta;
 
     std::vector<double> a, b;
     std::vector<std::string> formula_type;
@@ -50,9 +52,13 @@ public:
         std::vector<double> rho_opt,
         int K,
         arma::vec u_max,
+        double delta,
+        double zeta_l,
         std::vector<int> V);
 
     void init(double t_0, double t_r, arma::vec x, arma::vec X);
+
+    double rho_psi(std::vector<double> X);
 
     void setCollaborationParameters(double, double, double, double, double, double); 
 
@@ -67,7 +73,6 @@ private:
     arma::vec f(arma::vec x);
     arma::vec f_c(arma::vec X);
 
-    double rho_psi(std::vector<double> X);
     arma::vec drho_psi(std::vector<double> X, int n);
 
     double gamma(double t);
@@ -76,7 +81,9 @@ private:
 
     bool detect(double rho_psi);
 
-    void repair(std::vector<double> X, double t);
+    void repair(std::vector<double> X, double t, Stage stage);
+
+    void repairStageThree(std::vector<double> X, double t);
 
     bool formulaSatisfied(std::vector<double> X, double t);
 

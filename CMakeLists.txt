@@ -13,6 +13,7 @@ add_message_files(
   ControlInput.msg
   CriticalEvent.msg
   Params.msg
+  Robustness.msg
 )
 
 generate_messages(
