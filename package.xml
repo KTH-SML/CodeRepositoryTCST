@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <name>plotter</name>
+  <version>0.0.0</version>
+  <description>The plotter package</description>
+
+  <maintainer email="kuba@todo.todo">kuba</maintainer>
+
+  <license>TODO</license>
+
+ 
+  <!--   <build_depend>message_generation</build_depend> -->
+  <!--   <buildtool_depend>catkin</buildtool_depend> -->e: -->
+  <!--   <run_depend>message_runtime</run_depend> -->
+  <!--   <test_depend>gtest</test_depend> -->
+  <build_depend>rospy</build_depend>
+  <build_depend>hybrid_controller</build_depend>
+  <run_depend>rospy</run_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>
