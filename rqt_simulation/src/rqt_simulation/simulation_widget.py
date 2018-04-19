@@ -17,7 +17,7 @@ from math import atan2, cos, sin, pi, atan
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser, QGridLayout, QFileDialog
-from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF
+from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRectF, QPointF, Qt
 from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QTransform, QFont
 
 from rqt_simulation.map_dialog import Map_dialog
@@ -335,7 +335,7 @@ class SimulationWidget(QWidget):
 
         # Launch rosbag logger
         launch_logger = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rosbag_writer.launch')])
-        sys.argv.append('num_robots:=' + str(self.num_robots))
+        #sys.argv.append('num_robots:=' + str(self.num_robots))
         launch_logger.start()
         del sys.argv[2:len(sys.argv)]
 
@@ -420,7 +420,7 @@ class SimulationWidget(QWidget):
 
         # Launch rosbag logger
         launch_logger = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rosbag_writer.launch')])
-        sys.argv.append('num_robots:=' + str(self.num_robots))
+        #sys.argv.append('num_robots:=' + str(self.num_robots))
         launch_logger.start()
         del sys.argv[2:len(sys.argv)]
 
@@ -430,8 +430,16 @@ class SimulationWidget(QWidget):
 
         if self.tab_list[i].robot_localization_checkBox.checkState() == 2:
             # Launch qualysis mapper
+            sys.argv.append('trans_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][0]))
+            sys.argv.append('trans_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][1]))
+            sys.argv.append('trans_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][2]))
+            sys.argv.append('orient_w:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][0]))
+            sys.argv.append('orient_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][1]))
+            sys.argv.append('orient_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][2]))
+            sys.argv.append('orient_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][3]))
             launch_qualisys = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'qualisys_mapper.launch')])
             launch_qualisys.start()
+            del sys.argv[2:len(sys.argv)]
 
         # Launch robots
         launch_robot_list = []
@@ -439,6 +447,7 @@ class SimulationWidget(QWidget):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot_exp.launch')]))
 
             # Get orientation from pose
+            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
             quaternion = Quaternion(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
@@ -461,6 +470,14 @@ class SimulationWidget(QWidget):
                 sys.argv.append('use_qualisys:=true')
             else:
                 sys.argv.append('use_qualisys:=false')
+
+            sys.argv.append('trans_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][0]))
+            sys.argv.append('trans_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][1]))
+            sys.argv.append('trans_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][2]))
+            sys.argv.append('orient_w:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][0]))
+            sys.argv.append('orient_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][1]))
+            sys.argv.append('orient_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][2]))
+            sys.argv.append('orient_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][3]))
 
             launch_robot_list[i].start()
             #navigation = actionlib.SimpleActionClient('/' + self.tab_list[i].robot_name + '/move_base', MoveBaseAction)
@@ -498,7 +515,11 @@ class SimulationWidget(QWidget):
             robot_model = self.tab_list[i].robot_comboBox.currentText()
             initial_pose = self.tab_list[i].robot_comboBox_init.currentText()
             tasks = {'hard_task' : self.tab_list[i].robot_hard_task_input.text(), 'soft_task' : self.tab_list[i].robot_soft_task_input.text()}
-            robot_setup.update({self.tab_list[i].robot_name : {'robot_model' : robot_model, 'initial_pose' : initial_pose, 'tasks' : tasks}})
+            if self.tab_list[i].robot_localization_checkBox.checkState() == 2:
+                use_qualisys = True
+            else:
+                use_qualisys = False
+            robot_setup.update({self.tab_list[i].robot_name : {'robot_model' : robot_model, 'use_qualisys' : use_qualisys, 'initial_pose' : initial_pose, 'tasks' : tasks}})
             self.tab_list[i].soft_task_msg.data = self.tab_list[i].robot_soft_task_input.text()
             self.tab_list[i].hard_task_msg.data = self.tab_list[i].robot_hard_task_input.text()
             roslaunch_task_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'ltl_planner.launch')]))
@@ -706,6 +727,8 @@ class SimulationWidget(QWidget):
             print(robot_tabs[robot_tabs.keys()[i]])
             self.tab_list[i].robot_comboBox.setCurrentIndex(self.tab_list[i].robot_comboBox.findText(robot_tabs[robot_tabs.keys()[i]]['robot_model']))
             self.tab_list[i].robot_comboBox_init.setCurrentIndex(self.tab_list[i].robot_comboBox_init.findText(robot_tabs[robot_tabs.keys()[i]]['initial_pose']))
+            if robot_tabs[robot_tabs.keys()[i]]['use_qualisys']:
+                self.tab_list[i].robot_localization_checkBox.setCheckState(Qt.Checked)
             self.tab_list[i].robot_hard_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['hard_task'])
             self.tab_list[i].robot_soft_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['soft_task'])
             self.tab_list[i].robot_name_changed()

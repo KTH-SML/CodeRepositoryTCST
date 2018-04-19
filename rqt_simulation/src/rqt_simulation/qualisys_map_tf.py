@@ -28,18 +28,18 @@ class QualisysMapTfNode(object):
         data = yaml.load(stream)
         models = data['models']
 
-        print(models)
+        #print(models)
 
         self.start_stamp = rospy.Time.now().to_sec()
 
         self.tf_qualisys_map = Transform()
-        self.tf_qualisys_map.translation.x = 0.111
-        self.tf_qualisys_map.translation.y = 0.105
-        self.tf_qualisys_map.translation.z = 0.0
-        self.tf_qualisys_map.rotation.w = 0.934
-        self.tf_qualisys_map.rotation.x = 0.0
-        self.tf_qualisys_map.rotation.y = 0.0
-        self.tf_qualisys_map.rotation.z = 0.358
+        self.tf_qualisys_map.translation.x = rospy.get_param('~trans_x')
+        self.tf_qualisys_map.translation.y = rospy.get_param('~trans_y')
+        self.tf_qualisys_map.translation.z = rospy.get_param('~trans_z')
+        self.tf_qualisys_map.rotation.w = rospy.get_param('~orient_w')
+        self.tf_qualisys_map.rotation.x = rospy.get_param('~orient_x')
+        self.tf_qualisys_map.rotation.y = rospy.get_param('~orient_y')
+        self.tf_qualisys_map.rotation.z = rospy.get_param('~orient_z')
 
         self.publisher_pose_dict = {}
         #self.publisher_odom_dict = {}

@@ -1,54 +1,57 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import yaml
 import rospy
 import rosbag
+import rospkg
 from std_msgs.msg import Bool
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from move_base_msgs.msg import MoveBaseActionGoal
 
-def amcl_pose_cb(msg, source):
-    global num_robots
-    global bag
-    global active
-    if active:
-        for i in range(0, num_robots):
-            if source == '/robot' + str(i+1):
-                bag.write('/robot' + str(i+1) + '/pose', msg)
+class RosbagWriterNode(object):
+    def __init__(self):
+        self.node_name = "Rosbag Writer"
 
-def goal_cb(msg, source):
-    global num_robots
-    global bag
-    global active
-    if active:
-        for i in range(0, num_robots):
-            if source == '/robot' + str(i+1):
-                bag.write('/robot' + str(i+1) + '/move_base/goal', msg)
+        env_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
+        stream = file(env_file, 'r')
+        data = yaml.load(stream)
+        stream.close()
 
-def active_cb(msg):
-    global active
-    active = msg.data
+        self.robot_names = data['Tasks'].keys()
+        print(self.robot_names)
 
-def close_bag():
-    global bag
-    bag.close()
+        self.active = False
+        rospy.Subscriber('/logger_active', Bool, self.active_cb)
 
+        self.bag = rosbag.Bag('/home/sml/tiago_public_ws/rqt_simulation.bag', 'w')
 
-def rosbag_writer():
-    global num_robots
-    global bag
-    global active
-    active = False
-    rospy.Subscriber('/logger_active', Bool, active_cb)
-    bag = rosbag.Bag('/home/sml/tiago_public_ws/rqt_simulation.bag', 'w')
-    num_robots = rospy.get_param('num_robots')
-    for i in range(0, num_robots):
-        rospy.Subscriber('/robot' + str(i+1) + '/pose', PoseWithCovarianceStamped, amcl_pose_cb, '/robot' + str(i+1))
-        rospy.Subscriber('/robot' + str(i+1) + '/move_base/goal', MoveBaseActionGoal, goal_cb, '/robot' + str(i+1))
+        self.pose_sub_list = []
+        self.goal_sub_list = []
 
+        for i in range(0, len(self.robot_names)):
+            self.pose_sub_list.append(rospy.Subscriber('/' + self.robot_names[i] + '/pose_gui', PoseWithCovarianceStamped, self.pose_cb, '/' + self.robot_names[i]))
+            self.goal_sub_list.append(rospy.Subscriber('/' + self.robot_names[i] + '/move_base/goal', MoveBaseActionGoal, self.goal_cb, '/' + self.robot_names[i]))
+
+    def active_cb(self, msg):
+        self.active = msg.data
+
+    def goal_cb(self, msg, source):
+        if self.active:
+            for i in range(0, len(self.robot_names)):
+                self.bag.write('/' + self.robot_names[i] + '/move_base/goal', msg)
+
+    def pose_cb(self, msg, source):
+        if self.active:
+            for i in range(0, len(self.robot_names)):
+                self.bag.write('/' + self.robot_names[i] + '/pose', msg)
+
+    def close_bag(self):
+        self.bag.close()
 
 if __name__== '__main__':
-    rospy.init_node('rosbag_writer')
-    rosbag_writer()
-    rospy.on_shutdown(close_bag)
+    rospy.init_node('rosbag_writer', anonymous=False)
+    rosbag_writer_node = RosbagWriterNode()
+    rospy.on_shutdown(rosbag_writer_node.close_bag)
     rospy.spin()

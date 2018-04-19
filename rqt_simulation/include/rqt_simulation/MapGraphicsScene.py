@@ -183,9 +183,14 @@ class MapGraphicsScene(QGraphicsScene):
         self.map_negate = data['negate']
         self.map_occupied_thresh = data['occupied_thresh']
         self.map_free_thresh = data['free_thresh']
+        qualisys = data['qualisys']
+        if qualisys:
+            self.tf_qualisys_to_map = data['tf_qualisys_to_map']
+            rospy.loginfo('rqt_simulation map tf to qualisys : %s' % (self.tf_qualisys_to_map))
         rospy.loginfo('rqt_simulation map : %s' % (self.scenario))
         rospy.loginfo('rqt_simulation map resolution : %.6f' % (self.map_resolution))
         rospy.loginfo('rqt_simulation map origin : %s' % (self.map_origin,))
         rospy.loginfo('rqt_simulation map negate : %s' % (self.map_negate))
         rospy.loginfo('rqt_simulation map occupied threshold : %s' % (self.map_occupied_thresh))
         rospy.loginfo('rqt_simulation map free threshold : %s' % (self.map_free_thresh))
+

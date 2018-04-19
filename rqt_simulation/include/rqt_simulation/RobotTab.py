@@ -181,20 +181,20 @@ class RobotTab(QWidget):
         if self.agent_type == 'arial':
             self.label_marker_msg.header = msg.header
             self.label_marker_msg.pose = msg.pose.pose
-            self.label_marker_msg.pose.position.z = msg.pose.pose.position.z + 1.0
+            self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1.0
 
     def current_pose_gui_callback(self, msg):
         if self.simulation_started:
             if self.agent_type == 'ground':
                 msg_pose_rounded = Pose()
-                msg_pose_rounded.position.x = round(msg.pose.pose.position.x, 3)
-                msg_pose_rounded.position.y = round(msg.pose.pose.position.y, 3)
-                msg_pose_rounded.position.z = round(msg.pose.pose.position.z, 3)
+                msg_pose_rounded.position.x = round(msg.pose.pose.position.x - 0.0005, 3)
+                msg_pose_rounded.position.y = round(msg.pose.pose.position.y - 0.0005, 3)
+                msg_pose_rounded.position.z = round(msg.pose.pose.position.z - 0.0005, 3)
 
-                msg_pose_rounded.orientation.w = round(msg.pose.pose.orientation.w, 3)
-                msg_pose_rounded.orientation.x = round(msg.pose.pose.orientation.x, 3)
-                msg_pose_rounded.orientation.y = round(msg.pose.pose.orientation.y, 3)
-                msg_pose_rounded.orientation.z = round(msg.pose.pose.orientation.z, 3)
+                msg_pose_rounded.orientation.w = round(msg.pose.pose.orientation.w - 0.005, 2)
+                msg_pose_rounded.orientation.x = round(msg.pose.pose.orientation.x - 0.005, 2)
+                msg_pose_rounded.orientation.y = round(msg.pose.pose.orientation.y - 0.005, 2)
+                msg_pose_rounded.orientation.z = round(msg.pose.pose.orientation.z - 0.005, 2)
 
                 same_pose = self.two_poses(msg_pose_rounded, self.last_current_pose.pose)
                 if not same_pose:

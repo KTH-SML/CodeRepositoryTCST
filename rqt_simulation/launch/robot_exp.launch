@@ -37,7 +37,7 @@
             <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
             <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
             <arg name="use_qualisys" value="$(arg use_qualisys)" />
-            <!--
+            <!-- -->
             <arg name="trans_x" value="$(arg trans_x)"/>
             <arg name="trans_y" value="$(arg trans_y)"/>
             <arg name="trans_z" value="$(arg trans_z)"/>
@@ -45,7 +45,7 @@
             <arg name="orient_y" value="$(arg orient_y)"/>
             <arg name="orient_z" value="$(arg orient_z)"/>
             <arg name="orient_w" value="$(arg orient_w)"/>
-          -->
+
         </include>
 
     </group>
