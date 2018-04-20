@@ -4,89 +4,53 @@ FTS:
     - cost: 1.0
       target: r01
     - cost: 1.0
-      target: r04
+      target: r02
     pose:
       orientation:
-      - 0.6961484483258674
-      - -0.0
-      - -0.0
-      - -0.7178978603488709
+      - 0.9892120785012815
+      - 0.0
+      - 0.0
+      - 0.14649049029604144
       position:
-      - 0.02
-      - 0.81
+      - -0.93
+      - -0.61
       - 0.0
   r02:
     edges:
     - cost: 1.0
-      target: r02
-    - cost: 1.0
-      target: r04
-    pose:
-      orientation:
-      - 0.9465152549123209
-      - 0.0
-      - 0.0
-      - 0.3226590649869674
-      position:
-      - -1.87
-      - -0.86
-      - 0.0
-  r03:
-    edges:
-    - cost: 1.0
-      target: r03
-    - cost: 1.0
-      target: r04
-    pose:
-      orientation:
-      - 0.26594805031544955
-      - 0.0
-      - 0.0
-      - 0.9639873622270216
-      position:
-      - 1.9000000000000001
-      - -0.84
-      - 0.0
-  r04:
-    edges:
-    - cost: 1.0
       target: r01
     - cost: 1.0
-      target: r03
-    - cost: 1.0
       target: r02
-    - cost: 1.0
-      target: r04
     pose:
       orientation:
-      - 0.7116247112506232
+      - 0.2222985135557163
       - -0.0
       - -0.0
-      - -0.7025597984068453
+      - -0.974978651494954
       position:
-      - 0.01
-      - -0.22
+      - 0.96
+      - 0.56
       - 0.0
 Map: sml_arena
 Tasks:
   turtlebot1:
-    initial_pose: r01
+    initial_pose: r06
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r01) && ([]<> r02) && ([]<> r03)
+      hard_task: ([]<> r06) && ([]<> r03) && ([]! r01)
       soft_task: ''
-    use_qualisys: true
+    use_qualisys: false
   turtlebot2:
     initial_pose: r02
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r01) && ([]<> r02) && ([]<> r03)
+      hard_task: ([]<> r01) && ([]<> r09) && ([]! r03)
       soft_task: ''
-    use_qualisys: true
+    use_qualisys: false
   turtlebot3:
-    initial_pose: r03
+    initial_pose: r09
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r01) && ([]<> r02) && ([]<> r03)
+      hard_task: ([]<> r01) && ([]<> r03)
       soft_task: ''
-    use_qualisys: true
+    use_qualisys: false

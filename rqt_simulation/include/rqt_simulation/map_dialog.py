@@ -85,10 +85,13 @@ class Map_dialog(QDialog):
     @Slot(bool)
     def on_button_FTS_save_pressed(self):
         self.button_save_FTS.setEnabled(False)
+        sorted_keys = self.FTS.region_of_interest.keys()
+        sorted_keys.sort()
         for i in range(0, len(self.FTS_matrix)):
+            self.FTS.region_of_interest[sorted_keys[i]]['edges'] = []
             for j in range(0, len(self.FTS_matrix[0])):
                 if (self.FTS_matrix[i][j].checkState() == 2):
-                    self.FTS.add_edge(self.FTS.region_of_interest.keys()[i], self.FTS.region_of_interest.keys()[j], cost=1.0)
+                    self.FTS.add_edge(sorted_keys[i], sorted_keys[j], cost=1.0)
 
         print('start saving')
         data = {'FTS' : self.FTS.region_of_interest}
@@ -252,12 +255,14 @@ class Map_dialog(QDialog):
         print(FTS_file[0])
         stream = file(FTS_file[0], 'r')
         data = yaml.load(stream)
+
+        self.graphicsScene.reset()
+
+        self.FTS.region_of_interest = {}
         self.FTS.region_of_interest = data['FTS']
         sorted_keys = self.FTS.region_of_interest.keys()
         sorted_keys.sort()
-        stream.close()
-
-        self.graphicsScene.reset()
+        stream.close()      
 
         arrow_length = 50
 

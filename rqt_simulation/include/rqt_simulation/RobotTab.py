@@ -187,9 +187,9 @@ class RobotTab(QWidget):
         if self.simulation_started:
             if self.agent_type == 'ground':
                 msg_pose_rounded = Pose()
-                msg_pose_rounded.position.x = round(msg.pose.pose.position.x - 0.0005, 3)
-                msg_pose_rounded.position.y = round(msg.pose.pose.position.y - 0.0005, 3)
-                msg_pose_rounded.position.z = round(msg.pose.pose.position.z - 0.0005, 3)
+                msg_pose_rounded.position.x = round(msg.pose.pose.position.x - 0.005, 2)
+                msg_pose_rounded.position.y = round(msg.pose.pose.position.y - 0.005, 2)
+                msg_pose_rounded.position.z = round(msg.pose.pose.position.z - 0.005, 2)
 
                 msg_pose_rounded.orientation.w = round(msg.pose.pose.orientation.w - 0.005, 2)
                 msg_pose_rounded.orientation.x = round(msg.pose.pose.orientation.x - 0.005, 2)

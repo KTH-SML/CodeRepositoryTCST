@@ -191,11 +191,14 @@ class SimulationWidget(QWidget):
     def prefix_callback(self, msg, source):
         #print('----------')
         #print(msg)
+        self.prefix_string = ''
         for n in msg.poses:
             for i in range(0, len(self.FTS.region_of_interest)):
                 if self.position_msg_to_tuple(n.position) == tuple(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]]['pose']['position']):
                     self.prefix_string =  self.prefix_string + self.FTS.region_of_interest.keys()[i] + ' --> '
                     #print('match')
+        print(self.prefix_string)
+        print(self.prefix_plan_topic_list)
         index = self.prefix_plan_topic_list.index(source)
         #print(index)
         # Send signal for received msg
@@ -207,6 +210,7 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_prefix_textbox.clear()
         self.tab_list[index].robot_prefix_textbox.insertPlainText('Prefix: ')
         self.tab_list[index].robot_prefix_textbox.insertPlainText(self.prefix_string)
+        print(self.prefix_string)
         self.prefix_string = ''
         self.button_setup.setEnabled(True)
         self.button_setup_exp.setEnabled(True)
@@ -262,13 +266,16 @@ class SimulationWidget(QWidget):
 
             self.button_execute_task.setEnabled(True)
 
+        print(self.prefix_plan_topic_list)
+
     # Change initial pose if checkBox entry changed
     # index: Is Checkbox index to set initial pose
     # id: Is the ID of the robot tab, for changing the initial pose of the right robot
     @pyqtSlot(int, int)
     def set_init_pose_id(self, index, id):
         if self.tab_list[id -1].robot_comboBox_init.count() > 0:
-
+            print('--------')
+            print(self.prefix_plan_topic_list)
             # Get the initial pose
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose'] = self.FTS.region_of_interest[self.tab_list[id -1].robot_comboBox_init.currentText()]['pose']
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['label'] = self.tab_list[id -1].robot_comboBox_init.currentText()
@@ -291,6 +298,8 @@ class SimulationWidget(QWidget):
                 rect = self.current_graphicsScene.items_dict[self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label']]['ellipse_item'].rect()
                 point = rect.topLeft()
                 self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'].setPos(point.x() - 11, point.y() - 22)
+
+            print(self.prefix_plan_topic_list)
 
     @Slot(bool)
     def on_button_setup_pressed(self):
@@ -507,11 +516,30 @@ class SimulationWidget(QWidget):
         data = FTS
         robot_setup = {}
 
+        self.init_planner_publisher_and_subscriber(self.num_robots)
+
         # Launch ltl_planner
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
         roslaunch_task_list = []
         for i in range(0, self.num_robots):
+
+            '''
+            # Add plan topics and subscriber
+            self.prefix_plan_topic_list.append('/' + self.tab_list[i].robot_name + '/prefix_plan')
+            self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[i], PoseArray, self.prefix_callback))
+            self.sufix_plan_topic_list.append('/' + self.tab_list[i].robot_name + '/sufix_plan')
+            self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[i], PoseArray, self.sufix_callback))
+
+            self.prefix_plan_subscriber_list[i].received.connect(self.received_prefix)
+            self.sufix_plan_subscriber_list[i].received.connect(self.received_sufix)
+
+            # Add current goal subscriber
+            self.current_goal_topic_list.append('/' + self.tab_list[i].robot_name + '/move_base/goal')
+            self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[i], MoveBaseActionGoal, self.goal_callback))
+            self.current_goal_subscriber_list[i].received.connect(self.received_goal)
+            '''
+
             robot_model = self.tab_list[i].robot_comboBox.currentText()
             initial_pose = self.tab_list[i].robot_comboBox_init.currentText()
             tasks = {'hard_task' : self.tab_list[i].robot_hard_task_input.text(), 'soft_task' : self.tab_list[i].robot_soft_task_input.text()}
@@ -564,7 +592,7 @@ class SimulationWidget(QWidget):
         # Add tab
         self.num_robots += 1
         self.tab_list.append(RobotTab(self.num_robots, self.robots))
-        self.tab_list[self.num_robots-1].signalRobotNameChanged.connect(self.robot_name_changed)
+        #self.tab_list[self.num_robots-1].signalRobotNameChanged.connect(self.robot_name_changed)
         self.tabWidget.addTab(self.tab_list[self.num_robots-1], ('Robot ' + str(self.num_robots)))
         self.button_remove_robot.setEnabled(True)
         self.current_graphicsScene.addItem(self.tab_list[self.num_robots-1].initial_pose['start_' + str(self.num_robots).zfill(2)]['text_item'])
@@ -591,6 +619,7 @@ class SimulationWidget(QWidget):
         # Connect initial pose comboBox with set_init_pose_id function
         self.tab_list[self.num_robots-1].robot_comboBox_init.signalIndexChanged.connect(self.set_init_pose_id)
 
+        '''
         # Add plan topics and subscriber
         self.prefix_plan_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/prefix_plan')
         self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[self.num_robots-1], PoseArray, self.prefix_callback))
@@ -604,33 +633,34 @@ class SimulationWidget(QWidget):
         self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/goal')
         self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], MoveBaseActionGoal, self.goal_callback))
         self.current_goal_subscriber_list[self.num_robots-1].received.connect(self.received_goal)
+        '''
 
-    @pyqtSlot(int)
-    def robot_name_changed(self, id):
-        print(self.tab_list[id-1].robot_name)
+    # Initilaize Planner Publisher and Subscriber
+    def init_planner_publisher_and_subscriber(self, num_robots):
         # Remove plan topics and subscriber
-        del self.prefix_plan_topic_list[id-1]
-        del self.prefix_plan_subscriber_list[id-1]
-        del self.sufix_plan_topic_list[id-1]
-        del self.sufix_plan_subscriber_list[id-1]
+        self.prefix_plan_topic_list = []
+        self.prefix_plan_subscriber_list = []
+        self.sufix_plan_topic_list = []
+        self.sufix_plan_subscriber_list = []
 
         # Remove current goal subscriber
-        del self.current_goal_topic_list[id-1]
-        del self.current_goal_subscriber_list[id-1]
+        self.current_goal_topic_list = []
+        self.current_goal_subscriber_list = []
 
-        # Add plan topics and subscriber
-        self.prefix_plan_topic_list.append('/' + self.tab_list[id-1].robot_name + '/prefix_plan')
-        self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[id-1], PoseArray, self.prefix_callback))
-        self.sufix_plan_topic_list.append('/' + self.tab_list[id-1].robot_name + '/sufix_plan')
-        self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[id-1], PoseArray, self.sufix_callback))
+        for i in range(0, num_robots):
+            # Add plan topics and subscriber
+            self.prefix_plan_topic_list.append('/' + self.tab_list[i].robot_name + '/prefix_plan')
+            self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[i], PoseArray, self.prefix_callback))
+            self.sufix_plan_topic_list.append('/' + self.tab_list[i].robot_name + '/sufix_plan')
+            self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[i], PoseArray, self.sufix_callback))
 
-        self.prefix_plan_subscriber_list[id-1].received.connect(self.received_prefix)
-        self.sufix_plan_subscriber_list[id-1].received.connect(self.received_sufix)
+            self.prefix_plan_subscriber_list[i].received.connect(self.received_prefix)
+            self.sufix_plan_subscriber_list[i].received.connect(self.received_sufix)
 
-        # Add current goal subscriber
-        self.current_goal_topic_list.append('/' + self.tab_list[id-1].robot_name + '/move_base/goal')
-        self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[id-1], MoveBaseActionGoal, self.goal_callback))
-        self.current_goal_subscriber_list[id-1].received.connect(self.received_goal)
+            # Add current goal subscriber
+            self.current_goal_topic_list.append('/' + self.tab_list[i].robot_name + '/move_base/goal')
+            self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[i], MoveBaseActionGoal, self.goal_callback))
+            self.current_goal_subscriber_list[i].received.connect(self.received_goal)
 
     # Remove last robot
     @Slot(bool)
@@ -670,6 +700,12 @@ class SimulationWidget(QWidget):
         scenario_file = File_dialog.getOpenFileName()
         stream = file(scenario_file[0], 'r')
         data = yaml.load(stream)
+
+        for i in range(0, len(self.tab_list) - 1):
+            self.remove_robot()
+
+        self.reset()
+
 
         # Load map
         self.world_comboBox.setCurrentIndex(self.world_comboBox.findText(data['Map']))

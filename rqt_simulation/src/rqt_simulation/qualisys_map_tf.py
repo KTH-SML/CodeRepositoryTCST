@@ -48,12 +48,13 @@ class QualisysMapTfNode(object):
         roslaunch.configure_logging(uuid)
         roslaunch_qualisys_odom_list = []
 
-        self.first_pose = True
+        self.first_pose_dict = {}
         self.odom = Pose()
 
         #tf_br_list = []
 
         for i in range(0, len(models)):
+            self.first_pose_dict.update({models[i] : True})
             roslaunch_qualisys_odom_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'qualisys_odom.launch')]))
             sys.argv.append('model:=' + models[i])
             self.sub_qualysis_pose = rospy.Subscriber(models[i] + '/qualisys_pose', PoseStamped, self.pose_cb, models[i])
@@ -79,16 +80,16 @@ class QualisysMapTfNode(object):
         #self.pub_map_pose.publish(M_pose_M_R)
         self.publisher_pose_dict[source].publish(M_pose_M_R)
 
-        if self.first_pose and (msg.header.stamp.to_sec() > self.start_stamp):
+        if self.first_pose_dict[source] and (msg.header.stamp.to_sec() > self.start_stamp):
             #print('first odom')
             self.odom = M_pose_M_R.pose
             self.tf_map_odom = Transform()
             self.tf_map_odom.translation = self.odom.position
             self.tf_map_odom.rotation = self.odom.orientation
-            self.first_pose = False
+            self.first_pose_dict[source] = False
             #print(tf_map_odom)
 
-        if self.first_pose == False:
+        if self.first_pose_dict[source] == False:
             #print(self.tf_map_odom)
 
             O_pose_O_R = PoseStamped()
