@@ -68,6 +68,8 @@ public:
 
     void setc(int i, int c_i);
 
+    double get_t_0();
+
 private:
     arma::mat g(arma::vec x);
     arma::vec f(arma::vec x);

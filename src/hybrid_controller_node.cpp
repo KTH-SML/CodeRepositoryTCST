@@ -106,7 +106,9 @@ public:
 
 		double rho = prescribed_performance_controller.rho_psi(arma::conv_to<std::vector<double>>::from(X));
 		hybrid_controller::Robustness rho_msg;
-		rho_msg.stamp = ros::Time::now();
+		ros::Time stamp = ros::Time::now();
+		rho_msg.stamp = stamp;
+		rho_msg.t_relative = stamp.toSec()-prescribed_performance_controller.get_t_0();
 		rho_msg.rho = rho;
 		rho_pub.publish(rho_msg);
 	}

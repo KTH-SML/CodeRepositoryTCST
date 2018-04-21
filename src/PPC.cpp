@@ -86,7 +86,7 @@ double PPC::gamma(double t){
 double PPC::e(std::vector<double> X, double t){
     double epsilon = (rho_psi(X) - rho_max) / gamma(t);
     if(detect(epsilon)){
-        std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<std::endl;
+        std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<", t="<<t<<std::endl;
         if(k++ < K){ // stage 1
             CriticalEventParam ce;
             ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
@@ -246,7 +246,6 @@ void PPC::externalCollaborationRequest(arma::vec x, arma::vec X, double t, int i
         setFormulaParsers(c_i, x.n_elem);
         std::cout<<"Robot "<<robot_id<<" received collaboration request from robot "<<c_i<<", c: { "<<c[0]<<c[1]<<" }."<<std::endl;
         setCollaborationParameters(t_star, r, rho_max, gamma_0, gamma_inf, l);
-        //repair? (parameters would change and no longer be the ones sent from that agent)
     }
     else if (c_i == (int)RobotTask::Free){
         if(formula_satisfied){
@@ -284,4 +283,8 @@ void PPC::setFormulaParsers(int c, int n){
 
 void PPC::setc(int i, int c_i){
     c[i] = c_i;
+}
+
+double PPC::get_t_0(){
+    return t_0;
 }
