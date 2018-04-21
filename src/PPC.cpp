@@ -123,10 +123,6 @@ double PPC::e(std::vector<double> X, double t){
 }
 
 arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
-    
-    if(rho_psi(X) > r){
-        return arma::zeros<arma::vec>(x.size()); 
-    }
 
     if(c[robot_id] == (int)RobotTask::Own){
         if(formulaSatisfied(X, t-t_0)){
@@ -142,7 +138,10 @@ arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
         }
     }
     if(c[robot_id] == (int)RobotTask::Free){
-        return arma::zeros<arma::vec>(3);
+        return arma::zeros<arma::vec>(x.size());
+    }
+    if(rho_psi(X) > r && (c[robot_id]==(int)RobotTask::Own || c[robot_id]==robot_id)){
+        return arma::zeros<arma::vec>(x.size());
     }
 
     double e_ = e(X, t-t_0);
@@ -219,8 +218,9 @@ void PPC::repairStageThree(std::vector<double> X, double t){
 
 bool PPC::formulaSatisfied(std::vector<double> X, double t){
     double rho = rho_psi(X);
-    if(formula_type[robot_id] == "F" && t >= a[robot_id] && t <= b[robot_id]  
-    || formula_type[robot_id] == "G" && t >= b[robot_id]){
+    int i = c[robot_id] >= 0 ? c[robot_id] : robot_id;
+    if(formula_type[i] == "F" && t >= a[i] && t <= b[i]  
+    || formula_type[i] == "G" && t >= b[i]){
         if( r < rho && rho < rho_max)
             return true;
     }
@@ -256,7 +256,8 @@ void PPC::externalCollaborationRequest(arma::vec x, arma::vec X, double t, int i
         else{
             setc(robot_id, (int)RobotTask::Own);
             sendc((int)RobotTask::Own);
-            //init(t_0, t, X(arma::span(3*robot_id, 3*robot_id+2)), X);
+            setFormulaParsers(robot_id, x.n_elem);
+            init(t_0, t, X(arma::span(3*robot_id, 3*robot_id+2)), X);
         }
     }
 }
