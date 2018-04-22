@@ -1,4 +1,4 @@
-//this is specific to the problem; that is, pose type is suited to 3d states but out states are similar to Pose2d
+//this is specific to the problem; that is, pose type is suited to 3d states but our states are similar to Pose2d
 
 #include <armadillo>
 #include "geometry_msgs/PoseStamped.h"

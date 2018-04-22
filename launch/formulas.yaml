@@ -1,16 +1,19 @@
 formula0: "0.1-sqrt((x[0]-1)^2+(x[1]-1)^2)"
 formula_type0: "F"
-a0: 10.0
-b0: 15.0
+a0: 20.0
+b0: 25.0
 rho_opt0: 0.1
 cluster0: 0
+V0: [0]
 
-formula1: "0.5-sqrt((x[3]-x[0])^2+(x[4]-x[1])^2)"
-formula_type1: "G"
-a1: 12.0
+formula1: "-1/10*log( exp(10*(-0.5+sqrt((x[3]-x[0])^2+(x[4]-x[1])^2))) + exp(10*(-1+sqrt((x[3]-1)^2+(x[4]+1)^2))) )"
+#formula1: "min(-0.5+sqrt((x[3]-x[0])^2+(x[4]-x[1])^2) , -1+sqrt((x[3]-1)^2+(x[4]+1)^2) )"
+formula_type1: "F"
+a1: 14.0
 b1: 15.0
 rho_opt1: 0.5
 cluster1: 0
+V1: [0, 1]
 
 formula2: "1-sqrt((x[6]-1)^2+(x[7]-3)^2)"
 formula_type2: "F"
@@ -18,3 +21,4 @@ a2: 10.0
 b2: 13.0
 rho_opt2: 1
 cluster2: 1
+V2: [2]

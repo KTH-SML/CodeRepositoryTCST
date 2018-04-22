@@ -12,6 +12,8 @@ add_message_files(
   HybridState.msg
   ControlInput.msg
   CriticalEvent.msg
+  Params.msg
+  Robustness.msg
 )
 
 generate_messages(
