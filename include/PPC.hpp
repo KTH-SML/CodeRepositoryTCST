@@ -85,8 +85,6 @@ private:
 
     void repair(std::vector<double> X, double t, Stage stage);
 
-    void repairStageThree(std::vector<double> X, double t);
-
     bool formulaSatisfied(std::vector<double> X, double t);
 
     bool detectStageTwo();

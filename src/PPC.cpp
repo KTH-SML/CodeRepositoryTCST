@@ -103,12 +103,11 @@ double PPC::e(std::vector<double> X, double t){
                 
                 CriticalEventParam ce;
                 ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
-                repair(X, t, Stage::Two);
+                //repair(X, t, Stage::Two);//should not be here
                 ce.r[1] = r; ce.rho_max[1] = rho_max; ce.gamma_0[1] = gamma_0; ce.gamma_inf[1] = gamma_inf; ce.l[1] = l; ce.t_star[1] = t_star;
                 criticalEventCallback(ce);
             }
-            else{ //stage 3
-                // decrease r, increase rho_max, gamma = rho_max - rho + delta_i
+            else{ // stage 3
                 CriticalEventParam ce;
                 ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
                 repair(X, t, Stage::Three);
@@ -171,18 +170,16 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
 
     t_r = t;
 
-    if(stage == Stage::Three){
-        repairStageThree(X, t);
-        return;
-    }
-
     double rho = rho_psi(X);
 
     if(formula_type[robot_id] == "F"){
         t_star = b[robot_id];
     }
     
-    rho_max += zeta_u; // rho_max must always be < rho_opt
+    rho_max += zeta_u;
+    if(rho_max > rho_opt[robot_id]){
+        rho_max = rho_opt[robot_id] + 0.0001;
+    }
 
     if(stage == Stage::One){
         if(r>0){
@@ -192,7 +189,7 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
             r -= delta;
         }
     }
-    else if(stage == Stage::Two){
+    else if(stage == Stage::Two || stage == Stage::Three){
         r -= delta;
     }
 
@@ -203,7 +200,14 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
     else{
         zeta_l = (rho - r)*arma::randu();
     }
-    double gamma_tr = rho_max - rho + zeta_l;
+    
+    double gamma_tr;
+    if(stage == Stage::One || stage == Stage::Two){
+        gamma_tr = rho_max - rho + zeta_l;
+    }
+    else if(stage == Stage::Three){
+        gamma_tr = rho_max - rho + delta;
+    }
 
     gamma_inf = MIN(gamma_tr, rho_max - r)*arma::randu();
 
@@ -215,10 +219,6 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
     }
 
     gamma_0 = (gamma_tr - gamma_inf)*exp(l*t) + gamma_inf;
-}
-
-void PPC::repairStageThree(std::vector<double> X, double t){
-
 }
 
 bool PPC::formulaSatisfied(std::vector<double> X, double t){
