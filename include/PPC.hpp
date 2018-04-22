@@ -18,7 +18,7 @@ class PPC{
 
     int robot_id;
 
-    double gamma_0, gamma_inf, l, rho_max, r, t_0, t_star;
+    double gamma_0, gamma_inf, l, rho_max, r, t_0, t_star, t_r;
     double zeta_u, zeta_l;
     std::vector<double> rho_opt;
     arma::vec u_max;

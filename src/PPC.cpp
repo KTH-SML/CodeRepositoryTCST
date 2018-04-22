@@ -21,6 +21,7 @@ void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
 
     this->X_std = arma::conv_to<std::vector<double>>::from(X);
     this->t_0 = t_0;
+    this->t_r = t_r - t_0;
 
     setFormulaParsers(robot_id, x.n_elem);
     
@@ -30,10 +31,10 @@ void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
     r = rho_max * arma::randu() / 2;
 
     if(formula_type[robot_id] == "G"){
-        t_star = a[robot_id] - (t_r - t_0);
+        t_star = a[robot_id];
     }
     else if(formula_type[robot_id] == "F"){
-        t_star = a[robot_id] + (b[robot_id]-a[robot_id])/3 - (t_r - t_0);
+        t_star = a[robot_id] + (b[robot_id]-a[robot_id])/3;
     }
     else{
         throw std::runtime_error("Incorrect formula type");
@@ -49,7 +50,7 @@ void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
     gamma_inf = MIN(gamma_0, rho_max - r)*arma::randu();
 
     if(-gamma_0 + rho_max < r){
-        l = -log((r + gamma_inf - rho_max) / (-gamma_0 + gamma_inf))/t_star;
+        l = -log((r + gamma_inf - rho_max) / (-gamma_0 + gamma_inf)) / (t_star - this->t_r);
     }
     else{
         l = 0;
@@ -87,7 +88,7 @@ double PPC::e(std::vector<double> X, double t){
     double epsilon = (rho_psi(X) - rho_max) / gamma(t);
     if(detect(epsilon)){
         std::cout<<"Critical event "<<k+1<<", robot "<<robot_id<<", t="<<t<<std::endl;
-        if(k++ < K){ // stage 1
+        if(k++ < K){ // stage 1 
             CriticalEventParam ce;
             ce.r[0] = r; ce.rho_max[0] = rho_max; ce.gamma_0[0] = gamma_0; ce.gamma_inf[0] = gamma_inf; ce.l[0] = l; ce.t_star[0] = t_star;
             repair(X, t, Stage::One);
@@ -126,13 +127,15 @@ arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
 
     if(c[robot_id] == (int)RobotTask::Own){
         if(formulaSatisfied(X, t-t_0)){
-            c[robot_id] = (int)RobotTask::Free;
+            setc(robot_id, (int)RobotTask::Free);
+            sendc((int)RobotTask::Free);
             formula_satisfied = true;
         }
     }
     else if(c[robot_id] == robot_id){
         if(formulaSatisfied(X, t-t_0)){
-            c[robot_id] = (int)RobotTask::Free;
+            setc(robot_id, (int)RobotTask::Free);
+            sendc((int)RobotTask::Free);
             formula_satisfied = true;
             requestCollaboration(CollaborationRequestParam((int)RobotTask::Free));
         }
@@ -165,6 +168,8 @@ bool PPC::detect(double epsilon){
 }
 
 void PPC::repair(std::vector<double> X, double t, Stage stage){
+
+    t_r = t;
 
     if(stage == Stage::Three){
         repairStageThree(X, t);
@@ -203,7 +208,7 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
     gamma_inf = MIN(gamma_tr, rho_max - r)*arma::randu();
 
     if(-gamma_tr + rho_max < r){
-        l = -log((r + gamma_inf - rho_max) / (-gamma_tr + gamma_inf))/t_star;
+        l = -log((r + gamma_inf - rho_max) / (-gamma_tr + gamma_inf)) / (t_star - t);
     }
     else{
         l = 0;
@@ -221,8 +226,10 @@ bool PPC::formulaSatisfied(std::vector<double> X, double t){
     int i = c[robot_id] >= 0 ? c[robot_id] : robot_id;
     if(formula_type[i] == "F" && t >= a[i] && t <= b[i]  
     || formula_type[i] == "G" && t >= b[i]){
-        if( r < rho && rho < rho_max)
+        if( r < rho && rho < rho_max){
+            std::cout<<"Robot "<<robot_id<<", formula satisfied at t="<<t<<std::endl;
             return true;
+        }
     }
     return false;
 }
