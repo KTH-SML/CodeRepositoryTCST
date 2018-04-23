@@ -5,6 +5,7 @@ import Queue
 import rospy
 import sys
 import time
+import numpy as np
 
 
 from geometry_msgs.msg import PoseWithCovarianceStamped, PoseStamped, PolygonStamped, Point32, PointStamped, PoseArray, Pose, Point
@@ -18,7 +19,7 @@ from ms1_msgs.msg import Humans, ActionSeq
 from math import pi as PI
 from math import atan2, sin, cos, sqrt
 
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from tf.transformations import euler_from_quaternion, quaternion_from_euler, quaternion_matrix, euler_from_matrix
 #from tf2_ros import tf2_ros, TransformListener
 
 from tf2_ros import tf2_ros, TransformListener
@@ -128,23 +129,30 @@ class LtlPlannerNode(object):
         if self.active:
             if self.agent_type == 'ground':
                 position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.target_pose.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.target_pose.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.target_pose.pose.position.z)**2)
-                current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
-                goal_euler = euler_from_quaternion([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
+                current_R = quaternion_matrix([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
+                goal_R = quaternion_matrix([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
+
+                #current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
+                #goal_euler = euler_from_quaternion([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
             elif self.agent_type == 'arial':
                 position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.pose.position.z)**2)
-                current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
-                goal_euler = euler_from_quaternion([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
+                current_R = quaternion_matrix([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
+                goal_R = quaternion_matrix([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
 
-            orientation_error = current_euler[0] - goal_euler[0] + current_euler[1] - goal_euler[1]  + current_euler[2] - goal_euler[2]
+                #current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
+                #goal_euler = euler_from_quaternion([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
+
+            error_R = np.dot(current_R, goal_R.transpose())
+            orientation_error = np.linalg.norm(euler_from_matrix(error_R))
+            #orientation_error = current_euler[0] - goal_euler[0] + current_euler[1] - goal_euler[1]  + current_euler[2] - goal_euler[2]
             #print('pos_err')
             #print(position_error)
             #print('orien_err')
             #print(orientation_error)
             if self.agent_type == 'ground':
                 #print('planner')
-                #if ((position_error < 0.15) and (orientation_error < 0.3)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
-                if ((position_error < 0.2)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
-                    print('now')
+                if ((position_error < 0.2) and (orientation_error < 0.8)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
+                #if ((position_error < 0.2)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
                     print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
                     self.planner.find_next_move()
                     t = rospy.Time.now()-self.t0

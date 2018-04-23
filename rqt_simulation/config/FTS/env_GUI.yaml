@@ -5,15 +5,17 @@ FTS:
       target: r01
     - cost: 1.0
       target: r02
+    - cost: 1.0
+      target: r03
     pose:
       orientation:
-      - 0.9892120785012815
+      - 0.609739821963207
       - 0.0
       - 0.0
-      - 0.14649049029604144
+      - 0.7926016335538785
       position:
-      - -0.93
-      - -0.61
+      - -5.8500000000000005
+      - -7.8500000000000005
       - 0.0
   r02:
     edges:
@@ -21,36 +23,56 @@ FTS:
       target: r01
     - cost: 1.0
       target: r02
+    - cost: 1.0
+      target: r03
     pose:
       orientation:
-      - 0.2222985135557163
+      - 0.7708269527977624
       - -0.0
       - -0.0
-      - -0.974978651494954
+      - -0.6370445893660162
       position:
-      - 0.96
-      - 0.56
+      - -7.45
+      - -1.4500000000000002
       - 0.0
-Map: sml_arena
+  r03:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    pose:
+      orientation:
+      - 0.8012765844860855
+      - -0.0
+      - -0.0
+      - -0.5982941042282742
+      position:
+      - -6.800000000000001
+      - -4.5
+      - 0.0
+Map: pal_office
 Tasks:
-  turtlebot1:
-    initial_pose: r06
+  robot1:
+    initial_pose: r01
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r06) && ([]<> r03) && ([]! r01)
+      hard_task: ([]<> r01) && ([]<> r02)
       soft_task: ''
     use_qualisys: false
-  turtlebot2:
+  robot2:
     initial_pose: r02
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r01) && ([]<> r09) && ([]! r03)
+      hard_task: ([]<> r01) && ([]<> r02)
       soft_task: ''
     use_qualisys: false
-  turtlebot3:
-    initial_pose: r09
+  robot3:
+    initial_pose: r03
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r01) && ([]<> r03)
+      hard_task: ([]<> r01) && ([]<> r02)
       soft_task: ''
     use_qualisys: false

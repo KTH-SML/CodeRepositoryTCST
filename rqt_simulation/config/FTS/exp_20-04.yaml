@@ -16,8 +16,8 @@ FTS:
       - -0.0
       - -0.005434541837431222
       position:
-      - -1.74
-      - -0.01
+      - -2.0
+      - -0.00
       - 0.0
   r02:
     edges:
@@ -38,7 +38,7 @@ FTS:
       - 0.0
       - 0.003205078817752258
       position:
-      - 0.02
+      - 0.00
       - -0.0
       - 0.0
   r03:
@@ -58,7 +58,7 @@ FTS:
       - 0.0
       - 0.7023132207936049
       position:
-      - 1.96
+      - 2.0
       - -0.0
       - 0.0
   r04:
@@ -76,8 +76,8 @@ FTS:
       - 0.0
       - 1.0
       position:
-      - 1.95
-      - 1.08
+      - 2.0
+      - 1.00
       - 0.0
   r05:
     edges:
@@ -96,8 +96,8 @@ FTS:
       - 0.0
       - 1.0
       position:
-      - 0.02
-      - 1.11
+      - 0.00
+      - 1.00
       - 0.0
   r06:
     edges:
@@ -114,8 +114,8 @@ FTS:
       - -0.0
       - -0.7203155592864324
       position:
-      - -1.78
-      - 1.12
+      - -2.0
+      - 1.00
       - 0.0
   r07:
     edges:
@@ -132,8 +132,8 @@ FTS:
       - 0.0
       - 0.0
       position:
-      - -1.75
-      - -1.11
+      - -2.0
+      - -1.00
       - 0.0
   r08:
     edges:
@@ -152,8 +152,8 @@ FTS:
       - 0.0
       - 0.0
       position:
-      - 0.01
-      - -1.05
+      - 0.00
+      - -1.0
       - 0.0
   r09:
     edges:
@@ -170,8 +170,8 @@ FTS:
       - 0.0
       - 0.7144329267614405
       position:
-      - 2.02
-      - -1.06
+      - 2.00
+      - -1.0
       - 0.0
 Map: sml_arena
 Tasks:
@@ -183,14 +183,14 @@ Tasks:
       soft_task: ''
     use_qualisys: false
   turtlebot2:
-    initial_pose: r02
+    initial_pose: r09
     robot_model: Turtlebot
     tasks:
       hard_task: ([]<> r01) && ([]<> r09) && ([]! r03)
       soft_task: ''
     use_qualisys: false
   turtlebot3:
-    initial_pose: r09
+    initial_pose: r02
     robot_model: Turtlebot
     tasks:
       hard_task: ([]<> r01) && ([]<> r03)

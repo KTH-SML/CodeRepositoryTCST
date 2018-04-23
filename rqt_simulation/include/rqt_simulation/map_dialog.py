@@ -17,29 +17,33 @@ from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QRectF
 from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont
 
 class Map_dialog(QDialog):
-    #signalCheckBoxIndex = pyqtSignal([int], [int])
     def __init__(self, current_graphicsScene, FTS):
         super(Map_dialog, self).__init__()
         self.setObjectName('Map_dialog')
 
-        #checkBoxChanged = pyqtSignal([int], [int])
-
+        # Copy graphics scene
         self.graphicsScene = current_graphicsScene
+        # Copy FTS
         self.FTS = FTS
 
+        # Load ui file
         ui_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'resource', 'map.ui')
         loadUi(ui_file, self)
 
+        # Set dialog layout to grid
         self.grid = QGridLayout()
 
+        # Initialize variables for FTS matrix
         self.groupBox_list = []
         self.FTS_matrix = []
         self.vbox_list = []
         self.vbox = QVBoxLayout()
 
+        # Sort the ROI's alphabetic, needed for FTS matrix since it's implemented with list
         sorted_keys = self.FTS.region_of_interest.keys()
         sorted_keys.sort()
 
+        # Set the ROI's and edges from previous selection
         for i in range(0, self.graphicsScene.regionCounter):
             groupBox = QGroupBox(sorted_keys[i])
             self.groupBox_list.append(groupBox)
@@ -61,10 +65,13 @@ class Map_dialog(QDialog):
                 if (str(i+1) + '-' + str(j+1)) in self.graphicsScene.line_dict.keys():
                     self.FTS_matrix[i][j].setCheckState(2)
 
+        # Variable is True is left mouse button is holded
         self.clicked = False
 
+        # Make whole dialog scrollable
         self.scrollAreaWidgetContents.setLayout(self.grid)
 
+        # Connect all functions with corresponding functions
         self.button_save_FTS.pressed.connect(self.on_button_FTS_save_pressed)
         #self.button_save_FTS.setEnabled(False)
         self.button_reset.pressed.connect(self.on_button_reset_pressed)
@@ -80,8 +87,10 @@ class Map_dialog(QDialog):
         self.graphicsScene.signalMouseReleasedPos.connect(self.pointRelease)
         self.graphicsScene.signalMouseMovePos.connect(self.mouseMove)
 
+        # Load graphics scene in graphics view
         self.graphicsView.setScene(self.graphicsScene)
 
+    # Save the current FTS in yaml file
     @Slot(bool)
     def on_button_FTS_save_pressed(self):
         self.button_save_FTS.setEnabled(False)
@@ -102,6 +111,7 @@ class Map_dialog(QDialog):
 
         self.accept()
 
+    # Reset FTS
     @Slot(bool)
     def on_button_reset_pressed(self):
         print('Reset')
@@ -118,6 +128,7 @@ class Map_dialog(QDialog):
         self.FTS.region_of_interest = {}
         self.button_save_FTS.setEnabled(False)
 
+    # Remove last added ROI
     @Slot(bool)
     def remove_last_ROI(self):
         del self.FTS_matrix[self.graphicsScene.regionCounter-1]
@@ -144,12 +155,14 @@ class Map_dialog(QDialog):
         if self.graphicsScene.regionCounter < 1:
             self.button_ROI.setEnabled(False)
 
+    # Sets all edges between ROI's
     @Slot(bool)
     def on_button_set_edges_pressed(self):
         for i in range(0, len(self.FTS_matrix)):
             for j in range(0, len(self.FTS_matrix[0])):
                 self.FTS_matrix[i][j].setCheckState(Qt.Checked)
 
+    # Removes all edges between ROI's
     @Slot(bool)
     def delete_edges(self):
         for i in range(0, len(self.FTS_matrix)):
@@ -157,6 +170,7 @@ class Map_dialog(QDialog):
                 self.FTS_matrix[i][j].setCheckState(Qt.Unchecked)
 
 
+    # Add ROI with mouse click
     def pointSelection(self, pos):
         print('scene')
         print(pos)
@@ -193,6 +207,7 @@ class Map_dialog(QDialog):
             self.groupBox_list[i].setLayout(self.vbox_list[i])
             self.grid.addWidget(self.groupBox_list[i], 0, i+1, Qt.AlignRight)
 
+    # Set orientation of ROI by releasing mouse button
     def pointRelease(self, pos):
         self.clicked = False
         pixel_coords = self.graphicsScene.items_dict['r' + str(self.graphicsScene.regionCounter).zfill(2)]['pixel_coords']
@@ -206,6 +221,7 @@ class Map_dialog(QDialog):
         self.graphicsScene.items_dict['r' + str(self.graphicsScene.regionCounter).zfill(2)].update({'arrow' : self.current_arrow})
         self.button_ROI.setEnabled(True)
 
+    # Update orientation arrow while mouse button is pressed
     def mouseMove(self, pos):
         arrow_length = 50
         if self.clicked:
@@ -216,6 +232,7 @@ class Map_dialog(QDialog):
                 self.graphicsScene.removeArrow(self.current_arrow)
             self.current_arrow = self.graphicsScene.addArrow(pixel_coords, end_point)
 
+    # Set the edges both ways in FTS matrix
     @Slot(bool)
     def edge_both_ways(self, state):        
         for i in range(0, self.graphicsScene.regionCounter):
@@ -242,13 +259,16 @@ class Map_dialog(QDialog):
                             if (str(j+1) + '-' + str(i+1)) in self.graphicsScene.line_dict.keys():
                                 self.graphicsScene.remove_edge(str(j+1) + '-' + str(i+1))
 
+    # Cancel map dialog
     @Slot(bool)
     def on_button_cancel_pressed(self):
         self.on_button_reset_pressed()
         self.accept()
 
+    # Load FTS from a yaml file
     @Slot(bool)
     def load_FTS(self):
+        # Start file dialog
         directory = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS')
         File_dialog = QFileDialog(directory=directory, filter='.yaml')
         FTS_file = File_dialog.getOpenFileName()
@@ -256,8 +276,10 @@ class Map_dialog(QDialog):
         stream = file(FTS_file[0], 'r')
         data = yaml.load(stream)
 
+        # Reset graphics Scene
         self.graphicsScene.reset()
 
+        # Load FTS
         self.FTS.region_of_interest = {}
         self.FTS.region_of_interest = data['FTS']
         sorted_keys = self.FTS.region_of_interest.keys()
@@ -266,6 +288,7 @@ class Map_dialog(QDialog):
 
         arrow_length = 50
 
+        # Add all the ROI's and edges
         for i in range(0, len(self.FTS.region_of_interest)):
             region_string = 'r' + str(i+1).zfill(2)
             pixel_coords = self.graphicsScene.worldToPixel(self.FTS.region_of_interest[sorted_keys[i]]['pose']['position'])

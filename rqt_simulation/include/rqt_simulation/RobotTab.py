@@ -9,6 +9,7 @@ import time
 import codecs
 import roslaunch
 import numpy as np
+from math import sqrt
 from copy import deepcopy
 from geometry_msgs.msg import Point, Pose, PoseArray, PoseWithCovarianceStamped, PoseStamped, PolygonStamped, PointStamped
 from visualization_msgs.msg import Marker, MarkerArray
@@ -28,6 +29,7 @@ import actionlib
 from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
 from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal, MoveBaseGoal
+from tf.transformations import euler_from_quaternion, quaternion_from_euler, quaternion_matrix, euler_from_matrix
 
 class RobotTab(QWidget):
     signalRobotNameChanged = pyqtSignal(int)
@@ -197,8 +199,18 @@ class RobotTab(QWidget):
                 msg_pose_rounded.orientation.z = round(msg.pose.pose.orientation.z - 0.005, 2)
 
                 same_pose = self.two_poses(msg_pose_rounded, self.last_current_pose.pose)
-                if not same_pose:
+
+                moved_distance = sqrt((msg.pose.pose.position.x - self.last_current_pose.pose.position.x)**2 + (msg.pose.pose.position.y - self.last_current_pose.pose.position.y)**2 +(msg.pose.pose.position.z - self.last_current_pose.pose.position.z)**2)
+                current_R = quaternion_matrix([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+                last_R = quaternion_matrix([self.last_current_pose.pose.orientation.x, self.last_current_pose.pose.orientation.y, self.last_current_pose.pose.orientation.z, self.last_current_pose.pose.orientation.w])
+                performed_rotation_R = np.dot(current_R, last_R)
+                performed_rotation = np.linalg.norm(performed_rotation_R)
+
+                if (moved_distance > 0.05) and (performed_rotation > 0.05):
                     self.last_current_pose.header.stamp = rospy.Time.now()
+
+                #if not same_pose:
+                #    self.last_current_pose.header.stamp = rospy.Time.now()
 
                 if (rospy.Time.now() - self.last_current_pose.header.stamp).to_sec() > 5.0:
                     print('clear')
@@ -208,6 +220,10 @@ class RobotTab(QWidget):
                     self.move_base_ac.send_goal(self.robot_current_goal.goal)
                     self.last_current_pose.header.stamp = rospy.Time.now()
                 self.last_current_pose.pose = deepcopy(msg_pose_rounded)
+
+
+
+
 
     def two_poses(self, pose1, pose2):
         if pose1.position.x == pose2.position.x and \

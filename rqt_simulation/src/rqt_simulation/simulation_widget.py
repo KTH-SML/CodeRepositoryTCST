@@ -81,6 +81,7 @@ class SimulationWidget(QWidget):
         # Initialize FTS
         self.FTS = FTS()
 
+        # Get default scenario file
         self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
 
         # Variables for ROS Publisher
@@ -90,8 +91,10 @@ class SimulationWidget(QWidget):
         self.num_robots = 0
         self.tab_list = []
 
+        # Add the select world combo box
         self.world_comboBox.addItems(worlds)
 
+        # Variable setting rosbag writer subscribers active
         self.rosbag_active = False
 
         # Subscriber for prefix and sufix
@@ -168,6 +171,7 @@ class SimulationWidget(QWidget):
         transform = QTransform(scale, 0, 0.0, scale, 0, 0)
         self.graphicsView_main.setTransform(transform)
 
+        # Reset initial pose and plan textboxes
         for i in range(0, self.num_robots):
             self.tab_list[i].robot_comboBox_init.clear()
             self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'] = QGraphicsTextItem('start_' + str(i+1).zfill(2))
@@ -179,8 +183,10 @@ class SimulationWidget(QWidget):
         self.prefix_string = ''
         self.sufix_string = ''
 
+        # Reinitialize FTS
         self.FTS = FTS()
 
+        # Load new map
         self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
 
         # Reinitialize ROI marker msg
@@ -189,8 +195,6 @@ class SimulationWidget(QWidget):
 
     # Callback for prefix from ltl_planner
     def prefix_callback(self, msg, source):
-        #print('----------')
-        #print(msg)
         self.prefix_string = ''
         for n in msg.poses:
             for i in range(0, len(self.FTS.region_of_interest)):
@@ -301,6 +305,7 @@ class SimulationWidget(QWidget):
 
             print(self.prefix_plan_topic_list)
 
+    # Setup simulation, gazebo and RVIZ
     @Slot(bool)
     def on_button_setup_pressed(self):
         scenario = self.world_comboBox.currentText()
@@ -314,7 +319,7 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
         self.button_record_rosbag.setEnabled(True)
-        self.tabWidget.setEnabled(False)
+        #self.tabWidget.setEnabled(False)
         self.button_load_scenario.setEnabled(False)
         self.button_execute_task.setEnabled(False)
 
@@ -392,6 +397,7 @@ class SimulationWidget(QWidget):
         self.add_region_marker(self.FTS.region_of_interest, False)
         self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
 
+    # Setup experiment, RVIZ
     @Slot(bool)
     def on_button_setup_exp_pressed(self):
         scenario = self.world_comboBox.currentText()
@@ -437,6 +443,7 @@ class SimulationWidget(QWidget):
         launch_rviz = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rviz.launch')])
         launch_rviz.start()
 
+        # Load transformation between map and qualisys
         if self.tab_list[i].robot_localization_checkBox.checkState() == 2:
             # Launch qualysis mapper
             sys.argv.append('trans_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][0]))
@@ -505,6 +512,7 @@ class SimulationWidget(QWidget):
         self.add_region_marker(self.FTS.region_of_interest, False)
         self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
 
+    # Synthesize the tasks and start LTL Planner
     @Slot(bool)
     def on_button_execute_task_pressed(self):
         print('saved task')
@@ -668,12 +676,12 @@ class SimulationWidget(QWidget):
         if self.num_robots > 1:
             self.num_robots = self.num_robots - 1
 
-            del self.current_goal_topic_list[self.num_robots]
-            del self.current_goal_subscriber_list[self.num_robots]
-            del self.prefix_plan_subscriber_list[self.num_robots]
-            del self.sufix_plan_subscriber_list[self.num_robots]
-            del self.prefix_plan_topic_list[self.num_robots]
-            del self.sufix_plan_topic_list[self.num_robots]
+            #del self.current_goal_topic_list[self.num_robots]
+            #del self.current_goal_subscriber_list[self.num_robots]
+            #del self.prefix_plan_subscriber_list[self.num_robots]
+            #del self.sufix_plan_subscriber_list[self.num_robots]
+            #del self.prefix_plan_topic_list[self.num_robots]
+            #del self.sufix_plan_topic_list[self.num_robots]
 
             self.current_graphicsScene.removeItem(self.tab_list[self.num_robots].initial_pose['start_' + str(self.num_robots+1).zfill(2)]['text_item'])
 
@@ -695,17 +703,19 @@ class SimulationWidget(QWidget):
     # Load scenario from a yaml file
     @Slot(bool)
     def load_scenario(self):
+        # Start file dialog GUI
         directory = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS')
         File_dialog = QFileDialog(directory=directory, filter='.yaml')
         scenario_file = File_dialog.getOpenFileName()
         stream = file(scenario_file[0], 'r')
         data = yaml.load(stream)
 
+        # Remove all robots
         for i in range(0, len(self.tab_list) - 1):
             self.remove_robot()
 
+        # Reset map
         self.reset()
-
 
         # Load map
         self.world_comboBox.setCurrentIndex(self.world_comboBox.findText(data['Map']))
@@ -754,7 +764,6 @@ class SimulationWidget(QWidget):
         for i in range(0, len(self.FTS.region_of_interest)):
             self.tab_list[self.num_robots-1].robot_comboBox_init.addItem(self.FTS.region_of_interest.keys()[i])
         self.tab_list[self.num_robots-1].robot_comboBox_init.model().sort(0)
-
 
         for i in range(0, len(robot_tabs)):
             if i > 0:
