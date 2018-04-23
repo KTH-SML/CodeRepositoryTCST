@@ -8,8 +8,8 @@
 	<rosparam param="u_max">[0.2, 6.28]</rosparam>
 	<param name="K" type="int" value="2"/>
 	<param name="n_robots" type="int" value="2"/>
-	<param name="delta" type="double" value="0.01"/>
-	<param name="zeta_l" type="double" value="0.1"/>
+	<param name="delta" type="double" value="0.02"/>
+	<param name="zeta_l" type="double" value="0.2"/>
 
 
 	<node pkg="plotter" type="plotter_node.py" name="plotter_node0" output="screen">
