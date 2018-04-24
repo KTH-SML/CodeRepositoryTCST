@@ -152,8 +152,8 @@ arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
         e_ = e_>0 ? u_max(0) : -u_max(0);
     }
     u_ = -e_*g(x).t()*drho_psi(X, x.size());
-
-    double c = arma::as_scalar(u_.rows(0,1).t()*u_.rows(0,1));
+    
+    double c = arma::as_scalar(arma::sqrt(u_.rows(0,1).t()*u_.rows(0,1)));
     if(c > u_max(0)){ 
         u_(0) *= u_max(0)/c;
         u_(1) *= u_max(0)/c;
