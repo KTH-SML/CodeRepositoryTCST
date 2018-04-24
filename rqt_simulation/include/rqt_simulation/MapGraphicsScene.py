@@ -35,7 +35,7 @@ class MapGraphicsScene(QGraphicsScene):
     def add_ROI(self, pixel_coords):
         self.regionCounter += 1
 
-        markerSize = 13
+        markerSize = 25
         ellipse_item = QGraphicsEllipseItem(QRectF(QPointF(pixel_coords.x() - markerSize/2, pixel_coords.y() - markerSize/2), QSizeF(markerSize, markerSize)))
         ellipse_item.setBrush(QBrush(QColor('red')))
         self.addItem(ellipse_item)

@@ -179,14 +179,14 @@ Tasks:
     initial_pose: r06
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r06) && ([]<> r03) && ([]! r01)
+      hard_task: ([]<> r06) && ([]<> r03) && ([]! r02)
       soft_task: ''
     use_qualisys: false
   turtlebot2:
     initial_pose: r09
     robot_model: Turtlebot
     tasks:
-      hard_task: ([]<> r01) && ([]<> r09) && ([]! r03)
+      hard_task: ([]<> r01) && ([]<> r09) && ([]! r02)
       soft_task: ''
     use_qualisys: false
   turtlebot3:

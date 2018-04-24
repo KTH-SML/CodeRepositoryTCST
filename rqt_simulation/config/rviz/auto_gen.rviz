@@ -41,8 +41,8 @@ Visualization Manager:
         Collision Enabled: false
         Enabled: true
         Name: RobotModel
-        Robot Description: robot1/robot_description
-        TF Prefix: robot1
+        Robot Description: turtlebot1/robot_description
+        TF Prefix: turtlebot1
         Update Interval: 0
         Value: true
         Visual Enabled: true
@@ -51,12 +51,12 @@ Visualization Manager:
         Color: 255; 255; 0
         Enabled: true
         Name: Footprint
-        Topic: /robot1/move_base/local_costmap/footprint
+        Topic: /turtlebot1/move_base/local_costmap/footprint
         Unreliable: false
         Value: true
       - Class: rviz/Marker
         Enabled: true
-        Marker Topic: /robot1/label_marker
+        Marker Topic: /turtlebot1/label_marker
         Name: ROIMarker
         Namespaces:
           ? ''
@@ -90,7 +90,7 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /robot1/scan
+          Topic: /turtlebot1/scan
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -120,7 +120,7 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /robot1/camera/depth/points
+          Topic: /turtlebot1/camera/depth/points
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -157,7 +157,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot1/move_base/GlobalPlanner/plan
+              Topic: /turtlebot1/move_base/GlobalPlanner/plan
               Unreliable: false
               Value: true
             - Alpha: 1
@@ -180,7 +180,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot1/move_base/DWAPlannerROS/global_plan
+              Topic: /turtlebot1/move_base/DWAPlannerROS/global_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -191,7 +191,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot1/move_base/GlobalPlanner/potential
+            Topic: /turtlebot1/move_base/GlobalPlanner/potential
             Unreliable: false
             Value: true
           - Alpha: 0.7
@@ -200,7 +200,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot1/move_base/global_costmap/costmap
+            Topic: /turtlebot1/move_base/global_costmap/costmap
             Unreliable: false
             Value: true
           Enabled: true
@@ -229,7 +229,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot1/move_base/DWAPlannerROS/local_plan
+              Topic: /turtlebot1/move_base/DWAPlannerROS/local_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -240,7 +240,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot1/move_base/local_costmap/costmap
+            Topic: /turtlebot1/move_base/local_costmap/costmap
             Unreliable: false
             Value: true
           - Alpha: 0.2
@@ -268,7 +268,7 @@ Visualization Manager:
             Size (Pixels): 3
             Size (m): 0.07
             Style: Flat Squares
-            Topic: /robot1/move_base/DWAPlannerROS/cost_cloud
+            Topic: /turtlebot1/move_base/DWAPlannerROS/cost_cloud
             Unreliable: false
             Use Fixed Frame: true
             Use rainbow: true
@@ -287,7 +287,7 @@ Visualization Manager:
           Shaft Length: 1
           Shaft Radius: 0.05
           Shape: Arrow
-          Topic: /robot1/move_base/current_goal
+          Topic: /turtlebot1/move_base/current_goal
           Unreliable: false
           Value: true
         Enabled: true
@@ -301,7 +301,7 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: true
         Name: Pose
-        Topic: /robot1/particlecloud
+        Topic: /turtlebot1/particlecloud
         Unreliable: 'False'
         Value: true
       Enabled: true
@@ -314,7 +314,7 @@ Visualization Manager:
         Draw Behind: true
         Enabled: true
         Name: Map
-        Topic: /robot1/map
+        Topic: /turtlebot1/map
         Unreliable: false
         Value: true
       - Arrow Length: 0.3
@@ -322,13 +322,13 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: 'True'
         Name: Trajectory
-        Topic: /robot1/slam_trajectory
+        Topic: /turtlebot1/slam_trajectory
         Unreliable: false
         Value: true
       Enabled: true
       Name: Mapping
     Enabled: true
-    Name: robot1
+    Name: turtlebot1
   - Class: rviz/Group
     Displays:
     - Class: rviz/Group
@@ -338,8 +338,8 @@ Visualization Manager:
         Collision Enabled: false
         Enabled: true
         Name: RobotModel
-        Robot Description: robot2/robot_description
-        TF Prefix: robot2
+        Robot Description: turtlebot3/robot_description
+        TF Prefix: turtlebot3
         Update Interval: 0
         Value: true
         Visual Enabled: true
@@ -348,12 +348,12 @@ Visualization Manager:
         Color: 255; 255; 0
         Enabled: true
         Name: Footprint
-        Topic: /robot2/move_base/local_costmap/footprint
+        Topic: /turtlebot3/move_base/local_costmap/footprint
         Unreliable: false
         Value: true
       - Class: rviz/Marker
         Enabled: true
-        Marker Topic: /robot2/label_marker
+        Marker Topic: /turtlebot3/label_marker
         Name: ROIMarker
         Namespaces:
           ? ''
@@ -387,7 +387,7 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /robot2/scan
+          Topic: /turtlebot3/scan
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -417,7 +417,7 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /robot2/camera/depth/points
+          Topic: /turtlebot3/camera/depth/points
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -454,7 +454,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot2/move_base/GlobalPlanner/plan
+              Topic: /turtlebot3/move_base/GlobalPlanner/plan
               Unreliable: false
               Value: true
             - Alpha: 1
@@ -477,7 +477,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot2/move_base/DWAPlannerROS/global_plan
+              Topic: /turtlebot3/move_base/DWAPlannerROS/global_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -488,7 +488,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot2/move_base/GlobalPlanner/potential
+            Topic: /turtlebot3/move_base/GlobalPlanner/potential
             Unreliable: false
             Value: true
           - Alpha: 0.7
@@ -497,7 +497,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot2/move_base/global_costmap/costmap
+            Topic: /turtlebot3/move_base/global_costmap/costmap
             Unreliable: false
             Value: true
           Enabled: true
@@ -526,7 +526,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot2/move_base/DWAPlannerROS/local_plan
+              Topic: /turtlebot3/move_base/DWAPlannerROS/local_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -537,7 +537,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot2/move_base/local_costmap/costmap
+            Topic: /turtlebot3/move_base/local_costmap/costmap
             Unreliable: false
             Value: true
           - Alpha: 0.2
@@ -565,7 +565,7 @@ Visualization Manager:
             Size (Pixels): 3
             Size (m): 0.07
             Style: Flat Squares
-            Topic: /robot2/move_base/DWAPlannerROS/cost_cloud
+            Topic: /turtlebot3/move_base/DWAPlannerROS/cost_cloud
             Unreliable: false
             Use Fixed Frame: true
             Use rainbow: true
@@ -584,7 +584,7 @@ Visualization Manager:
           Shaft Length: 1
           Shaft Radius: 0.05
           Shape: Arrow
-          Topic: /robot2/move_base/current_goal
+          Topic: /turtlebot3/move_base/current_goal
           Unreliable: false
           Value: true
         Enabled: true
@@ -598,7 +598,7 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: true
         Name: Pose
-        Topic: /robot2/particlecloud
+        Topic: /turtlebot3/particlecloud
         Unreliable: 'False'
         Value: true
       Enabled: true
@@ -611,7 +611,7 @@ Visualization Manager:
         Draw Behind: true
         Enabled: true
         Name: Map
-        Topic: /robot2/map
+        Topic: /turtlebot3/map
         Unreliable: false
         Value: true
       - Arrow Length: 0.3
@@ -619,13 +619,13 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: 'True'
         Name: Trajectory
-        Topic: /robot2/slam_trajectory
+        Topic: /turtlebot3/slam_trajectory
         Unreliable: false
         Value: true
       Enabled: true
       Name: Mapping
     Enabled: true
-    Name: robot2
+    Name: turtlebot3
   - Class: rviz/Group
     Displays:
     - Class: rviz/Group
@@ -635,8 +635,8 @@ Visualization Manager:
         Collision Enabled: false
         Enabled: true
         Name: RobotModel
-        Robot Description: robot3/robot_description
-        TF Prefix: robot3
+        Robot Description: turtlebot2/robot_description
+        TF Prefix: turtlebot2
         Update Interval: 0
         Value: true
         Visual Enabled: true
@@ -645,12 +645,12 @@ Visualization Manager:
         Color: 255; 255; 0
         Enabled: true
         Name: Footprint
-        Topic: /robot3/move_base/local_costmap/footprint
+        Topic: /turtlebot2/move_base/local_costmap/footprint
         Unreliable: false
         Value: true
       - Class: rviz/Marker
         Enabled: true
-        Marker Topic: /robot3/label_marker
+        Marker Topic: /turtlebot2/label_marker
         Name: ROIMarker
         Namespaces:
           ? ''
@@ -684,7 +684,7 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /robot3/scan
+          Topic: /turtlebot2/scan
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -714,7 +714,7 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /robot3/camera/depth/points
+          Topic: /turtlebot2/camera/depth/points
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -751,7 +751,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot3/move_base/GlobalPlanner/plan
+              Topic: /turtlebot2/move_base/GlobalPlanner/plan
               Unreliable: false
               Value: true
             - Alpha: 1
@@ -774,7 +774,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot3/move_base/DWAPlannerROS/global_plan
+              Topic: /turtlebot2/move_base/DWAPlannerROS/global_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -785,7 +785,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot3/move_base/GlobalPlanner/potential
+            Topic: /turtlebot2/move_base/GlobalPlanner/potential
             Unreliable: false
             Value: true
           - Alpha: 0.7
@@ -794,7 +794,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot3/move_base/global_costmap/costmap
+            Topic: /turtlebot2/move_base/global_costmap/costmap
             Unreliable: false
             Value: true
           Enabled: true
@@ -823,7 +823,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot3/move_base/DWAPlannerROS/local_plan
+              Topic: /turtlebot2/move_base/DWAPlannerROS/local_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -834,7 +834,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot3/move_base/local_costmap/costmap
+            Topic: /turtlebot2/move_base/local_costmap/costmap
             Unreliable: false
             Value: true
           - Alpha: 0.2
@@ -862,7 +862,7 @@ Visualization Manager:
             Size (Pixels): 3
             Size (m): 0.07
             Style: Flat Squares
-            Topic: /robot3/move_base/DWAPlannerROS/cost_cloud
+            Topic: /turtlebot2/move_base/DWAPlannerROS/cost_cloud
             Unreliable: false
             Use Fixed Frame: true
             Use rainbow: true
@@ -881,7 +881,7 @@ Visualization Manager:
           Shaft Length: 1
           Shaft Radius: 0.05
           Shape: Arrow
-          Topic: /robot3/move_base/current_goal
+          Topic: /turtlebot2/move_base/current_goal
           Unreliable: false
           Value: true
         Enabled: true
@@ -895,7 +895,7 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: true
         Name: Pose
-        Topic: /robot3/particlecloud
+        Topic: /turtlebot2/particlecloud
         Unreliable: 'False'
         Value: true
       Enabled: true
@@ -908,7 +908,7 @@ Visualization Manager:
         Draw Behind: true
         Enabled: true
         Name: Map
-        Topic: /robot3/map
+        Topic: /turtlebot2/map
         Unreliable: false
         Value: true
       - Arrow Length: 0.3
@@ -916,13 +916,13 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: 'True'
         Name: Trajectory
-        Topic: /robot3/slam_trajectory
+        Topic: /turtlebot2/slam_trajectory
         Unreliable: false
         Value: true
       Enabled: true
       Name: Mapping
     Enabled: true
-    Name: robot3
+    Name: turtlebot2
   - Class: rviz/MarkerArray
     Enabled: true
     Marker Topic: /region_of_interest

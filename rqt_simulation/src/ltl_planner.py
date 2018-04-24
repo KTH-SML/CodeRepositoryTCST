@@ -151,8 +151,8 @@ class LtlPlannerNode(object):
             #print(orientation_error)
             if self.agent_type == 'ground':
                 #print('planner')
-                if ((position_error < 0.2) and (orientation_error < 0.8)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
-                #if ((position_error < 0.2)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
+                #if ((position_error < 0.2) and (orientation_error < 0.8)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
+                if ((position_error < 0.2)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
                     print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
                     self.planner.find_next_move()
                     t = rospy.Time.now()-self.t0
