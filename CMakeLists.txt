@@ -58,5 +58,6 @@ target_link_libraries(${PROJECT_NAME}_node
   ${ARMADILLO_LIBRARIES}
   PPC
   ${formula_parser_LIBRARIES}
+  PFC
 )
 add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp)
