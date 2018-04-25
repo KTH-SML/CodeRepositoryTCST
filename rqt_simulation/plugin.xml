@@ -13,7 +13,7 @@
       </group>
       -->
       <label>Simulation</label>
-      <icon type="theme">system-help</icon>
+      <icon type="file">resource/KTH_Logo.png</icon>
       <statustip>Great user interface to provide real value.</statustip>
     </qtgui>
   </class>

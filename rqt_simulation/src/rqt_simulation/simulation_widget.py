@@ -14,6 +14,7 @@ from geometry_msgs.msg import Point, Pose, PoseArray, PoseStamped
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Bool, String
 from math import atan2, cos, sin, pi, atan
+from inspect import currentframe, getframeinfo
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QGraphicsScene, QGraphicsTextItem, QVBoxLayout, QComboBox, QLineEdit, QTextBrowser, QGridLayout, QFileDialog
@@ -46,9 +47,16 @@ class SimulationWidget(QWidget):
         super(SimulationWidget, self).__init__()
         self.setObjectName('SimulationWidget')
 
+        self.cf = currentframe()
+        self.filename = getframeinfo(self.cf).filename
+
         # Load ui file
-        ui_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'resource', 'SimulationPlugin.ui')
-        loadUi(ui_file, self)
+        try:
+            ui_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'resource', 'SimulationPlugin.ui')
+            loadUi(ui_file, self)
+        except:
+            print('In file ' + self.filename + ' at line ' + str(self.cf.f_lineno) + ': Error while loading ui file')
+            exit()
 
         # Connect buttons from ui file with functions
         self.button_RI.pressed.connect(self.on_button_RI_pressed)                       # Select ROI and FTS button
@@ -71,8 +79,12 @@ class SimulationWidget(QWidget):
         self.button_record_rosbag.setEnabled(False)
 
         # Load configuration available robots and worlds
-        config_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'gui_config.yaml')
-        stream = file(config_file, 'r')
+        try:
+            config_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'gui_config.yaml')
+            stream = file(config_file, 'r')
+        except:
+            print('In file ' + self.filename + ' at line ' + str(self.cf.f_lineno) + ': Error while loading gui configuration file')
+            exit()
         data = yaml.load(stream)
 
         self.robots = data['Robots']
@@ -82,7 +94,11 @@ class SimulationWidget(QWidget):
         self.FTS = FTS()
 
         # Get default scenario file
-        self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
+        try:
+            self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
+        except:
+            print('In file ' + self.filename + ' at line ' + str(self.cf.f_lineno) + ': Error while loading env_GUI.yaml file')
+            exit()
 
         # Variables for ROS Publisher
         self.ros_publisher = ROS_Publisher()
@@ -187,7 +203,11 @@ class SimulationWidget(QWidget):
         self.FTS = FTS()
 
         # Load new map
-        self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
+        try:
+            self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
+        except:
+            print('In file ' + self.filename + ' at line ' + str(self.cf.f_lineno) + ': Error while loading env_GUI.yaml file')
+            exit()
 
         # Reinitialize ROI marker msg
         self.region_pose_marker_array_msg = MarkerArray()
@@ -215,12 +235,13 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_prefix_textbox.insertPlainText('Prefix: ')
         self.tab_list[index].robot_prefix_textbox.insertPlainText(self.prefix_string)
         print(self.prefix_string)
-        self.prefix_string = ''
+        #self.prefix_string = ''
         self.button_setup.setEnabled(True)
         self.button_setup_exp.setEnabled(True)
 
     # Callback for sufix from ltl_planner
     def sufix_callback(self, msg, source):
+        self.sufix_string = ''
         for n in msg.poses:
             for i in range(0, len(self.FTS.region_of_interest)):
                 if self.position_msg_to_tuple(n.position) == tuple(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]]['pose']['position']):
@@ -235,7 +256,7 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_sufix_textbox.clear()
         self.tab_list[index].robot_sufix_textbox.insertPlainText('Sufix: ')
         self.tab_list[index].robot_sufix_textbox.insertPlainText(self.sufix_string)
-        self.sufix_string = ''
+       # self.sufix_string = ''
 
     # Callback for current goal
     def goal_callback(self, msg, source):
@@ -707,7 +728,12 @@ class SimulationWidget(QWidget):
         directory = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS')
         File_dialog = QFileDialog(directory=directory, filter='.yaml')
         scenario_file = File_dialog.getOpenFileName()
-        stream = file(scenario_file[0], 'r')
+        try:
+            stream = file(scenario_file[0], 'r')
+        except:
+            print('In file ' + self.filename + ' at line ' + str(self.cf.f_lineno) + ': Error no valid scenario file')
+            return False
+
         data = yaml.load(stream)
 
         # Remove all robots
