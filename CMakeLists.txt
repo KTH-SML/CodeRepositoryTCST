@@ -7,7 +7,7 @@ project(plotter)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED rospy hybrid_controller)
+find_package(catkin REQUIRED rospy hybrid_controller geometry_msgs)
 
 
 # find_package(Boost REQUIRED COMPONENTS system)
