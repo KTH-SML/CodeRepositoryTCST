@@ -43,6 +43,13 @@ target_link_libraries(PPC
   ${ARMADILLO_LIBRARIES}
 )
 
+add_library(PFC src/PFC.cpp)
+target_link_libraries(PFC
+  -lopenblas
+  -llapack
+  ${ARMADILLO_LIBRARIES}
+)
+
 add_executable(${PROJECT_NAME}_node src/hybrid_controller_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
@@ -51,5 +58,6 @@ target_link_libraries(${PROJECT_NAME}_node
   ${ARMADILLO_LIBRARIES}
   PPC
   ${formula_parser_LIBRARIES}
+  PFC
 )
 add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp)

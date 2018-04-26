@@ -8,8 +8,11 @@
 	<rosparam param="u_max">[0.2, 6.28]</rosparam>
 	<param name="K" type="int" value="2"/>
 	<param name="n_robots" type="int" value="2"/>
-	<param name="delta" type="double" value="0.01"/>
-	<param name="zeta_l" type="double" value="0.1"/>
+	<param name="delta" type="double" value="0.025"/>
+	<param name="zeta_l" type="double" value="0.25"/>
+	<param name="r" type="double" value="0.4"/>
+	<param name="R" type="double" value="0.5"/>
+	<param name="w" type="double" value="0.5"/>
 
 
 	<node pkg="plotter" type="plotter_node.py" name="plotter_node0" output="screen">
@@ -45,10 +48,12 @@
 	<node pkg="robot" type="robot_node" name="robot0" output="screen">
 		<remap from="/control_input" to="/cmdvel0" />
 		<remap from="/pose" to="/pose_robot0" />
+		<remap from="/uppc" to="/uppc0"/>
 	</node>
 	<node pkg="robot" type="robot_node" name="robot1" output="screen" >
 		<remap from="/control_input" to="/cmdvel1" />
 		<remap from="/pose" to="/pose_robot1" />
+		<remap from="/uppc" to="/uppc1"/>
 	</node>
 	<!--
 	<node pkg="robot" type="robot_node" name="robot2" output="screen" >

@@ -12,9 +12,10 @@
 #include "PPC.hpp"
 #include <armadillo>
 #include "arma_ros_std_conversions.h"
+#include "PFC.hpp"
 
 class ControllerNode{
-	ros::Publisher control_input_pub, critical_event_pub, collaboration_request_pub, c_pub, rho_pub;
+	ros::Publisher control_input_pub, critical_event_pub, collaboration_request_pub, c_pub, rho_pub, upfc_pub, uppc_pub;
 	std::vector<ros::Subscriber> pose_subs, collaboration_params_subs, c_subs;
 
 	std::vector<geometry_msgs::PoseStamped> poses;
@@ -26,19 +27,24 @@ class ControllerNode{
 	std::vector<int> robots_in_cluster;
 
 	PPC prescribed_performance_controller;
+	PFC potential_field_controller;
 	int robot_id;
+	arma::vec u_max;
 
 	std::vector<bool> state_was_read;
+	double w;
 
 public:
 	ControllerNode(ros::NodeHandle nh, ros::NodeHandle priv_nh, PPC ppc, int n_robots, int robot_id, 
-			std::vector<int> V, std::vector<int> robots_in_cluster, arma::vec u_max): 
-				prescribed_performance_controller(ppc), robot_id(robot_id){
+			std::vector<int> V, std::vector<int> robots_in_cluster, arma::vec u_max, PFC pfc, double w): 
+				prescribed_performance_controller(ppc), robot_id(robot_id), u_max(u_max), potential_field_controller(pfc), w(w){
 
 		state_was_read = std::vector<bool>(n_robots, false);
 		X = arma::vec(3*n_robots);
 
 		control_input_pub = nh.advertise<geometry_msgs::Twist>("/cmdvel", 100);
+		upfc_pub = nh.advertise<geometry_msgs::Twist>("/upfc"+std::to_string(robot_id), 100);
+		uppc_pub = nh.advertise<geometry_msgs::Twist>("/uppc"+std::to_string(robot_id), 100);
 		critical_event_pub = nh.advertise<hybrid_controller::CriticalEvent>("/critical_event"+std::to_string(robot_id), 100);
 		collaboration_request_pub = nh.advertise<hybrid_controller::Params>("/collaboration_params", 100);
 		c_pub = nh.advertise<std_msgs::Int32>("/c"+std::to_string(robot_id), 100);
@@ -96,13 +102,33 @@ public:
 
 	void update(){
 		if(std::any_of(state_was_read.cbegin(), state_was_read.cend(), [](bool v){return !v;})) return;
-		arma::vec u = prescribed_performance_controller.u(arma::conv_to<std::vector<double>>::from(X), pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
+		arma::vec u_ppc = prescribed_performance_controller.u(arma::conv_to<std::vector<double>>::from(X), pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
+		arma::vec u_pfc = potential_field_controller.u(X);
+
+		arma::vec u = u_ppc + (arma::norm(u_ppc)>0 ? u_pfc : arma::zeros<arma::vec>(u_ppc.size()));
+		if(arma::norm(u) > u_max[0]){
+			u = u/arma::norm(u)*u_max[0];
+		}
+
 		geometry_msgs::Twist u_msg;
 		double c = cos(X(robot_id*3+2));
 		double s = sin(X(robot_id*3+2));
 		u_msg.linear.x = (u(0)*c + u(1)*s)*1000.0;
 		u_msg.linear.y = (-u(0)*s + u(1)*c)*1000.0;
 		control_input_pub.publish(u_msg);
+
+		geometry_msgs::Twist u1;
+		//u1.linear.x = (u_ppc(0)*c + u_ppc(1)*s);
+		//u1.linear.y = (-u_ppc(0)*s + u_ppc(1)*c);
+		u1.linear.x = u_ppc(0);
+		u1.linear.y = u_ppc(1);
+		uppc_pub.publish(u1);
+		geometry_msgs::Twist u2;
+		//u2.linear.x = (u_pfc(0)*c + u_pfc(1)*s);
+		//u2.linear.y = (-u_pfc(0)*s + u_pfc(1)*c);
+		u2.linear.x = u_pfc(0);
+		u2.linear.y = u_pfc(1);
+		upfc_pub.publish(u2);
 
 		double rho = prescribed_performance_controller.rho_psi(arma::conv_to<std::vector<double>>::from(X));
 		hybrid_controller::Robustness rho_msg;
@@ -183,7 +209,8 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 		std::vector<std::vector<std::string>>& dformula,
 		std::vector<int>& cluster, std::vector<int>& V, std::vector<int>& robots_in_cluster,
 		std::vector<double>& a, std::vector<double>& b, std::vector<double>& rho_opt,
-		arma::vec& u_max){
+		arma::vec& u_max,
+		double& r, double& R, double& w){
 	nh.param<int>("control_freq", freq, 100);
 	nh.param("n_robots", n_robots, 1);
 	priv_nh.getParam("robot_id", robot_id);
@@ -226,6 +253,10 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 	}
 
 	nh.getParam("V"+std::to_string(robot_id), V);
+
+	nh.getParam("R", R);
+	nh.getParam("r", r);
+	nh.getParam("w", w);
 }
 
 int main(int argc, char* argv[]){
@@ -240,15 +271,19 @@ int main(int argc, char* argv[]){
 	std::vector<int> cluster, V, robots_in_cluster;
 	std::vector<double> a, b, rho_opt;
 	arma::vec u_max;
+	double r, R, w;
 
 	readParameters(nh, priv_nh, n_robots, robot_id, K, freq, delta, zeta_l,
-		formula, formula_type, dformula, cluster, V, robots_in_cluster, a, b, rho_opt, u_max);
+		formula, formula_type, dformula, cluster, V, robots_in_cluster, a, b, rho_opt, u_max,
+		r, R, w);
 
 	PPC ppc(robot_id, a, b, 
 			formula_type, formula,
 			dformula, rho_opt, K, u_max, delta, zeta_l,	V);
 
-	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, V, robots_in_cluster, u_max);
+	PFC pfc(robot_id, r, R, u_max);
+
+	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, V, robots_in_cluster, u_max, pfc, w);
 	
 	CriticalEvent::controller_node = &controller_node;
 	controller_node.setCriticalEventCallback(CriticalEvent::criticalEventCallback);
