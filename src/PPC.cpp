@@ -159,6 +159,7 @@ arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
         u_(1) *= u_max(0)/c;
     }
     u_(2) = u_(2)>0 ? (u_(2)>u_max(1) ? u_max(1) : u_(2)) : (u_(2)<-u_max(1) ? -u_max(1) : u_(2));
+
     return u_;
 }
 
