@@ -173,13 +173,15 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
 
     double rho = rho_psi(X);
 
-    if(formula_type[robot_id] == "F"){
-        t_star = b[robot_id];
+    int c_i = c[robot_id]>=0 ? c[robot_id] : robot_id;
+
+    if(formula_type[c_i] == "F"){
+        t_star = b[c_i];
     }
     
     rho_max += zeta_u;
-    if(rho_max > rho_opt[robot_id]){
-        rho_max = rho_opt[robot_id] + 0.0001;
+    if(rho_max > rho_opt[c_i]){
+        rho_max = rho_opt[c_i] + 0.0001;
     }
 
     if(stage == Stage::One){
