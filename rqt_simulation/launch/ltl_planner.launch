@@ -2,7 +2,7 @@
 <launch>
   <arg name="robot_name" default="robot"/>
   <arg name="agent_type" default="ground"/>
-  <arg name="scenario_file" default="env_GUI.yaml"/>
+  <arg name="scenario_file" default="$(find rqt_simulation)/config/FTS/env_GUI.yaml"/>
 
   <group ns="$(arg robot_name)">
 

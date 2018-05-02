@@ -16,6 +16,8 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 from ms1_msgs.msg import Humans, ActionSeq
 
+from rqt_simulation_msgs.msg import Sense
+
 from math import pi as PI
 from math import atan2, sin, cos, sqrt
 
@@ -80,6 +82,8 @@ class LtlPlannerNode(object):
         # task from GUI
         self.sub_soft_task = rospy.Subscriber('soft_task', String, self.SoftTaskCallback)
         self.sub_hard_task = rospy.Subscriber('hard_task', String, self.HardTaskCallback)
+        # environment sense
+        self.sub_sense = rospy.Subscriber('environment', Sense, self.SenseCallback)
 
         ####### Wait 3 seconds to receive the initial position from the GUI
         usleep = lambda x: time.sleep(x)
@@ -188,8 +192,21 @@ class LtlPlannerNode(object):
     def SoftTaskCallback(self, soft_task):
         self.soft_task = soft_task.data
 
-    def HardTaskCallback(self,hard_task):
+    def HardTaskCallback(self, hard_task):
         self.hard_task = hard_task.data
+
+    def SenseCallback(self, sense):
+        print sense.rois
+        pose_tuple = self.pose_to_tuple(sense.rois[i]['pose'])
+        sense_info = {sense.rois['label'] : set(pose_tuple, sense.rois[i]['label'])}
+        add_edges = ()
+        del_edges = ()
+        for i in range(0, len(sense.edges)):
+            if sense.edges[i]['add']:
+                add_edges = add_edges + tuple(self.pose_to_tuple(sense.edges[i]['start_pose']), self.pose_to_tuple(sense.edges[i]['target_pose']))
+            else:
+                del_edges = add_edges + tuple(self.pose_to_tuple(sense.edges[i]['start_pose']), self.pose_to_tuple(sense.edges[i]['target_pose']))
+        self.planner.revise(sense_info, com_info, 0.0)
 
     def FormatGoal(self, goal, index, time_stamp):
         if self.agent_type == 'ground':
@@ -231,6 +248,19 @@ class LtlPlannerNode(object):
             pose.position.z = n[0][0][2]
             plan_msg.poses.append(pose)
         return plan_msg
+
+    #def UpdKnow(self, sense):
+    #    for i in range(0, len(sense.rois)):
+    #        print sense.rois[i]
+    #        pose_tuple = self.pose_to_tuple(sense.rois[i]['pose'])
+    #        sense_info = {sense.rois[i]['label'] : set(pose_tuple, sense.rois[i]['label'])}
+    #        self.planner.product.graph['ts'].update_after_region_change()
+
+    def pose_to_tuple(self, pose):
+        tuple = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z))
+        return tuple
+
+
 
     def convert_pose_from_map_to_mocap(self, pose, tf_mocap_to_map):
         M_trans_M_R = Quaternion([0, pose.position.x, pose.position.y, pose.position.z])

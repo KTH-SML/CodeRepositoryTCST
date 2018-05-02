@@ -3,7 +3,7 @@
 from product import ProdAut_Run
 from collections import defaultdict
 from networkx import dijkstra_predecessor_and_distance
-import time 
+import time
 
 
 #===========================================
@@ -51,7 +51,7 @@ def dijkstra_plan_networkX(product, beta=10):
 		print 'Dijkstra_plan_networkX done within %.2fs: precost %.2f, sufcost %.2f' %(time.time()-start, precost, sufcost)
 		return run, time.time()-start
 		#print '\n==================\n'
-	print '=================='        
+	print '=================='
 	print 'No accepting run found in optimal planning!'
         return None, None
 
@@ -117,7 +117,7 @@ def dijkstra_plan_bounded(product, time_limit=3, beta=10):
 				 	print 'optimal_dijkstra done within %.2fs: precost %.2f, sufcost %.2f' %(time.time()-start, precost, sufcost)
 				 	return run, time.time()-start
 	print 'no accepting run found in optimal planning!'
-	
+
 
 def dijkstra_targets(product, prod_source, prod_targets):
 	# for product graph only, shortest path from source to a set of targets
@@ -138,7 +138,7 @@ def dijkstra_targets(product, prod_source, prod_targets):
 		visited.add(f_prod_node)
 		d = dist[f_prod_node]
 		for (t_prod_node, cost) in product.fly_successors(f_prod_node):
-		 	nd = d + cost 
+		 	nd = d + cost
 		 	if nd < dist[t_prod_node]:
 		 		dist[t_prod_node] = nd
 		 		pre_node[t_prod_node] = [f_prod_node]
@@ -217,15 +217,15 @@ def improve_plan_given_history(product, trace):
 #===========================================
 #local revision, in case of system update
 #===========================================
-def validate_and_revise_after_ts_change(run, product, sense_info, com_info):
+def validate_and_revise_after_ts_change(run, product, sense_info, com_info, margin):
 	new_prefix = None
 	new_suffix = None
 	start = time.time()
-	changed_regs = product.graph['ts'].graph['region'].update_after_region_change(sense_info, com_info)
+	changed_regs = product.graph['ts'].graph['region'].update_after_region_change(sense_info, com_info, margin)
 	if changed_regs:
 		for (index, prod_edge) in enumerate(run.pre_prod_edges):
 			(f_ts_node, f_buchi_node) = prod_edge[0]
-			(t_ts_node, t_buchi_node) = prod_edge[1] 
+			(t_ts_node, t_buchi_node) = prod_edge[1]
 			succ_prod = set()
 			for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
 				succ_prod.add(prod_node_to)
@@ -235,7 +235,7 @@ def validate_and_revise_after_ts_change(run, product, sense_info, com_info):
 					break
 		for (index, prod_edge) in enumerate(run.suf_prod_edges):
 			(f_ts_node, f_buchi_node) = prod_edge[0]
-			(t_ts_node, t_buchi_node) = prod_edge[1] 
+			(t_ts_node, t_buchi_node) = prod_edge[1]
 			succ_prod = set()
 			for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
 				succ_prod.add(prod_node_to)

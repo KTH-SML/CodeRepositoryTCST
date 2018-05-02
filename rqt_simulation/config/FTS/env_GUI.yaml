@@ -7,13 +7,13 @@ FTS:
       target: r02
     pose:
       orientation:
-      - 0.5962362820494859
+      - 0.5938012712222848
       - 0.0
       - 0.0
-      - 0.8028090034172549
+      - 0.8046117388497378
       position:
       - -5.7
-      - -7.300000000000001
+      - -8.6
       - 0.0
   r02:
     edges:
@@ -23,19 +23,19 @@ FTS:
       target: r02
     pose:
       orientation:
-      - 0.8472192538252069
+      - 0.8226179455611751
       - -0.0
       - -0.0
-      - -0.5312433867332935
+      - -0.5685945089786847
       position:
-      - -7.300000000000001
-      - -1.1500000000000001
+      - -7.6000000000000005
+      - -1.75
       - 0.0
 Map: pal_office
 Tasks:
   robot1:
     initial_pose: r01
-    robot_model: TiaGo
+    robot_model: Turtlebot
     tasks:
       hard_task: ([]<> r01) && ([]<> r02)
       soft_task: ''
