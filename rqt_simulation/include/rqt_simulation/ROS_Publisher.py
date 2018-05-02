@@ -38,6 +38,9 @@ class ROS_Publisher(QWidget):
         publisher['timer'].start(int(1000.0 / rate))
         self.id_counter += 1
 
+    def remove_publisher(self, id):
+        del self.publisher_dict[publisher['publisher_id']]
+
     @Slot(int)
     def publish_once(self, publisher_id):
         publisher = self.publisher_dict.get(publisher_id, None)

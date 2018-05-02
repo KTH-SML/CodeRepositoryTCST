@@ -21,6 +21,16 @@
 		<arg name="headless" value="$(arg headless)" />
 	</include>
 
+	<!--
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find uavs_simulation_gazebo)/worlds/basic.world" />
+    <arg name="debug" value="false" />
+    <arg name="paused" value="false" />
+    <arg name="gui" value="true" />
+    <arg name="verbose" value="false"/>
+  </include>
+  -->
+
 <!-- Set up World-->
 	<node name="rviz" pkg="rviz" type="rviz" clear_params="true" args="-d $(find rqt_simulation)/config/rviz/$(arg rviz).rviz"/>
 

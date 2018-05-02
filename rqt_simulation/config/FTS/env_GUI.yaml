@@ -1,32 +1,42 @@
-r01:
-  edges:
-  - cost: 1.0
-    target: r01
-  - cost: 1.0
-    target: r02
-  pose:
-    orientation:
-    - 0.8909299596331067
-    - -0.0
-    - -0.0
-    - -0.45414073482583656
-    position:
-    - 3.9000000000000017
-    - 2.85
-    - 0.0
-r02:
-  edges:
-  - cost: 1.0
-    target: r01
-  - cost: 1.0
-    target: r02
-  pose:
-    orientation:
-    - 0.444754718145726
-    - 0.0
-    - 0.0
-    - 0.8956524106410454
-    position:
-    - 4.600000000000001
-    - 1.9500000000000002
-    - 0.0
+FTS:
+  r01:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    pose:
+      orientation:
+      - 0.5962362820494859
+      - 0.0
+      - 0.0
+      - 0.8028090034172549
+      position:
+      - -5.7
+      - -7.300000000000001
+      - 0.0
+  r02:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    pose:
+      orientation:
+      - 0.8472192538252069
+      - -0.0
+      - -0.0
+      - -0.5312433867332935
+      position:
+      - -7.300000000000001
+      - -1.1500000000000001
+      - 0.0
+Map: pal_office
+Tasks:
+  robot1:
+    initial_pose: r01
+    robot_model: TiaGo
+    tasks:
+      hard_task: ([]<> r01) && ([]<> r02)
+      soft_task: ''
+    use_qualisys: false

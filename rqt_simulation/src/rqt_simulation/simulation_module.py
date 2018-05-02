@@ -50,17 +50,6 @@ class SimulationPlugin(Plugin):
         # Add widget to the user interface
         context.add_widget(self._widget)
 
-        point_list = []
-        point = Point()
-        point.x = 0.0
-        point.y = 0.0
-        point.z = 0.0
-        point_list.append(point)
-
-        pose = Pose()
-
-
-
     def shutdown_plugin(self):
         #self._widget.unregister()
         pass

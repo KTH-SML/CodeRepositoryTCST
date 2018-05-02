@@ -46,6 +46,19 @@ Visualization Manager:
         Update Interval: 0
         Value: true
         Visual Enabled: true
+      - 6DOF: false
+        Alpha: 1
+        Axis: false
+        Class: rviz_plugin_covariance/Odometry
+        Color: 204; 51; 204
+        Enabled: false
+        Name: Odometry
+        Orientation: false
+        Position: false
+        Scale: 1
+        Topic: /robot1/mobile_base_controller/odom
+        Unreliable: false
+        Value: false
       - Alpha: 1
         Class: rviz/Polygon
         Color: 255; 255; 0
@@ -103,6 +116,36 @@ Visualization Manager:
             Value: true
           Axis: Z
           Channel Name: intensity
+          Class: rviz/LaserScan
+          Color: 255; 0; 127
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: RGBD scan
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 3
+          Size (m): 0.05
+          Style: Flat Squares
+          Topic: /robot1/rgbd_scan
+          Unreliable: false
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: 10
+            Min Value: -10
+            Value: true
+          Axis: Z
+          Channel Name: intensity
           Class: rviz/PointCloud2
           Color: 255; 255; 255
           Color Transformer: Intensity
@@ -120,11 +163,41 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /robot1/camera/depth/points
+          Topic: /robot1/xtion/depth_registered/points
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
           Value: false
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: -1.27299
+            Min Value: -1.67406
+            Value: true
+          Axis: X
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Sonar Cloud
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 10
+          Size (m): 0.01
+          Style: Points
+          Topic: /robot1/sonar_cloud
+          Unreliable: false
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
         Enabled: true
         Name: Sensors
       Enabled: true
@@ -157,7 +230,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot1/move_base/GlobalPlanner/plan
+              Topic: /robot1/move_base/NavfnROS/plan
               Unreliable: false
               Value: true
             - Alpha: 1
@@ -180,7 +253,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /robot1/move_base/DWAPlannerROS/global_plan
+              Topic: /robot1/move_base/EBandPlannerROS/global_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -191,7 +264,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /robot1/move_base/GlobalPlanner/potential
+            Topic: /robot1/move_base/global_costmap/costmap
             Unreliable: false
             Value: true
           - Alpha: 0.7
@@ -219,6 +292,29 @@ Visualization Manager:
               Length: 0.3
               Line Style: Lines
               Line Width: 0.03
+              Name: EBand
+              Offset:
+                X: 0
+                Y: 0
+                Z: 0
+              Pose Color: 255; 85; 255
+              Pose Style: None
+              Radius: 0.03
+              Shaft Diameter: 0.1
+              Shaft Length: 0.1
+              Topic: /robot1/move_base/EBandPlannerROS/local_plan
+              Unreliable: false
+              Value: true
+            - Alpha: 1
+              Buffer Length: 1
+              Class: rviz/Path
+              Color: 0; 0; 255
+              Enabled: true
+              Head Diameter: 0.3
+              Head Length: 0.2
+              Length: 0.3
+              Line Style: Lines
+              Line Width: 0.03
               Name: DWA
               Offset:
                 X: 0
@@ -230,6 +326,29 @@ Visualization Manager:
               Shaft Diameter: 0.1
               Shaft Length: 0.1
               Topic: /robot1/move_base/DWAPlannerROS/local_plan
+              Unreliable: false
+              Value: true
+            - Alpha: 1
+              Buffer Length: 1
+              Class: rviz/Path
+              Color: 0; 0; 255
+              Enabled: true
+              Head Diameter: 0.3
+              Head Length: 0.2
+              Length: 0.3
+              Line Style: Lines
+              Line Width: 0.03
+              Name: Pal
+              Offset:
+                X: 0
+                Y: 0
+                Z: 0
+              Pose Color: 255; 85; 255
+              Pose Style: None
+              Radius: 0.03
+              Shaft Diameter: 0.1
+              Shaft Length: 0.1
+              Topic: /robot1/move_base/PalPlannerROS/local_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -268,7 +387,7 @@ Visualization Manager:
             Size (Pixels): 3
             Size (m): 0.07
             Style: Flat Squares
-            Topic: /robot1/move_base/DWAPlannerROS/cost_cloud
+            Topic: /robot1/move_base/TrajectoryPlannerROS/cost_cloud
             Unreliable: false
             Use Fixed Frame: true
             Use rainbow: true
@@ -327,17 +446,6 @@ Visualization Manager:
         Value: true
       Enabled: true
       Name: Mapping
-    - Class: rviz/Camera
-      Enabled: true
-      Image Rendering: background and overlay
-      Image Topic: /robot1/camera/rgb/image_raw
-      Name: Camera
-      Overlay Alpha: 0.5
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      'Value ': true
-      Zoom Factor: 1
     Enabled: true
     Name: robot1
   - Class: rviz/MarkerArray

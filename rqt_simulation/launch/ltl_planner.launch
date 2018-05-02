@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
   <arg name="robot_name" default="robot"/>
+  <arg name="agent_type" default="ground"/>
+  <arg name="scenario_file" default="env_GUI.yaml"/>
 
   <group ns="$(arg robot_name)">
 
       <node name="ltl_planner" pkg="rqt_simulation" type="ltl_planner.py" output="screen"/>
           <param name="robot_name" type="string" value="$(arg robot_name)" />
+          <param name="agent_type" type="string" value="$(arg agent_type)" />
+          <param name="scenario_file" type="string" value="$(arg scenario_file)" />
 
   </group>
 

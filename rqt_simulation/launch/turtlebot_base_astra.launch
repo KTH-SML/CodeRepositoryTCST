@@ -5,6 +5,9 @@
 
     <arg name="robot_name" default="robot1" />
 
+    <arg name="odom" default="$(arg robot_name)/odom" />
+    <arg name="use_qualisys" default="false" />
+
     <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
 
     <group ns="$(arg robot_name)" >
@@ -41,23 +44,56 @@
           <param name="tf_prefix" value="$(arg robot_name)"/>
         </node>
 
+
         <arg name="manager" value="mobile_base_nodelet_manager"/>
+        <!--
+        <arg name="odom_frame"   default="$(arg robot_name)/odom"/>
+        <arg name="base_frame"   default="$(arg robot_name)/base_footprint"/>
+        -->
 
-        <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet $(arg manager)">
-          <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
-          <param name="device_port" value="$(arg serialport)" />
-          <param name="tf_prefix" value="$(arg robot_name)" />
-          <param name="odom_frame" value="$(arg robot_name)/odom"/>
-          <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
+        <group if="$(arg use_qualisys)">
+          <arg name="odom_frame"   value="$(arg robot_name)/qualisys_odom"/>
+          <arg name="base_frame"   value="$(arg robot_name)/open_loop_base_footprint"/>
+        </group>
 
-          <remap from="mobile_base/odom" to="odom"/>
-          <!-- Don't do this - force applications to use a velocity mux for redirection
-            <remap from="mobile_base/commands/velocity" to="cmd_vel"/>
-          -->
-          <remap from="mobile_base/enable" to="enable"/>
-          <remap from="mobile_base/disable" to="disable"/>
-          <remap from="mobile_base/joint_states" to="joint_states"/>
-        </node>
+        <!-- -->
+        <group unless="$(arg use_qualisys)">
+          <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet $(arg manager)">
+            <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
+            <param name="device_port" value="$(arg serialport)" />
+            <param name="tf_prefix" value="$(arg robot_name)" />
+            <!---->
+            <param name="odom_frame" value="$(arg odom)"/>
+            <param name="base_frame" value="$(arg robot_name)/base_footprint"/>
+
+            <remap from="mobile_base/odom" to="odom"/>
+            <!-- Don't do this - force applications to use a velocity mux for redirection
+              <remap from="mobile_base/commands/velocity" to="cmd_vel"/>
+            -->
+            <remap from="mobile_base/enable" to="enable"/>
+            <remap from="mobile_base/disable" to="disable"/>
+            <remap from="mobile_base/joint_states" to="joint_states"/>
+          </node>
+        </group>
+
+        <group if="$(arg use_qualisys)">
+          <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet $(arg manager)">
+            <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
+            <param name="device_port" value="$(arg serialport)" />
+            <param name="tf_prefix" value="$(arg robot_name)" />
+            <!---->
+            <param name="odom_frame" value="$(arg robot_name)/qualisys_odom"/>
+            <param name="base_frame" value="$(arg robot_name)/open_loop_base_footprint"/>
+
+            <remap from="mobile_base/odom" to="odom"/>
+            <!-- Don't do this - force applications to use a velocity mux for redirection
+              <remap from="mobile_base/commands/velocity" to="cmd_vel"/>
+            -->
+            <remap from="mobile_base/enable" to="enable"/>
+            <remap from="mobile_base/disable" to="disable"/>
+            <remap from="mobile_base/joint_states" to="joint_states"/>
+          </node>
+        </group>
 
         <!-- bumper/cliff to pointcloud
         <include file="$(find turtlebot_bringup)/launch/includes/kobuki/bumper2pc.launch.xml"/>
@@ -177,6 +213,46 @@
             <remap from="$(arg camera)/image" to="$(arg camera)/$(arg depth)/image_raw"/>
             <remap from="$(arg camera)/scan" to="$(arg scan_topic)"/>
           </node>
+
+          <!-- Move base
+          <include file="$(find turtlebot_navigation)/launch/includes/velocity_smoother.launch.xml"/>
+          <include file="$(find turtlebot_navigation)/launch/includes/safety_controller.launch.xml"/>
+
+          <arg name="odom_frame_id"   default="$(arg robot_name)/odom"/>
+          <arg name="base_frame_id"   default="$(arg robot_name)/base_footprint"/>
+          <arg name="global_frame_id" default="$(arg robot_name)/map"/>
+          <arg name="odom_topic" default="odom" />
+          <arg name="laser_topic" default="scan" />
+          <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/dummy.yaml"/>
+
+          <node pkg="move_base" type="move_base" respawn="false" name="move_base" clear_params="true" output="screen">
+            <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="global_costmap" />
+            <rosparam file="$(find rqt_simulation)/config/planner/costmap_common_params.yaml" command="load" ns="local_costmap" />
+            <rosparam file="$(find rqt_simulation)/config/planner/local_costmap_params.yaml" command="load" />
+            <rosparam file="$(find rqt_simulation)/config/planner/global_costmap_params.yaml" command="load" />
+            <rosparam file="$(find rqt_simulation)/config/planner/dwa_local_planner_params.yaml" command="load" />
+            <rosparam file="$(find rqt_simulation)/config/planner/move_base_params.yaml" command="load" />
+            <rosparam file="$(find turtlebot_navigation)/param/global_planner_params.yaml" command="load" />
+            <rosparam file="$(find turtlebot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
+-->
+            <!-- external params file that could be loaded into the move_base namespace
+            <rosparam file="$(arg custom_param_file)" command="load" />
+
+            <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
+            <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/>
+-->
+            <!-- reset frame_id parameters using user input data
+            <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>
+            <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+            <param name="local_costmap/global_frame" value="$(arg odom_frame_id)"/>
+            <param name="local_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+            <param name="DWAPlannerROS/global_frame_id" value="$(arg odom_frame_id)"/>
+
+            <remap from="cmd_vel" to="navigation_velocity_smoother/raw_cmd_vel"/>
+            <remap from="odom" to="$(arg odom_topic)"/>
+            <remap from="scan" to="$(arg laser_topic)"/>
+          </node>
+-->
         </group>
 
 

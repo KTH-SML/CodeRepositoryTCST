@@ -1,0 +1,20 @@
+image: map.png
+resolution: 0.01
+origin: [-3.0, -2.0, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+
+qualisys: true
+# translation = [x, y, z]
+# rotation = [w, x, y, z]; [q0, q1i, q2j, q3k]
+tf_qualisys_to_map:
+  translation:
+    - 0.544
+    - -0.426
+    - 0.0
+  rotation:
+    - 0.735
+    - 0.0
+    - 0.0
+    - 0.678
