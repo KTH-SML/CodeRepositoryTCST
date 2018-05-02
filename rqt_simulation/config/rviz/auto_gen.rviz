@@ -41,22 +41,35 @@ Visualization Manager:
         Collision Enabled: false
         Enabled: true
         Name: RobotModel
-        Robot Description: turtlebot1/robot_description
-        TF Prefix: turtlebot1
+        Robot Description: robot1/robot_description
+        TF Prefix: robot1
         Update Interval: 0
         Value: true
         Visual Enabled: true
+      - 6DOF: false
+        Alpha: 1
+        Axis: false
+        Class: rviz_plugin_covariance/Odometry
+        Color: 204; 51; 204
+        Enabled: false
+        Name: Odometry
+        Orientation: false
+        Position: false
+        Scale: 1
+        Topic: /robot1/mobile_base_controller/odom
+        Unreliable: false
+        Value: false
       - Alpha: 1
         Class: rviz/Polygon
         Color: 255; 255; 0
         Enabled: true
         Name: Footprint
-        Topic: /turtlebot1/move_base/local_costmap/footprint
+        Topic: /robot1/move_base/local_costmap/footprint
         Unreliable: false
         Value: true
       - Class: rviz/Marker
         Enabled: true
-        Marker Topic: /turtlebot1/label_marker
+        Marker Topic: /robot1/label_marker
         Name: ROIMarker
         Namespaces:
           ? ''
@@ -90,279 +103,12 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /turtlebot1/scan
+          Topic: /robot1/scan
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
           Value: true
         - Alpha: 1
-          Autocompute Intensity Bounds: true
-          Autocompute Value Bounds:
-            Max Value: 10
-            Min Value: -10
-            Value: true
-          Axis: Z
-          Channel Name: intensity
-          Class: rviz/PointCloud2
-          Color: 255; 255; 255
-          Color Transformer: Intensity
-          Decay Time: 0
-          Enabled: false
-          Invert Rainbow: false
-          Max Color: 255; 255; 255
-          Max Intensity: 4096
-          Min Color: 0; 0; 0
-          Min Intensity: 0
-          Name: Depth Cloud
-          Position Transformer: XYZ
-          Queue Size: 1
-          Selectable: true
-          Size (Pixels): 3
-          Size (m): 0.01
-          Style: Points
-          Topic: /turtlebot1/camera/depth/points
-          Unreliable: false
-          Use Fixed Frame: true
-          Use rainbow: true
-          Value: false
-        Enabled: true
-        Name: Sensors
-      Enabled: true
-      Name: Robot
-    - Class: rviz/Group
-      Displays:
-      - Class: rviz/Group
-        Displays:
-        - Class: rviz/Group
-          Displays:
-          - Class: rviz/Group
-            Displays:
-            - Alpha: 1
-              Buffer Length: 1
-              Class: rviz/Path
-              Color: 0; 0; 255
-              Enabled: true
-              Head Diameter: 0.3
-              Head Length: 0.2
-              Length: 0.3
-              Line Style: Lines
-              Line Width: 0.03
-              Name: Navfn
-              Offset:
-                X: 0
-                Y: 0
-                Z: 0
-              Pose Color: 255; 85; 255
-              Pose Style: None
-              Radius: 0.03
-              Shaft Diameter: 0.1
-              Shaft Length: 0.1
-              Topic: /turtlebot1/move_base/GlobalPlanner/plan
-              Unreliable: false
-              Value: true
-            - Alpha: 1
-              Buffer Length: 1
-              Class: rviz/Path
-              Color: 0; 0; 255
-              Enabled: true
-              Head Diameter: 0.3
-              Head Length: 0.2
-              Length: 0.3
-              Line Style: Lines
-              Line Width: 0.03
-              Name: Global
-              Offset:
-                X: 0
-                Y: 0
-                Z: 0
-              Pose Color: 255; 85; 255
-              Pose Style: None
-              Radius: 0.03
-              Shaft Diameter: 0.1
-              Shaft Length: 0.1
-              Topic: /turtlebot1/move_base/DWAPlannerROS/global_plan
-              Unreliable: false
-              Value: true
-            Enabled: true
-            Name: Plan
-          - Alpha: 0.7
-            Class: rviz/Map
-            Color Scheme: costmap
-            Draw Behind: true
-            Enabled: true
-            Name: Costmap
-            Topic: /turtlebot1/move_base/GlobalPlanner/potential
-            Unreliable: false
-            Value: true
-          - Alpha: 0.7
-            Class: rviz/Map
-            Color Scheme: costmap
-            Draw Behind: true
-            Enabled: true
-            Name: Costmap
-            Topic: /turtlebot1/move_base/global_costmap/costmap
-            Unreliable: false
-            Value: true
-          Enabled: true
-          Name: Global
-        - Class: rviz/Group
-          Displays:
-          - Class: rviz/Group
-            Displays:
-            - Alpha: 1
-              Buffer Length: 1
-              Class: rviz/Path
-              Color: 0; 0; 255
-              Enabled: true
-              Head Diameter: 0.3
-              Head Length: 0.2
-              Length: 0.3
-              Line Style: Lines
-              Line Width: 0.03
-              Name: DWA
-              Offset:
-                X: 0
-                Y: 0
-                Z: 0
-              Pose Color: 255; 85; 255
-              Pose Style: None
-              Radius: 0.03
-              Shaft Diameter: 0.1
-              Shaft Length: 0.1
-              Topic: /turtlebot1/move_base/DWAPlannerROS/local_plan
-              Unreliable: false
-              Value: true
-            Enabled: true
-            Name: Plan
-          - Alpha: 0.7
-            Class: rviz/Map
-            Color Scheme: costmap
-            Draw Behind: true
-            Enabled: true
-            Name: Costmap
-            Topic: /turtlebot1/move_base/local_costmap/costmap
-            Unreliable: false
-            Value: true
-          - Alpha: 0.2
-            Autocompute Intensity Bounds: true
-            Autocompute Value Bounds:
-              Max Value: 0
-              Min Value: 0
-              Value: true
-            Axis: Z
-            Channel Name: total_cost
-            Class: rviz/PointCloud2
-            Color: 255; 255; 255
-            Color Transformer: Intensity
-            Decay Time: 0
-            Enabled: true
-            Invert Rainbow: false
-            Max Color: 255; 255; 255
-            Max Intensity: 7.06
-            Min Color: 0; 0; 0
-            Min Intensity: 0.56
-            Name: Cost
-            Position Transformer: XYZ
-            Queue Size: 10
-            Selectable: true
-            Size (Pixels): 3
-            Size (m): 0.07
-            Style: Flat Squares
-            Topic: /turtlebot1/move_base/DWAPlannerROS/cost_cloud
-            Unreliable: false
-            Use Fixed Frame: true
-            Use rainbow: true
-            Value: true
-          Enabled: true
-          Name: Local
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.1
-          Class: rviz/Pose
-          Color: 255; 25; 0
-          Enabled: true
-          Head Length: 0.3
-          Head Radius: 0.1
-          Name: Goal
-          Shaft Length: 1
-          Shaft Radius: 0.05
-          Shape: Arrow
-          Topic: /turtlebot1/move_base/current_goal
-          Unreliable: false
-          Value: true
-        Enabled: true
-        Name: Base
-      Enabled: true
-      Name: Planning
-    - Class: rviz/Group
-      Displays:
-      - Arrow Length: 0.3
-        Class: rviz/PoseArray
-        Color: 255; 25; 0
-        Enabled: true
-        Name: Pose
-        Topic: /turtlebot1/particlecloud
-        Unreliable: 'False'
-        Value: true
-      Enabled: true
-      Name: Localization
-    - Class: rviz/Group
-      Displays:
-      - Alpha: 0.2
-        Class: rviz/Map
-        Color Scheme: map
-        Draw Behind: true
-        Enabled: true
-        Name: Map
-        Topic: /turtlebot1/map
-        Unreliable: false
-        Value: true
-      - Arrow Length: 0.3
-        Class: rviz/PoseArray
-        Color: 255; 25; 0
-        Enabled: 'True'
-        Name: Trajectory
-        Topic: /turtlebot1/slam_trajectory
-        Unreliable: false
-        Value: true
-      Enabled: true
-      Name: Mapping
-    Enabled: true
-    Name: turtlebot1
-  - Class: rviz/Group
-    Displays:
-    - Class: rviz/Group
-      Displays:
-      - Alpha: 1
-        Class: rviz/RobotModel
-        Collision Enabled: false
-        Enabled: true
-        Name: RobotModel
-        Robot Description: turtlebot3/robot_description
-        TF Prefix: turtlebot3
-        Update Interval: 0
-        Value: true
-        Visual Enabled: true
-      - Alpha: 1
-        Class: rviz/Polygon
-        Color: 255; 255; 0
-        Enabled: true
-        Name: Footprint
-        Topic: /turtlebot3/move_base/local_costmap/footprint
-        Unreliable: false
-        Value: true
-      - Class: rviz/Marker
-        Enabled: true
-        Marker Topic: /turtlebot3/label_marker
-        Name: ROIMarker
-        Namespaces:
-          ? ''
-          : true
-        Queue Size: 100
-        Value: true
-      - Class: rviz/Group
-        Displays:
-        - Alpha: 0.5
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
             Max Value: 10
@@ -371,23 +117,23 @@ Visualization Manager:
           Axis: Z
           Channel Name: intensity
           Class: rviz/LaserScan
-          Color: 0; 0; 255
+          Color: 255; 0; 127
           Color Transformer: FlatColor
           Decay Time: 0
           Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
-          Max Intensity: 0
+          Max Intensity: 4096
           Min Color: 0; 0; 0
           Min Intensity: 0
-          Name: Laser
+          Name: RGBD scan
           Position Transformer: XYZ
           Queue Size: 10
           Selectable: true
           Size (Pixels): 3
-          Size (m): 0.01
-          Style: Points
-          Topic: /turtlebot3/scan
+          Size (m): 0.05
+          Style: Flat Squares
+          Topic: /robot1/rgbd_scan
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -417,11 +163,41 @@ Visualization Manager:
           Size (Pixels): 3
           Size (m): 0.01
           Style: Points
-          Topic: /turtlebot3/camera/depth/points
+          Topic: /robot1/xtion/depth_registered/points
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
           Value: false
+        - Alpha: 1
+          Autocompute Intensity Bounds: true
+          Autocompute Value Bounds:
+            Max Value: -1.27299
+            Min Value: -1.67406
+            Value: true
+          Axis: X
+          Channel Name: intensity
+          Class: rviz/PointCloud2
+          Color: 255; 255; 255
+          Color Transformer: FlatColor
+          Decay Time: 0
+          Enabled: true
+          Invert Rainbow: false
+          Max Color: 255; 255; 255
+          Max Intensity: 4096
+          Min Color: 0; 0; 0
+          Min Intensity: 0
+          Name: Sonar Cloud
+          Position Transformer: XYZ
+          Queue Size: 10
+          Selectable: true
+          Size (Pixels): 10
+          Size (m): 0.01
+          Style: Points
+          Topic: /robot1/sonar_cloud
+          Unreliable: false
+          Use Fixed Frame: true
+          Use rainbow: true
+          Value: true
         Enabled: true
         Name: Sensors
       Enabled: true
@@ -454,7 +230,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /turtlebot3/move_base/GlobalPlanner/plan
+              Topic: /robot1/move_base/NavfnROS/plan
               Unreliable: false
               Value: true
             - Alpha: 1
@@ -477,7 +253,7 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /turtlebot3/move_base/DWAPlannerROS/global_plan
+              Topic: /robot1/move_base/EBandPlannerROS/global_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -488,7 +264,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /turtlebot3/move_base/GlobalPlanner/potential
+            Topic: /robot1/move_base/global_costmap/costmap
             Unreliable: false
             Value: true
           - Alpha: 0.7
@@ -497,7 +273,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /turtlebot3/move_base/global_costmap/costmap
+            Topic: /robot1/move_base/global_costmap/costmap
             Unreliable: false
             Value: true
           Enabled: true
@@ -506,6 +282,29 @@ Visualization Manager:
           Displays:
           - Class: rviz/Group
             Displays:
+            - Alpha: 1
+              Buffer Length: 1
+              Class: rviz/Path
+              Color: 0; 0; 255
+              Enabled: true
+              Head Diameter: 0.3
+              Head Length: 0.2
+              Length: 0.3
+              Line Style: Lines
+              Line Width: 0.03
+              Name: EBand
+              Offset:
+                X: 0
+                Y: 0
+                Z: 0
+              Pose Color: 255; 85; 255
+              Pose Style: None
+              Radius: 0.03
+              Shaft Diameter: 0.1
+              Shaft Length: 0.1
+              Topic: /robot1/move_base/EBandPlannerROS/local_plan
+              Unreliable: false
+              Value: true
             - Alpha: 1
               Buffer Length: 1
               Class: rviz/Path
@@ -526,7 +325,30 @@ Visualization Manager:
               Radius: 0.03
               Shaft Diameter: 0.1
               Shaft Length: 0.1
-              Topic: /turtlebot3/move_base/DWAPlannerROS/local_plan
+              Topic: /robot1/move_base/DWAPlannerROS/local_plan
+              Unreliable: false
+              Value: true
+            - Alpha: 1
+              Buffer Length: 1
+              Class: rviz/Path
+              Color: 0; 0; 255
+              Enabled: true
+              Head Diameter: 0.3
+              Head Length: 0.2
+              Length: 0.3
+              Line Style: Lines
+              Line Width: 0.03
+              Name: Pal
+              Offset:
+                X: 0
+                Y: 0
+                Z: 0
+              Pose Color: 255; 85; 255
+              Pose Style: None
+              Radius: 0.03
+              Shaft Diameter: 0.1
+              Shaft Length: 0.1
+              Topic: /robot1/move_base/PalPlannerROS/local_plan
               Unreliable: false
               Value: true
             Enabled: true
@@ -537,7 +359,7 @@ Visualization Manager:
             Draw Behind: true
             Enabled: true
             Name: Costmap
-            Topic: /turtlebot3/move_base/local_costmap/costmap
+            Topic: /robot1/move_base/local_costmap/costmap
             Unreliable: false
             Value: true
           - Alpha: 0.2
@@ -565,7 +387,7 @@ Visualization Manager:
             Size (Pixels): 3
             Size (m): 0.07
             Style: Flat Squares
-            Topic: /turtlebot3/move_base/DWAPlannerROS/cost_cloud
+            Topic: /robot1/move_base/TrajectoryPlannerROS/cost_cloud
             Unreliable: false
             Use Fixed Frame: true
             Use rainbow: true
@@ -584,7 +406,7 @@ Visualization Manager:
           Shaft Length: 1
           Shaft Radius: 0.05
           Shape: Arrow
-          Topic: /turtlebot3/move_base/current_goal
+          Topic: /robot1/move_base/current_goal
           Unreliable: false
           Value: true
         Enabled: true
@@ -598,7 +420,7 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: true
         Name: Pose
-        Topic: /turtlebot3/particlecloud
+        Topic: /robot1/particlecloud
         Unreliable: 'False'
         Value: true
       Enabled: true
@@ -611,7 +433,7 @@ Visualization Manager:
         Draw Behind: true
         Enabled: true
         Name: Map
-        Topic: /turtlebot3/map
+        Topic: /robot1/map
         Unreliable: false
         Value: true
       - Arrow Length: 0.3
@@ -619,310 +441,13 @@ Visualization Manager:
         Color: 255; 25; 0
         Enabled: 'True'
         Name: Trajectory
-        Topic: /turtlebot3/slam_trajectory
+        Topic: /robot1/slam_trajectory
         Unreliable: false
         Value: true
       Enabled: true
       Name: Mapping
     Enabled: true
-    Name: turtlebot3
-  - Class: rviz/Group
-    Displays:
-    - Class: rviz/Group
-      Displays:
-      - Alpha: 1
-        Class: rviz/RobotModel
-        Collision Enabled: false
-        Enabled: true
-        Name: RobotModel
-        Robot Description: turtlebot2/robot_description
-        TF Prefix: turtlebot2
-        Update Interval: 0
-        Value: true
-        Visual Enabled: true
-      - Alpha: 1
-        Class: rviz/Polygon
-        Color: 255; 255; 0
-        Enabled: true
-        Name: Footprint
-        Topic: /turtlebot2/move_base/local_costmap/footprint
-        Unreliable: false
-        Value: true
-      - Class: rviz/Marker
-        Enabled: true
-        Marker Topic: /turtlebot2/label_marker
-        Name: ROIMarker
-        Namespaces:
-          ? ''
-          : true
-        Queue Size: 100
-        Value: true
-      - Class: rviz/Group
-        Displays:
-        - Alpha: 0.5
-          Autocompute Intensity Bounds: true
-          Autocompute Value Bounds:
-            Max Value: 10
-            Min Value: -10
-            Value: true
-          Axis: Z
-          Channel Name: intensity
-          Class: rviz/LaserScan
-          Color: 0; 0; 255
-          Color Transformer: FlatColor
-          Decay Time: 0
-          Enabled: true
-          Invert Rainbow: false
-          Max Color: 255; 255; 255
-          Max Intensity: 0
-          Min Color: 0; 0; 0
-          Min Intensity: 0
-          Name: Laser
-          Position Transformer: XYZ
-          Queue Size: 10
-          Selectable: true
-          Size (Pixels): 3
-          Size (m): 0.01
-          Style: Points
-          Topic: /turtlebot2/scan
-          Unreliable: false
-          Use Fixed Frame: true
-          Use rainbow: true
-          Value: true
-        - Alpha: 1
-          Autocompute Intensity Bounds: true
-          Autocompute Value Bounds:
-            Max Value: 10
-            Min Value: -10
-            Value: true
-          Axis: Z
-          Channel Name: intensity
-          Class: rviz/PointCloud2
-          Color: 255; 255; 255
-          Color Transformer: Intensity
-          Decay Time: 0
-          Enabled: false
-          Invert Rainbow: false
-          Max Color: 255; 255; 255
-          Max Intensity: 4096
-          Min Color: 0; 0; 0
-          Min Intensity: 0
-          Name: Depth Cloud
-          Position Transformer: XYZ
-          Queue Size: 1
-          Selectable: true
-          Size (Pixels): 3
-          Size (m): 0.01
-          Style: Points
-          Topic: /turtlebot2/camera/depth/points
-          Unreliable: false
-          Use Fixed Frame: true
-          Use rainbow: true
-          Value: false
-        Enabled: true
-        Name: Sensors
-      Enabled: true
-      Name: Robot
-    - Class: rviz/Group
-      Displays:
-      - Class: rviz/Group
-        Displays:
-        - Class: rviz/Group
-          Displays:
-          - Class: rviz/Group
-            Displays:
-            - Alpha: 1
-              Buffer Length: 1
-              Class: rviz/Path
-              Color: 0; 0; 255
-              Enabled: true
-              Head Diameter: 0.3
-              Head Length: 0.2
-              Length: 0.3
-              Line Style: Lines
-              Line Width: 0.03
-              Name: Navfn
-              Offset:
-                X: 0
-                Y: 0
-                Z: 0
-              Pose Color: 255; 85; 255
-              Pose Style: None
-              Radius: 0.03
-              Shaft Diameter: 0.1
-              Shaft Length: 0.1
-              Topic: /turtlebot2/move_base/GlobalPlanner/plan
-              Unreliable: false
-              Value: true
-            - Alpha: 1
-              Buffer Length: 1
-              Class: rviz/Path
-              Color: 0; 0; 255
-              Enabled: true
-              Head Diameter: 0.3
-              Head Length: 0.2
-              Length: 0.3
-              Line Style: Lines
-              Line Width: 0.03
-              Name: Global
-              Offset:
-                X: 0
-                Y: 0
-                Z: 0
-              Pose Color: 255; 85; 255
-              Pose Style: None
-              Radius: 0.03
-              Shaft Diameter: 0.1
-              Shaft Length: 0.1
-              Topic: /turtlebot2/move_base/DWAPlannerROS/global_plan
-              Unreliable: false
-              Value: true
-            Enabled: true
-            Name: Plan
-          - Alpha: 0.7
-            Class: rviz/Map
-            Color Scheme: costmap
-            Draw Behind: true
-            Enabled: true
-            Name: Costmap
-            Topic: /turtlebot2/move_base/GlobalPlanner/potential
-            Unreliable: false
-            Value: true
-          - Alpha: 0.7
-            Class: rviz/Map
-            Color Scheme: costmap
-            Draw Behind: true
-            Enabled: true
-            Name: Costmap
-            Topic: /turtlebot2/move_base/global_costmap/costmap
-            Unreliable: false
-            Value: true
-          Enabled: true
-          Name: Global
-        - Class: rviz/Group
-          Displays:
-          - Class: rviz/Group
-            Displays:
-            - Alpha: 1
-              Buffer Length: 1
-              Class: rviz/Path
-              Color: 0; 0; 255
-              Enabled: true
-              Head Diameter: 0.3
-              Head Length: 0.2
-              Length: 0.3
-              Line Style: Lines
-              Line Width: 0.03
-              Name: DWA
-              Offset:
-                X: 0
-                Y: 0
-                Z: 0
-              Pose Color: 255; 85; 255
-              Pose Style: None
-              Radius: 0.03
-              Shaft Diameter: 0.1
-              Shaft Length: 0.1
-              Topic: /turtlebot2/move_base/DWAPlannerROS/local_plan
-              Unreliable: false
-              Value: true
-            Enabled: true
-            Name: Plan
-          - Alpha: 0.7
-            Class: rviz/Map
-            Color Scheme: costmap
-            Draw Behind: true
-            Enabled: true
-            Name: Costmap
-            Topic: /turtlebot2/move_base/local_costmap/costmap
-            Unreliable: false
-            Value: true
-          - Alpha: 0.2
-            Autocompute Intensity Bounds: true
-            Autocompute Value Bounds:
-              Max Value: 0
-              Min Value: 0
-              Value: true
-            Axis: Z
-            Channel Name: total_cost
-            Class: rviz/PointCloud2
-            Color: 255; 255; 255
-            Color Transformer: Intensity
-            Decay Time: 0
-            Enabled: true
-            Invert Rainbow: false
-            Max Color: 255; 255; 255
-            Max Intensity: 7.06
-            Min Color: 0; 0; 0
-            Min Intensity: 0.56
-            Name: Cost
-            Position Transformer: XYZ
-            Queue Size: 10
-            Selectable: true
-            Size (Pixels): 3
-            Size (m): 0.07
-            Style: Flat Squares
-            Topic: /turtlebot2/move_base/DWAPlannerROS/cost_cloud
-            Unreliable: false
-            Use Fixed Frame: true
-            Use rainbow: true
-            Value: true
-          Enabled: true
-          Name: Local
-        - Alpha: 1
-          Axes Length: 1
-          Axes Radius: 0.1
-          Class: rviz/Pose
-          Color: 255; 25; 0
-          Enabled: true
-          Head Length: 0.3
-          Head Radius: 0.1
-          Name: Goal
-          Shaft Length: 1
-          Shaft Radius: 0.05
-          Shape: Arrow
-          Topic: /turtlebot2/move_base/current_goal
-          Unreliable: false
-          Value: true
-        Enabled: true
-        Name: Base
-      Enabled: true
-      Name: Planning
-    - Class: rviz/Group
-      Displays:
-      - Arrow Length: 0.3
-        Class: rviz/PoseArray
-        Color: 255; 25; 0
-        Enabled: true
-        Name: Pose
-        Topic: /turtlebot2/particlecloud
-        Unreliable: 'False'
-        Value: true
-      Enabled: true
-      Name: Localization
-    - Class: rviz/Group
-      Displays:
-      - Alpha: 0.2
-        Class: rviz/Map
-        Color Scheme: map
-        Draw Behind: true
-        Enabled: true
-        Name: Map
-        Topic: /turtlebot2/map
-        Unreliable: false
-        Value: true
-      - Arrow Length: 0.3
-        Class: rviz/PoseArray
-        Color: 255; 25; 0
-        Enabled: 'True'
-        Name: Trajectory
-        Topic: /turtlebot2/slam_trajectory
-        Unreliable: false
-        Value: true
-      Enabled: true
-      Name: Mapping
-    Enabled: true
-    Name: turtlebot2
+    Name: robot1
   - Class: rviz/MarkerArray
     Enabled: true
     Marker Topic: /region_of_interest
