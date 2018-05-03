@@ -2,7 +2,7 @@
 from buchi import mission_to_buchi
 from product import ProdAut
 from ts import distance, reach_waypoint
-from discrete_plan import dijkstra_plan_networkX, dijkstra_plan_optimal, improve_plan_given_history, validate_and_revise_after_ts_change
+from discrete_plan import dijkstra_plan_networkX, dijkstra_plan_optimal, improve_plan_given_history, validate_and_revise_after_sense_info
 
 
 class ltl_planner(object):
@@ -99,8 +99,8 @@ class ltl_planner(object):
 		self.segment = 'line'
 		self.next_move = self.run.pre_plan[self.index]
 
-	def revise(self, sense_info, com_info, margin):
-		validate_and_revise_after_ts_change(self.run, self.product, sense_info, com_info, margin)
+	def revise(self, sense_info):
+		validate_and_revise_after_sense_info(self.run, self.product, sense_info)
 
 
 

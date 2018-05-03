@@ -22,7 +22,7 @@ from python_qt_binding.QtCore import QTimer, Slot, pyqtSlot, QSignalMapper, QRec
 from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, QBrush, QColor, QPixmap, QTransform, QFont
 
 from rqt_simulation.map_dialog import Map_dialog
-from .initial_pose import Initial_pose
+from rqt_simulation.change_FTS_dialog import Change_FTS_dialog
 from rqt_simulation.MapGraphicsScene import MapGraphicsScene
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
@@ -69,6 +69,7 @@ class SimulationWidget(QWidget):
         self.button_start_sim.clicked.connect(self.on_button_start_sim_pressed)         # Start simulation button
         self.world_comboBox.currentIndexChanged.connect(self.reset)                     # World combobox
         self.button_load_scenario.clicked.connect(self.load_scenario)
+        self.button_change_FTS.clicked.connect(self.on_button_change_FTS_pressed)
 
         # Disable buttons
         self.button_setup.setEnabled(False)
@@ -720,6 +721,12 @@ class SimulationWidget(QWidget):
 
             if self.num_robots == 1:
                 self.button_remove_robot.setEnabled(False)
+
+    @Slot(bool)
+    def on_button_change_FTS_pressed(self):
+        # Start change FTS dialog
+        change_FTS_dialog = Change_FTS_dialog(self.current_graphicsScene, self.FTS)
+        change_FTS_dialog.exec_()
 
     # Load scenario from a yaml file
     @Slot(bool)

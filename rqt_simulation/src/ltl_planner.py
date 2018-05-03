@@ -83,7 +83,7 @@ class LtlPlannerNode(object):
         self.sub_soft_task = rospy.Subscriber('soft_task', String, self.SoftTaskCallback)
         self.sub_hard_task = rospy.Subscriber('hard_task', String, self.HardTaskCallback)
         # environment sense
-        self.sub_sense = rospy.Subscriber('environment', Sense, self.SenseCallback)
+        self.sub_sense = rospy.Subscriber('/environment', Sense, self.SenseCallback)
 
         ####### Wait 3 seconds to receive the initial position from the GUI
         usleep = lambda x: time.sleep(x)
@@ -96,7 +96,7 @@ class LtlPlannerNode(object):
         self.full_model = MotActModel(self.robot_motion, self.robot_action)
         self.planner = ltl_planner(self.full_model, self.hard_task, self.soft_task)
         ####### initial plan synthesis
-        self.planner.optimal(10)
+        self.planner.optimal(10, 'on-the-fly')
         ### Publish plan for GUI
         prefix_msg = self.plan_msg_builder(self.planner.run.line, rospy.Time.now())
         self.PrefixPlanPublisher.publish(prefix_msg)
@@ -196,17 +196,22 @@ class LtlPlannerNode(object):
         self.hard_task = hard_task.data
 
     def SenseCallback(self, sense):
-        print sense.rois
-        pose_tuple = self.pose_to_tuple(sense.rois[i]['pose'])
-        sense_info = {sense.rois['label'] : set(pose_tuple, sense.rois[i]['label'])}
-        add_edges = ()
-        del_edges = ()
+        #print sense.roi
+        pose_tuple = self.pose_to_tuple(sense.roi.pose)
+        sense_info = {'label' : {pose_tuple : set([sense.roi.label.data, ])}}
+        #print sense.edges
+        add_edges = []
+        del_edges = []
         for i in range(0, len(sense.edges)):
-            if sense.edges[i]['add']:
-                add_edges = add_edges + tuple(self.pose_to_tuple(sense.edges[i]['start_pose']), self.pose_to_tuple(sense.edges[i]['target_pose']))
+            if sense.edges[i].add:
+                add_edges.append((self.pose_to_tuple(sense.edges[i].start_pose), self.pose_to_tuple(sense.edges[i].target_pose)))
             else:
-                del_edges = add_edges + tuple(self.pose_to_tuple(sense.edges[i]['start_pose']), self.pose_to_tuple(sense.edges[i]['target_pose']))
-        self.planner.revise(sense_info, com_info, 0.0)
+                del_edges.append((self.pose_to_tuple(sense.edges[i].start_pose), self.pose_to_tuple(sense.edges[i].target_pose)))
+        sense_info.update({'edge' : [add_edges, del_edges]})
+        #print(sense_info)
+        com_info = {((0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0)) : set(['r08',])}
+        #print(com_info)
+        self.planner.revise(sense_info)
 
     def FormatGoal(self, goal, index, time_stamp):
         if self.agent_type == 'ground':

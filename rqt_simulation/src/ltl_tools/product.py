@@ -26,7 +26,7 @@ class ProdAut(DiGraph):
 							if truth:
 								self.add_edge(f_prod_node, t_prod_node, weight=total_weight)
                                                                 #print 'add edge', (f_prod_node, t_prod_node)
-                print 'full product constructed with %d states and %s transitions' %(len(self.nodes()), len(self.edges())) 
+                print 'full product constructed with %d states and %s transitions' %(len(self.nodes()), len(self.edges()))
 
 	def composition(self, ts_node, buchi_node):
 		prod_node = (ts_node, buchi_node)
@@ -73,8 +73,8 @@ class ProdAut(DiGraph):
 
 	def fly_successors(self, f_prod_node):
 		f_ts_node, f_buchi_node = self.projection(f_prod_node)
-		# been visited before, and hasn't changed 
-		if ((self.node[f_prod_node]['marker'] == 'visited') and 
+		# been visited before, and hasn't changed
+		if ((self.node[f_prod_node]['marker'] == 'visited') and
 			(self.graph['ts'].graph['region'].node[
 				self.graph['ts'].node[self.node[f_prod_node]['ts']]['region']]['status'] == 'confirmed')):
 			for t_prod_node in self.successors(f_prod_node):
@@ -101,9 +101,11 @@ class ProdAut_Run(object):
 		self.prefix = prefix
 		self.precost = precost
 		self.suffix = suffix
+		print('---suffix---')
+		print(self.suffix)
 		self.sufcost = sufcost
 		self.totalcost = totalcost
-		#self.prod_run_to_prod_edges(product)
+		self.prod_run_to_prod_edges(product)
 		self.plan_output(product)
 		#self.plan = chain(self.line, cycle(self.loop))
 		#self.plan = chain(self.loop)
@@ -126,30 +128,20 @@ class ProdAut_Run(object):
                 self.suf_ts_edges.append((self.loop[-1],self.loop[0]))
 		# output plan
 		self.pre_plan = []
-		self.pre_plan.append(self.line[0][0]) 
+		self.pre_plan.append(self.line[0][0])
 		for ts_edge in self.pre_ts_edges:
 			if product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'] == 'goto':
-				self.pre_plan.append(ts_edge[1][0]) # motion 
+				self.pre_plan.append(ts_edge[1][0]) # motion
 			else:
 				self.pre_plan.append(ts_edge[1][1]) # action
                 bridge = (self.line[-1],self.loop[0])
                 if product.graph['ts'][bridge[0]][bridge[1]]['label'] == 'goto':
-			self.pre_plan.append(bridge[1][0]) # motion 
+			self.pre_plan.append(bridge[1][0]) # motion
 		else:
 			self.pre_plan.append(bridge[1][1]) # action
-		self.suf_plan = []		
+		self.suf_plan = []
 		for ts_edge in self.suf_ts_edges:
 			if product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'] == 'goto':
-				self.suf_plan.append(ts_edge[1][0]) # motion 
+				self.suf_plan.append(ts_edge[1][0]) # motion
 			else:
 				self.suf_plan.append(ts_edge[1][1]) # action
-
-
-
-
-
-
-
-
-
-

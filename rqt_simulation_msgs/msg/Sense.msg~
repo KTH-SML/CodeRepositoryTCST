@@ -1,4 +1,4 @@
 std_msgs/Header header
-Roi[] rois
+Roi rois
 Edge[] edges
 

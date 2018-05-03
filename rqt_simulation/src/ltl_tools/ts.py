@@ -9,7 +9,7 @@ def distance(pose1, pose2):
     print('pose')
     print(pose1)
     print(pose2)
-    return (sqrt((pose1[0][0]-pose2[0][0])**2+(pose1[0][1]-pose2[0][1])**2)+0.001)
+    return (sqrt((pose1[0][0]-pose2[0][0])**2+(pose1[0][1]-pose2[0][1])**2+(pose1[0][2]-pose2[0][2])**2)+0.001)
 
 def reach_waypoint(pose, waypoint, margin):
     if distance(pose, waypoint)<=margin:
@@ -21,6 +21,9 @@ class MotionFts(DiGraph):
     def __init__(self, node_dict, symbols, ts_type):
         DiGraph.__init__(self, symbols=symbols, type=ts_type, initial=set())
         for (n, label) in node_dict.iteritems():
+            print('---set init---')
+            print(n)
+            print(label)
             self.add_node(n, label=label, status='confirmed')
 
 
@@ -61,7 +64,10 @@ class MotionFts(DiGraph):
         # label udpate
         label_info = sense_info['label']
         label_info.update(com_info)
+        print('---ts---')
+        print(label_info)
         for mes in label_info:
+            print(mes)
             if mes[1]:
                 close_node = self.closest_node(mes[0])
                 if distance(close_node, mes[0])>margin:
@@ -84,6 +90,28 @@ class MotionFts(DiGraph):
             changed_regs.add(e[0])
             self.node[close_node]['status'] = 'notconfirmed'
         return chnaged_regs
+
+    def update_after_sense_info(self, sense_info):
+        # sense_info = {'label':set((x,y), l', l'_)), 'edge': [add_edges, del_edges]}
+        changed_regs = set()
+        # label udpate
+        label_info = sense_info['label']
+        print('---ts---')
+        print(label_info)
+        for (n, label) in label_info.iteritems():
+            self.add_node(n, label=label)
+
+        # edges udpate
+        edge_info = sense_info['edge']
+        print('---edge---')
+        print edge_info
+        for e in edge_info[0]:
+            self.add_edge(e[0], e[1], weight=distance(e[0], e[1]))
+            changed_regs.add(e[0])
+        for e in edge_info[1]:
+            self.remove_edge(e[0], e[1])
+            changed_regs.add(e[0])
+        return changed_regs
 
 class ActionModel(object):
     # action_dict = {act_name: (cost, guard_formula, label)}

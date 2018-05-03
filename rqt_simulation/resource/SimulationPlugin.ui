@@ -184,6 +184,19 @@
      <string>Load scenario</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="button_change_FTS">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>470</y>
+      <width>80</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Change FTS</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
