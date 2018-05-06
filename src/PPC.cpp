@@ -26,7 +26,9 @@ void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
     setFormulaParsers(robot_id, x.n_elem);
     
     double rho_0 = rho_psi(X_std);
+
     rho_max = MAX(0, rho_0) + (rho_opt[robot_id] - MAX(0, rho_0))*0.9;
+
     zeta_u = (rho_opt[robot_id] - rho_max)/(K>1?K:2); 
     r = rho_max * arma::randu() / 2;
 
@@ -41,7 +43,7 @@ void PPC::init(double t_0, double t_r, arma::vec x, arma::vec X){
     }
 
     if(t_star > 0.01){
-        gamma_0 = (rho_max - rho_0)+ABS(rho_max - rho_0);
+        gamma_0 = (rho_max - rho_0)+0.2*ABS(rho_max - rho_0);
     }
     else{
         gamma_0 = (rho_max-rho_0) + (rho_0 - r)*arma::randu();
@@ -77,11 +79,14 @@ arma::vec PPC::drho_psi(std::vector<double> X, int n){
     if(!drho.is_finite()){
         drho.zeros();
     }
-    return drho/arma::norm(drho);
+    else{
+        drho /= arma::norm(drho);
+    }
+    return drho;
 }
 
 double PPC::gamma(double t){
-    return (gamma_0 - gamma_inf)*exp(-l*t) + gamma_inf;
+    return (gamma_0 - gamma_inf)*exp(-l*(t-t_r)) + gamma_inf;
 }
 
 double PPC::e(std::vector<double> X, double t){
@@ -143,7 +148,9 @@ arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
         return arma::zeros<arma::vec>(x.size());
     }
     if(rho_psi(X) > r && (c[robot_id]==(int)RobotTask::Own || c[robot_id]==robot_id)){
-        return arma::zeros<arma::vec>(x.size());
+        if(formula_type[c[robot_id]>=0 ? c[robot_id] : robot_id] == "F"){
+            return arma::zeros<arma::vec>(x.size());
+        }
     }
 
     double e_ = e(X, t-t_0);
@@ -184,6 +191,9 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
         rho_max = rho_opt[c_i] + 0.0001;
     }
 
+    if(t_r > t_star && rho < r){
+        r = rho - 0.001;
+    }
     if(stage == Stage::One){
         if(r>0){
             r *= 0.5;
@@ -221,7 +231,7 @@ void PPC::repair(std::vector<double> X, double t, Stage stage){
         l = 0;
     }
 
-    gamma_0 = (gamma_tr - gamma_inf)*exp(l*t) + gamma_inf;
+    gamma_0 = (gamma_tr - gamma_inf)*exp(l*(t-t_r)) + gamma_inf;
 }
 
 bool PPC::formulaSatisfied(std::vector<double> X, double t){
@@ -265,7 +275,6 @@ void PPC::externalCollaborationRequest(arma::vec x, arma::vec X, double t, int i
         else{
             setc(robot_id, (int)RobotTask::Own);
             sendc((int)RobotTask::Own);
-            setFormulaParsers(robot_id, x.n_elem);
             init(t_0, t, X(arma::span(3*robot_id, 3*robot_id+2)), X);
         }
     }

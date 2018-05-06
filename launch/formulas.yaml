@@ -15,10 +15,10 @@ rho_opt1: 0.1
 cluster1: 0
 V1: [0, 1]
 
-formula2: "1-sqrt((x[6]-1)^2+(x[7]-3)^2)"
+formula2: "0.1-sqrt((x[6]+1)^2+(x[7]-0.5)^2)"
 formula_type2: "F"
 a2: 10.0
 b2: 13.0
-rho_opt2: 1
+rho_opt2: 0.1
 cluster2: 1
 V2: [2]
