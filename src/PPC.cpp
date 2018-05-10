@@ -307,3 +307,13 @@ void PPC::setc(int i, int c_i){
 double PPC::get_t_0(){
     return t_0;
 }
+
+double PPC::get_t_r(){
+    return t_r;
+}
+
+void PPC::getFunnel(double& rho_max, double& r, double& gamma, double t){
+    rho_max = this->rho_max;
+    r = this->r;
+    gamma = this->gamma(t - this->t_0);
+}
