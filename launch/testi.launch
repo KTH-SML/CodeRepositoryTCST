@@ -18,8 +18,8 @@
 	</include>
 	
 	<!-- formulas: -->
-	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
-	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives.yaml" />
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas_intermediate.yaml" />
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives_intermediate.yaml" />
 
 	<!-- parameters: -->
 	<rosparam param="u_max">[0.2, 6.28]</rosparam>
