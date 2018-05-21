@@ -70,6 +70,10 @@ public:
 
     double get_t_0();
 
+    double get_t_r();
+
+    void getFunnel(double& rho_max, double& r, double& gamma, double t);
+
 private:
     arma::mat g(arma::vec x);
     arma::vec f(arma::vec x);

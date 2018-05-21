@@ -102,7 +102,8 @@ public:
 
 	void update(){
 		if(std::any_of(state_was_read.cbegin(), state_was_read.cend(), [](bool v){return !v;})) return;
-		arma::vec u_ppc = prescribed_performance_controller.u(arma::conv_to<std::vector<double>>::from(X), pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
+		std::vector<double> X_std = arma::conv_to<std::vector<double>>::from(X);
+		arma::vec u_ppc = prescribed_performance_controller.u(X_std, pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
 		arma::vec u_pfc = potential_field_controller.u(X);
 
 		arma::vec u = u_ppc + (arma::norm(u_ppc)>0 ? u_pfc : arma::zeros<arma::vec>(u_ppc.size()));
@@ -118,24 +119,26 @@ public:
 		control_input_pub.publish(u_msg);
 
 		geometry_msgs::Twist u1;
-		//u1.linear.x = (u_ppc(0)*c + u_ppc(1)*s);
-		//u1.linear.y = (-u_ppc(0)*s + u_ppc(1)*c);
 		u1.linear.x = u_ppc(0);
 		u1.linear.y = u_ppc(1);
 		uppc_pub.publish(u1);
 		geometry_msgs::Twist u2;
-		//u2.linear.x = (u_pfc(0)*c + u_pfc(1)*s);
-		//u2.linear.y = (-u_pfc(0)*s + u_pfc(1)*c);
 		u2.linear.x = u_pfc(0);
 		u2.linear.y = u_pfc(1);
 		upfc_pub.publish(u2);
 
-		double rho = prescribed_performance_controller.rho_psi(arma::conv_to<std::vector<double>>::from(X));
+		double rho = prescribed_performance_controller.rho_psi(X_std);
 		hybrid_controller::Robustness rho_msg;
 		ros::Time stamp = ros::Time::now();
 		rho_msg.stamp = stamp;
-		rho_msg.t_relative = stamp.toSec()-prescribed_performance_controller.get_t_0();
+		rho_msg.t_relative_t0 = stamp.toSec()-prescribed_performance_controller.get_t_0();
+		rho_msg.t_relative_tr = stamp.toSec()-prescribed_performance_controller.get_t_0()-prescribed_performance_controller.get_t_r();
 		rho_msg.rho = rho;
+		double gamma, rho_max, r;
+		prescribed_performance_controller.getFunnel(rho_max, r, gamma, stamp.toSec());
+		rho_msg.r = r;
+		rho_msg.rho_max = rho_max;
+		rho_msg.gamma = gamma;
 		rho_pub.publish(rho_msg);
 	}
 

@@ -6,7 +6,7 @@ rho_opt0: 0.1
 cluster0: 0
 V0: [0]
 
-formula1: "-1/10*log( exp(10*(-0.5+sqrt((x[3]-x[0])^2+(x[4]-x[1])^2))) + exp(10*(-0.1+sqrt((x[3]-2)^2+(x[4]+2)^2))) )"
+formula1: "-1/10*log( exp(10*(-0.6+sqrt((x[3]-x[0])^2+(x[4]-x[1])^2))) + exp(10*(-0.1+sqrt((x[3]-2)^2+(x[4]+2)^2))) )"
 #formula1: "min(-0.5+sqrt((x[3]-x[0])^2+(x[4]-x[1])^2) , -1+sqrt((x[3]-1)^2+(x[4]+1)^2) )"
 formula_type1: "F"
 a1: 23.0
@@ -15,10 +15,10 @@ rho_opt1: 0.1
 cluster1: 0
 V1: [0, 1]
 
-formula2: "1-sqrt((x[6]-1)^2+(x[7]-3)^2)"
+formula2: "0.1-sqrt((x[6]+1)^2+(x[7]-0.5)^2)"
 formula_type2: "F"
 a2: 10.0
 b2: 13.0
-rho_opt2: 1
+rho_opt2: 0.1
 cluster2: 1
 V2: [2]
