@@ -213,7 +213,8 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 		std::vector<int>& cluster, std::vector<int>& V, std::vector<int>& robots_in_cluster,
 		std::vector<double>& a, std::vector<double>& b, std::vector<double>& rho_opt,
 		arma::vec& u_max,
-		double& r, double& R, double& w){
+		double& r, double& R, double& w,
+		bool& funnel_linear){
 	nh.param<int>("control_freq", freq, 100);
 	nh.param("n_robots", n_robots, 1);
 	priv_nh.getParam("robot_id", robot_id);
@@ -260,6 +261,7 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 	nh.getParam("R", R);
 	nh.getParam("r", r);
 	nh.getParam("w", w);
+	nh.param<bool>("funnel_linear", funnel_linear, false);
 }
 
 int main(int argc, char* argv[]){
@@ -275,14 +277,15 @@ int main(int argc, char* argv[]){
 	std::vector<double> a, b, rho_opt;
 	arma::vec u_max;
 	double r, R, w;
+	bool funnel_linear;
 
 	readParameters(nh, priv_nh, n_robots, robot_id, K, freq, delta, zeta_l,
 		formula, formula_type, dformula, cluster, V, robots_in_cluster, a, b, rho_opt, u_max,
-		r, R, w);
+		r, R, w, funnel_linear);
 
 	PPC ppc(robot_id, a, b, 
 			formula_type, formula,
-			dformula, rho_opt, K, u_max, delta, zeta_l,	V);
+			dformula, rho_opt, K, u_max, delta, zeta_l,	V, funnel_linear);
 
 	PFC pfc(robot_id, r, R, u_max);
 
