@@ -24,6 +24,7 @@ class PPC{
     arma::vec u_max;
     int K, k=0;
     double delta;
+    bool funnel_linear;
 
     std::vector<double> a, b;
     std::vector<std::string> formula_type;
@@ -54,7 +55,8 @@ public:
         arma::vec u_max,
         double delta,
         double zeta_l,
-        std::vector<int> V);
+        std::vector<int> V,
+        bool funnel_linear);
 
     void init(double t_0, double t_r, arma::vec x, arma::vec X);
 

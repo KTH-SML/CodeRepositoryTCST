@@ -7,11 +7,11 @@
 PPC::PPC(int robot_id, std::vector<double> a, std::vector<double> b, 
     std::vector<std::string> formula_type, std::vector<std::string> formula, 
     std::vector<std::vector<std::string>> dformula, std::vector<double> rho_opt, 
-    int K, arma::vec u_max, double delta, double zeta_l, std::vector<int> V): 
+    int K, arma::vec u_max, double delta, double zeta_l, std::vector<int> V, bool funnel_linear): 
         robot_id(robot_id), a(a), b(b),
         formula_type(formula_type), formula(formula), dformula(dformula),
         rho_opt(rho_opt), K(K), u_max(u_max), delta(delta), zeta_l(zeta_l), drho_fp(std::vector<FormulaParser<double>>(3)),
-        V(V){
+        V(V), funnel_linear(funnel_linear){
             for(int i=0; i<V.size(); i++){
                 c[V[i]] = (int)RobotTask::Own;
             }
@@ -86,7 +86,22 @@ arma::vec PPC::drho_psi(std::vector<double> X, int n){
 }
 
 double PPC::gamma(double t){
-    return (gamma_0 - gamma_inf)*exp(-l*(t-t_r)) + gamma_inf;
+    if(funnel_linear){
+        if(formula_type[c[robot_id]>=0 ? c[robot_id] : robot_id] == "F"){
+            if(t > t_star){
+                return r;
+            }
+            else{
+                return (gamma_0-r)/(t_r-t_star)*(t-t_star)+r;
+            }
+        }
+        else{
+            return (gamma_0 - gamma_inf)*exp(-l*(t-t_r)) + gamma_inf;
+        }
+    }
+    else{
+        return (gamma_0 - gamma_inf)*exp(-l*(t-t_r)) + gamma_inf;
+    }
 }
 
 double PPC::e(std::vector<double> X, double t){
