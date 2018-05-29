@@ -136,8 +136,8 @@ double PPC::e(std::vector<double> X, double t){
             }
         }
 
-        if(epsilon>=0) epsilon = 0;
-        if(epsilon<=-1) epsilon = -1;
+        if(epsilon>=0) epsilon = -0.0;
+        if(epsilon<=-1) epsilon = -1.0;
     }
     return log(-1-1/epsilon);
 }
