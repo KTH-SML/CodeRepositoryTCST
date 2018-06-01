@@ -33,14 +33,16 @@ class ControllerNode{
 
 	std::vector<bool> state_was_read;
 	double w;
+	int turtlebots;
 
 public:
 	ControllerNode(ros::NodeHandle nh, ros::NodeHandle priv_nh, PPC ppc, int n_robots, int robot_id, 
-			std::vector<int> V, std::vector<int> robots_in_cluster, arma::vec u_max, PFC pfc, double w): 
-				prescribed_performance_controller(ppc), robot_id(robot_id), u_max(u_max), potential_field_controller(pfc), w(w){
+			std::vector<int> V, std::vector<int> robots_in_cluster, arma::vec u_max, PFC pfc, double w, int turtlebots): 
+				prescribed_performance_controller(ppc), robot_id(robot_id), u_max(u_max), potential_field_controller(pfc), w(w),
+				turtlebots(turtlebots){
 
-		state_was_read = std::vector<bool>(n_robots, false);
-		X = arma::vec(3*n_robots);
+		state_was_read = std::vector<bool>(n_robots + turtlebots, false);
+		X = arma::vec(3*(n_robots+turtlebots));
 
 		control_input_pub = nh.advertise<geometry_msgs::Twist>("/cmdvel", 100);
 		upfc_pub = nh.advertise<geometry_msgs::Twist>("/upfc"+std::to_string(robot_id), 100);
@@ -50,12 +52,19 @@ public:
 		c_pub = nh.advertise<std_msgs::Int32>("/c"+std::to_string(robot_id), 100);
 		rho_pub = nh.advertise<hybrid_controller::Robustness>("/robustness"+std::to_string(robot_id), 100);
 
-		poses = std::vector<geometry_msgs::PoseStamped>(n_robots);
+		poses = std::vector<geometry_msgs::PoseStamped>(n_robots+turtlebots);
 
 		for(int i=0; i<n_robots; i++){
 			pose_subs.push_back(
 				nh.subscribe<geometry_msgs::PoseStamped>(
 					"/pose_robot" + std::to_string(i),
+					100,
+					boost::bind(&ControllerNode::poseCallback, this, _1, i)));
+		}
+		for(int i=n_robots; i<n_robots+turtlebots; i++){
+			pose_subs.push_back(
+				nh.subscribe<geometry_msgs::PoseStamped>(
+					"/turtlebot" + std::to_string(i-n_robots) + "/pose",
 					100,
 					boost::bind(&ControllerNode::poseCallback, this, _1, i)));
 		}
@@ -214,7 +223,7 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 		std::vector<double>& a, std::vector<double>& b, std::vector<double>& rho_opt,
 		arma::vec& u_max,
 		double& r, double& R, double& w,
-		bool& funnel_linear){
+		bool& funnel_linear, int& turtlebots){
 	nh.param<int>("control_freq", freq, 100);
 	nh.param("n_robots", n_robots, 1);
 	priv_nh.getParam("robot_id", robot_id);
@@ -262,6 +271,7 @@ void readParameters(ros::NodeHandle nh, ros::NodeHandle priv_nh, int& n_robots, 
 	nh.getParam("r", r);
 	nh.getParam("w", w);
 	nh.param<bool>("funnel_linear", funnel_linear, false);
+	nh.param<int>("turtlebots", turtlebots, 0);
 }
 
 int main(int argc, char* argv[]){
@@ -278,10 +288,11 @@ int main(int argc, char* argv[]){
 	arma::vec u_max;
 	double r, R, w;
 	bool funnel_linear;
+	int turtlebots;
 
 	readParameters(nh, priv_nh, n_robots, robot_id, K, freq, delta, zeta_l,
 		formula, formula_type, dformula, cluster, V, robots_in_cluster, a, b, rho_opt, u_max,
-		r, R, w, funnel_linear);
+		r, R, w, funnel_linear, turtlebots);
 
 	PPC ppc(robot_id, a, b, 
 			formula_type, formula,
@@ -289,7 +300,7 @@ int main(int argc, char* argv[]){
 
 	PFC pfc(robot_id, r, R, u_max);
 
-	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, V, robots_in_cluster, u_max, pfc, w);
+	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, V, robots_in_cluster, u_max, pfc, w, turtlebots);
 	
 	CriticalEvent::controller_node = &controller_node;
 	controller_node.setCriticalEventCallback(CriticalEvent::criticalEventCallback);

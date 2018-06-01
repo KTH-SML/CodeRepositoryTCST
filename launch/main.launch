@@ -14,6 +14,7 @@
 	<param name="R" type="double" value="0.65"/>
 	<param name="w" type="double" value="0.5"/>
 	<param name="funnel_linear" type="bool" value="false"/>
+	<param name="turtlebots" type="int" value="1"/>
 
 
 	<node pkg="plotter" type="plotter_node.py" name="plotter_node0" output="screen">
@@ -36,7 +37,6 @@
 		<remap from="/controller_params" to="/controller_params0" />
 		<param name="~robot_id" type="int" value="0"/>
 	</node>
-	<!--
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
 		<remap from="/cmdvel" to="/cmdvel1" />
 		<remap from="/collaboration_params" to="/collaboration_params1" />
@@ -49,7 +49,6 @@
 		<remap from="/controller_params" to="/controller_params2" />
 		<param name="~robot_id" type="int" value="2"/>
 	</node>
-	-->
 
 	<!-- virtual robots -->
 	<!--<include file="$(find hybrid_controller)/launch/robot.launch"/>-->
