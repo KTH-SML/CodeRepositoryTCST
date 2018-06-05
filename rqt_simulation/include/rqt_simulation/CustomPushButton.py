@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
+'''
+This is a custom QPushbutton. If the the button clicked
+it emits the robot tab id
 
-from python_qt_binding.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsLineItem, QComboBox, QPushButton
-from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QLineF, pyqtSlot, Qt
-from python_qt_binding.QtGui import QPen, QFont
+Input:  id  int
+
+Output: robot tab id    int
+'''
+
+from python_qt_binding.QtWidgets import QPushButton
+from python_qt_binding.QtCore import pyqtSignal, pyqtSlot, Qt
 
 class CustomPushButton(QPushButton):
     signalPushedButton = pyqtSignal(int)

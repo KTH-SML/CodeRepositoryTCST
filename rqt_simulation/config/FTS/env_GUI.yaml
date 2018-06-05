@@ -7,16 +7,20 @@ FTS:
       target: r02
     - cost: 1.0
       target: r03
+    - cost: 1.0
+      target: r04
     pose:
       orientation:
-      - 0.5323089164818312
+      - 0.5427252901829079
       - 0.0
       - 0.0
-      - 0.8465501860102205
+      - 0.8399102686572408
       position:
-      - -5.4
-      - -8.9
+      - 15.56
+      - 3.12
       - 0.0
+    propos:
+    - r01
   r02:
     edges:
     - cost: 1.0
@@ -25,16 +29,21 @@ FTS:
       target: r02
     - cost: 1.0
       target: r03
+    - cost: 1.0
+      target: r04
     pose:
       orientation:
-      - 0.7401730901094209
+      - 0.2981675773421896
       - -0.0
       - -0.0
-      - -0.6724163863841147
+      - -0.9545135388363485
       position:
-      - -7.45
-      - 0.9
+      - 13.56
+      - 4.3
       - 0.0
+    propos:
+    - r02
+    - b
   r03:
     edges:
     - cost: 1.0
@@ -43,22 +52,39 @@ FTS:
       target: r02
     - cost: 1.0
       target: r03
+    - cost: 1.0
+      target: r04
     pose:
       orientation:
-      - 0.9156416495778019
+      - 0.8145890264063119
       - -0.0
       - -0.0
-      - -0.40199548450006467
+      - -0.5800385487693184
       position:
-      - -9.5
-      - -2.25
+      - 11.56
+      - 4.66
       - 0.0
-Map: pal_office
-Tasks:
-  robot1:
-    initial_pose: r01
-    robot_model: Turtlebot
-    tasks:
-      hard_task: ([]<> r01) && ([]<> r03)
-      soft_task: ''
-    use_qualisys: false
+    propos:
+    - r03
+  r04:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r04
+    pose:
+      orientation:
+      - 0.9864962889104031
+      - -0.0
+      - -0.0
+      - -0.16378361324016066
+      position:
+      - 15.44
+      - 4.94
+      - 0.0
+    propos:
+    - r04

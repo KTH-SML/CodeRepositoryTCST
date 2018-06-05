@@ -4,6 +4,7 @@ from boolean_formulas.parser import parse as parse_guard
 
 from math import sqrt
 from networkx.classes.digraph import DiGraph
+from ltl_tools.automaton_vis import plot_automaton
 
 def distance(pose1, pose2):
     print('pose')
@@ -91,26 +92,36 @@ class MotionFts(DiGraph):
             self.node[close_node]['status'] = 'notconfirmed'
         return chnaged_regs
 
-    def update_after_sense_info(self, sense_info):
+    def update_ts_after_sense_info(self, sense_info):
         # sense_info = {'label':set((x,y), l', l'_)), 'edge': [add_edges, del_edges]}
         changed_regs = set()
         # label udpate
-        label_info = sense_info['label']
+        region_info = sense_info['regions']
+        #plot_automaton(self)
         print('---ts---')
-        print(label_info)
-        for (n, label) in label_info.iteritems():
-            self.add_node(n, label=label)
+        print(region_info)
+        for (n, label) in region_info.iteritems():
+            self.add_node(n, label=label, status='notconfirmed')
 
         # edges udpate
         edge_info = sense_info['edge']
         print('---edge---')
         print edge_info
         for e in edge_info[0]:
+            print('---add edges---')
+            print(e)
             self.add_edge(e[0], e[1], weight=distance(e[0], e[1]))
             changed_regs.add(e[0])
+            self.node[e[0]]['status'] = 'notconfirmed'
+            #self.node[e[1]]['status'] = 'notconfirmed'
         for e in edge_info[1]:
+            print('---remove edges---')
+            print(e)
             self.remove_edge(e[0], e[1])
             changed_regs.add(e[0])
+            self.node[e[0]]['status'] = 'notconfirmed'
+            #self.node[e[1]]['status'] = 'notconfirmed'
+        #plot_automaton(self)
         return changed_regs
 
 class ActionModel(object):
@@ -179,6 +190,7 @@ class MotActModel(DiGraph):
     def fly_successors(self, prod_node):
         reg, act = self.projection(prod_node)
         # been visited before, and hasn't changed
+        print('---------------------------------------------------------')
         if ((self.node[prod_node]['marker'] == 'visited') and
             (self.graph['region'].node[self.node[prod_node]['region']]['status'] == 'confirmed')):
             for prod_node_to in self.successors(prod_node):
@@ -194,11 +206,11 @@ class MotActModel(DiGraph):
                 yield prod_node_to, cost
             # motions
             for reg_to in self.graph['region'].successors(reg):
-                if reg_to != reg:
-                    prod_node_to = self.composition(reg_to, 'None')
-                    cost = self.graph['region'][reg][reg_to]['weight']
-                    self.add_edge(prod_node, prod_node_to, weight=cost, label= 'goto')
-                    yield prod_node_to, cost
+            #    if reg_to != reg:
+                prod_node_to = self.composition(reg_to, 'None')
+                cost = self.graph['region'][reg][reg_to]['weight']
+                self.add_edge(prod_node, prod_node_to, weight=cost, label= 'goto')
+                yield prod_node_to, cost
             self.graph['region'].node[self.node[prod_node]['region']]['status'] = 'confirmed'
             self.node[prod_node]['marker'] = 'visited'
 

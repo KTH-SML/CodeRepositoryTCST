@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
+'''
+This is a custom QCombobox. If the current index changed it emits
+index of the box, id of robot tab
 
-from python_qt_binding.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsLineItem, QComboBox
-from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QLineF, pyqtSlot, Qt
-from python_qt_binding.QtGui import QPen, QFont
+Input:  id  int
+
+Output: robot tab id    int
+        box index       int
+'''
+
+from python_qt_binding.QtWidgets import QComboBox
+from python_qt_binding.QtCore import pyqtSignal, pyqtSlot, Qt
 
 class CustomComboBox(QComboBox):
     signalIndexChanged = pyqtSignal(int, int)

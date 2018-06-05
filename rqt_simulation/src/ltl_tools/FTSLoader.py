@@ -25,8 +25,11 @@ class FTSLoader(object):
         # motion FTS
 
         for i in range(0, len(FTS)):
-            ap.update({FTS.keys()[i]})
-            regions.update({(tuple(FTS[FTS.keys()[i]]['pose']['position']), tuple(FTS[FTS.keys()[i]]['pose']['orientation'])): set([FTS.keys()[i]])})
+            #ap.update({FTS.keys()[i]})
+            for j in range(0, len(FTS[FTS.keys()[i]]['propos'])):
+                if FTS[FTS.keys()[i]]['propos'][j] not in ap:
+                    ap.update({FTS[FTS.keys()[i]]['propos'][j]})
+            regions.update({(tuple(FTS[FTS.keys()[i]]['pose']['position']), tuple(FTS[FTS.keys()[i]]['pose']['orientation'])): set(FTS[FTS.keys()[i]]['propos'])})
 
         init_pose = ((7.77,  7.00, 0.0), (0.0, 0.0, 0.0, 1.0))
 

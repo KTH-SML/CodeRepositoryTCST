@@ -146,7 +146,7 @@ class SimulationWidget(QWidget):
         self.graphicsView_main.setTransform(transform)
 
         # ROI marker msg
-        self.region_pose_marker_array_msg = MarkerArray()
+        #self.region_pose_marker_array_msg = MarkerArray()
 
         # Add robot tab
         self.add_robot()
@@ -160,7 +160,7 @@ class SimulationWidget(QWidget):
         self.ros_publisher.add_publisher('/logger_active', Bool, 1.0, self.logger_active_msg)
 
         # Counter for marker id counter
-        self.marker_id_counter = 0
+        #self.marker_id_counter = 0
 
     # Reset is called if new map selected
     def reset(self):
@@ -411,13 +411,14 @@ class SimulationWidget(QWidget):
             #navigation.wait_for_server()
             del sys.argv[2:len(sys.argv)]
 
-            self.add_region_marker(self.tab_list[i].initial_pose, True)
+            self.FTS.add_region_marker(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)], 'start_' + str(i+1).zfill(2), True)
 
             rospy.loginfo("server up")
 
         # Publish region marker
-        self.add_region_marker(self.FTS.region_of_interest, False)
-        self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
+        for i in range(0, len(self.FTS.region_of_interest)):
+            self.FTS.add_region_marker(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]], self.FTS.region_of_interest.keys()[i], False)
+        #self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.FTS.region_pose_marker_array_msg)
 
     # Setup experiment, RVIZ
     @Slot(bool)
@@ -526,13 +527,14 @@ class SimulationWidget(QWidget):
             #navigation.wait_for_server()
             del sys.argv[2:len(sys.argv)]
 
-            self.add_region_marker(self.tab_list[i].initial_pose, True)
+            self.FTS.add_region_marker(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)], 'start_' + str(i+1).zfill(2), True)
 
             rospy.loginfo("server up")
 
         # Publish region marker
-        self.add_region_marker(self.FTS.region_of_interest, False)
-        self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
+        for i in range(0, len(self.FTS.region_of_interest)):
+            self.FTS.add_region_marker(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]], self.FTS.region_of_interest.keys()[i], False)
+        #self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.FTS.region_pose_marker_array_msg)
 
     # Synthesize the tasks and start LTL Planner
     @Slot(bool)
@@ -772,6 +774,10 @@ class SimulationWidget(QWidget):
             pixel_coords = self.current_graphicsScene.worldToPixel(self.FTS.region_of_interest[sorted_keys[i]]['pose']['position'])
             self.current_graphicsScene.add_ROI(pixel_coords)
 
+            for j in range(0, len(self.FTS.region_of_interest[sorted_keys[i]]['propos'])):
+                if sorted_keys[i] != self.FTS.region_of_interest[sorted_keys[i]]['propos'][j]:
+                    self.current_graphicsScene.add_ap(sorted_keys[i], self.FTS.region_of_interest[sorted_keys[i]]['propos'][j])
+
             quaternion = Quaternion(self.FTS.region_of_interest[sorted_keys[i]]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
@@ -813,76 +819,18 @@ class SimulationWidget(QWidget):
 
         self.button_execute_task.setEnabled(True)
 
-    # Add region markers for RVIZ
-    # Red marker: General ROI
-    # Green marker : Start ROI
-    def add_region_marker(self, region, initial):
-
-        for i in range(0, len(region)):
-            pose_marker = Pose()
-            pose_text = Pose()
-            self.region_pose_marker = Marker()
-            self.region_pose_marker_label = Marker()
-
-            self.region_pose_marker.pose = pose_marker
-            self.region_pose_marker_label.pose = pose_text
-
-            pose_marker.position.x = region[region.keys()[i]]['pose']['position'][0]
-            pose_marker.position.y = region[region.keys()[i]]['pose']['position'][1]
-            pose_text.position.x = region[region.keys()[i]]['pose']['position'][0]
-            pose_text.position.y = region[region.keys()[i]]['pose']['position'][1]
-
-            if initial:
-                self.region_pose_marker_label.text = region.keys()[i]
-                self.region_pose_marker.color.r = 0.0
-                self.region_pose_marker.color.g = 0.5
-                self.region_pose_marker.color.b = 0.0
-                self.region_pose_marker.pose.position.z = 0.01
-                self.region_pose_marker_label.pose.position.z = 1.5
-                self.region_pose_marker.scale.x = 0.5
-                self.region_pose_marker.scale.y = 0.5
-            else:
-                self.region_pose_marker_label.text = region.keys()[i]
-                self.region_pose_marker.color.r = 0.5
-                self.region_pose_marker.color.g = 0.0
-                self.region_pose_marker.color.b = 0.0
-                self.region_pose_marker_label.pose.position.z = 0.5
-
-                self.region_pose_marker.scale.x = 1.0
-                self.region_pose_marker.scale.y = 1.0
-
-            self.region_pose_marker.header.frame_id = '/map'
-
-            self.region_pose_marker.type = self.region_pose_marker.CYLINDER
-            self.region_pose_marker.id = self.marker_id_counter
-            self.region_pose_marker.action = self.region_pose_marker.ADD
-            self.region_pose_marker.scale.z = 0.01
-            self.region_pose_marker.color.a = 1.0
-
-            self.region_pose_marker_label.header.frame_id = '/map'
-
-            self.region_pose_marker_label.type = self.region_pose_marker.TEXT_VIEW_FACING
-            self.region_pose_marker_label.id = self.marker_id_counter + 1
-            self.region_pose_marker_label.action = self.region_pose_marker.ADD
-            self.region_pose_marker_label.scale.z = 0.5
-            self.region_pose_marker_label.color.a = 1.0
-            self.region_pose_marker_label.color.r = 0.0
-            self.region_pose_marker_label.color.g = 0.0
-            self.region_pose_marker_label.color.b = 0.0
-
-            self.region_pose_marker_array_msg.markers.append(self.region_pose_marker_label)
-            self.region_pose_marker_array_msg.markers.append(self.region_pose_marker)
-
-            self.marker_id_counter = self.marker_id_counter + 2
 
 class FTS:
     def __init__(self):
         #self.region_list = []
         self.region_of_interest = {}
+        self.marker_id_counter = 0
+        self.region_pose_marker_array_msg = MarkerArray()
+        self.ros_publisher = ROS_Publisher()
+        self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.region_pose_marker_array_msg)
 
     def add_region(self, label, edges = list(), pose = dict()):
-        #self.region_list.append(label)
-        self.region_of_interest.update({label : {'edges' : edges, 'pose' : pose}})
+        self.region_of_interest.update({label : {'edges' : edges, 'pose' : pose, 'propos' : [label]}})
 
     def add_edge(self, label, target_label, cost):
         self.region_of_interest[label]['edges'].append({'cost' : cost, 'target' : target_label})
@@ -890,5 +838,74 @@ class FTS:
     def remove_edge(self, label, target_label):
         for i in range(0, len(self.region_of_interest[label]['edges'])):
             if self.region_of_interest[label]['edges'][i]['target'] == target_label:
-                index = i
-        del self.region_of_interest[label]['edges'][i]
+                del self.region_of_interest[label]['edges'][i]
+
+    def add_propos(self, label, ap):
+        self.region_of_interest[label]['propos'].append(ap)
+
+    def remove_propos(self, label, ap):
+        for i in range(0, len(self.region_of_interest[label]['propos'])):
+            if self.region_of_interest[label]['propos'][i] == ap:
+                del self.region_of_interest[label]['propos'][i]
+
+
+    # Add region markers for RVIZ
+    # Red marker: General ROI
+    # Green marker : Start ROI
+    def add_region_marker(self, region, label, initial):
+
+        pose_marker = Pose()
+        pose_text = Pose()
+        self.region_pose_marker = Marker()
+        self.region_pose_marker_label = Marker()
+
+        self.region_pose_marker.pose = pose_marker
+        self.region_pose_marker_label.pose = pose_text
+
+        pose_marker.position.x = region['pose']['position'][0]
+        pose_marker.position.y = region['pose']['position'][1]
+        pose_text.position.x = region['pose']['position'][0]
+        pose_text.position.y = region['pose']['position'][1]
+
+        if initial:
+            self.region_pose_marker_label.text = label
+            self.region_pose_marker.color.r = 0.0
+            self.region_pose_marker.color.g = 0.5
+            self.region_pose_marker.color.b = 0.0
+            self.region_pose_marker.pose.position.z = 0.01
+            self.region_pose_marker_label.pose.position.z = 1.5
+            self.region_pose_marker.scale.x = 0.5
+            self.region_pose_marker.scale.y = 0.5
+        else:
+            self.region_pose_marker_label.text = label
+            self.region_pose_marker.color.r = 0.5
+            self.region_pose_marker.color.g = 0.0
+            self.region_pose_marker.color.b = 0.0
+            self.region_pose_marker_label.pose.position.z = 0.5
+
+            self.region_pose_marker.scale.x = 1.0
+            self.region_pose_marker.scale.y = 1.0
+
+        self.region_pose_marker.header.frame_id = '/map'
+
+        self.region_pose_marker.type = self.region_pose_marker.CYLINDER
+        self.region_pose_marker.id = self.marker_id_counter
+        self.region_pose_marker.action = self.region_pose_marker.ADD
+        self.region_pose_marker.scale.z = 0.01
+        self.region_pose_marker.color.a = 1.0
+
+        self.region_pose_marker_label.header.frame_id = '/map'
+
+        self.region_pose_marker_label.type = self.region_pose_marker.TEXT_VIEW_FACING
+        self.region_pose_marker_label.id = self.marker_id_counter + 1
+        self.region_pose_marker_label.action = self.region_pose_marker.ADD
+        self.region_pose_marker_label.scale.z = 0.5
+        self.region_pose_marker_label.color.a = 1.0
+        self.region_pose_marker_label.color.r = 0.0
+        self.region_pose_marker_label.color.g = 0.0
+        self.region_pose_marker_label.color.b = 0.0
+
+        self.region_pose_marker_array_msg.markers.append(self.region_pose_marker_label)
+        self.region_pose_marker_array_msg.markers.append(self.region_pose_marker)
+
+        self.marker_id_counter = self.marker_id_counter + 2

@@ -16,6 +16,9 @@ from python_qt_binding.QtWidgets import QWidget, QLabel, QApplication, QDialog, 
 from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QRectF, QSizeF, QLineF, Slot, pyqtSlot, Qt
 from python_qt_binding.QtGui import QImageReader, QImage, QPixmap, QMouseEvent, QPen, QBrush, QColor, QFont
 
+from CustomCheckBox import CustomCheckBox
+from generalAP_dialog import GeneralAP_dialog
+
 class Map_dialog(QDialog):
     def __init__(self, current_graphicsScene, FTS):
         super(Map_dialog, self).__init__()
@@ -35,7 +38,7 @@ class Map_dialog(QDialog):
 
         # Initialize variables for FTS matrix
         self.groupBox_list = []
-        self.FTS_matrix = []
+        self.edge_matrix = []
         self.vbox_list = []
         self.vbox = QVBoxLayout()
 
@@ -48,22 +51,22 @@ class Map_dialog(QDialog):
             groupBox = QGroupBox(sorted_keys[i])
             self.groupBox_list.append(groupBox)
             checkBox_list = []
-            self.FTS_matrix.append(checkBox_list)
+            self.edge_matrix.append(checkBox_list)
 
             vbox = QVBoxLayout()
             self.vbox_list.append(vbox)
             for j in range(0, self.graphicsScene.regionCounter):
-                self.FTS_matrix[i].append(QCheckBox('r' + str(j+1).zfill(2)))
-                self.FTS_matrix[i][j].stateChanged.connect(self.edge_both_ways)
-                self.vbox_list[i].addWidget(self.FTS_matrix[i][j])
+                self.edge_matrix[i].append(CustomCheckBox('r' + str(j+1).zfill(2), i, j))
+                self.edge_matrix[i][j].signalStateChanged.connect(self.edge_both_ways)
+                self.vbox_list[i].addWidget(self.edge_matrix[i][j])
 
             self.groupBox_list[i].setLayout(self.vbox_list[i])
             self.grid.addWidget(self.groupBox_list[i], 0, i+1, Qt.AlignRight)
 
-        for i in range(0, self.graphicsScene.regionCounter):
-            for j in range(0, self.graphicsScene.regionCounter):
-                if (str(i+1) + '-' + str(j+1)) in self.graphicsScene.line_dict.keys():
-                    self.FTS_matrix[i][j].setCheckState(2)
+        for i in range(0, len(self.graphicsScene.line_dict.keys())):
+            self.edge_matrix[int(self.graphicsScene.line_dict.keys()[i][0])-1][int(self.graphicsScene.line_dict.keys()[i][2])-1].setCheckState(2)
+            self.edge_matrix[int(self.graphicsScene.line_dict.keys()[i][2])-1][int(self.graphicsScene.line_dict.keys()[i][0])-1].setCheckState(2)
+
 
         # Variable is True is left mouse button is holded
         self.clicked = False
@@ -81,6 +84,7 @@ class Map_dialog(QDialog):
         #self.button_ROI.setEnabled(False)
         self.button_delete_edges.clicked.connect(self.delete_edges)
         self.button_load_FTS.clicked.connect(self.load_FTS)
+        self.button_general_AP.clicked.connect(self.general_ap)
         #self.button_set_edges.setEnabled(False)
 
         self.graphicsScene.signalMousePressedPos.connect(self.pointSelection)
@@ -96,10 +100,10 @@ class Map_dialog(QDialog):
         self.button_save_FTS.setEnabled(False)
         sorted_keys = self.FTS.region_of_interest.keys()
         sorted_keys.sort()
-        for i in range(0, len(self.FTS_matrix)):
+        for i in range(0, len(self.edge_matrix)):
             self.FTS.region_of_interest[sorted_keys[i]]['edges'] = []
-            for j in range(0, len(self.FTS_matrix[0])):
-                if (self.FTS_matrix[i][j].checkState() == 2):
+            for j in range(0, len(self.edge_matrix[0])):
+                if (self.edge_matrix[i][j].checkState() == 2):
                     self.FTS.add_edge(sorted_keys[i], sorted_keys[j], cost=1.0)
 
         print('start saving')
@@ -124,14 +128,14 @@ class Map_dialog(QDialog):
         self.graphicsScene.reset()
         self.vbox = QVBoxLayout()
         self.vbox_list = []
-        self.FTS_matrix = []
+        self.edge_matrix = []
         self.FTS.region_of_interest = {}
         self.button_save_FTS.setEnabled(False)
 
     # Remove last added ROI
     @Slot(bool)
     def remove_last_ROI(self):
-        del self.FTS_matrix[self.graphicsScene.regionCounter-1]
+        del self.edge_matrix[self.graphicsScene.regionCounter-1]
         del self.FTS.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)]
         del self.vbox_list[self.graphicsScene.regionCounter-1]
 
@@ -140,9 +144,9 @@ class Map_dialog(QDialog):
         del self.groupBox_list[self.graphicsScene.regionCounter-1]
 
         for i in range(0, self.graphicsScene.regionCounter-1):
-            self.vbox_list[i].removeWidget(self.FTS_matrix[i][self.graphicsScene.regionCounter-1])
-            self.FTS_matrix[i][self.graphicsScene.regionCounter-1].deleteLater()
-            del self.FTS_matrix[i][self.graphicsScene.regionCounter-1]
+            self.vbox_list[i].removeWidget(self.edge_matrix[i][self.graphicsScene.regionCounter-1])
+            self.edge_matrix[i][self.graphicsScene.regionCounter-1].deleteLater()
+            del self.edge_matrix[i][self.graphicsScene.regionCounter-1]
             if self.graphicsScene.regionCounter < (i+1):
                 if ((str(self.graphicsScene.regionCounter) + '-' + str(i+1)) in self.graphicsScene.line_dict.keys()):
                     self.graphicsScene.remove_edge((str(self.graphicsScene.regionCounter) + '-' + str(i+1)))
@@ -158,16 +162,16 @@ class Map_dialog(QDialog):
     # Sets all edges between ROI's
     @Slot(bool)
     def on_button_set_edges_pressed(self):
-        for i in range(0, len(self.FTS_matrix)):
-            for j in range(0, len(self.FTS_matrix[0])):
-                self.FTS_matrix[i][j].setCheckState(Qt.Checked)
+        for i in range(0, len(self.edge_matrix)):
+            for j in range(0, len(self.edge_matrix[0])):
+                self.edge_matrix[i][j].setCheckState(Qt.Checked)
 
     # Removes all edges between ROI's
     @Slot(bool)
     def delete_edges(self):
-        for i in range(0, len(self.FTS_matrix)):
-            for j in range(0, len(self.FTS_matrix[0])):
-                self.FTS_matrix[i][j].setCheckState(Qt.Unchecked)
+        for i in range(0, len(self.edge_matrix)):
+            for j in range(0, len(self.edge_matrix[0])):
+                self.edge_matrix[i][j].setCheckState(Qt.Unchecked)
 
 
     # Add ROI with mouse click
@@ -188,20 +192,21 @@ class Map_dialog(QDialog):
         groupBox = QGroupBox(regionString)
         self.groupBox_list.append(groupBox)
         checkBox_list = []
-        self.FTS_matrix.append(checkBox_list)
+        self.edge_matrix.append(checkBox_list)
+        #self.FTS_matrix.append(checkBox_list)
 
         vbox = QVBoxLayout()
         self.vbox_list.append(vbox)
         for i in range(0, self.graphicsScene.regionCounter):
             if i == (self.graphicsScene.regionCounter-1):
                 for j in range(0, i+1):
-                    self.FTS_matrix[i].append(QCheckBox('r' + str(j+1).zfill(2)))
-                    self.FTS_matrix[i][j].stateChanged.connect(self.edge_both_ways)
-                    self.vbox_list[i].addWidget(self.FTS_matrix[i][j])
+                    self.edge_matrix[i].append(CustomCheckBox('r' + str(j+1).zfill(2), i, j))
+                    self.edge_matrix[i][j].signalStateChanged.connect(self.edge_both_ways)
+                    self.vbox_list[i].addWidget(self.edge_matrix[i][j])
             else:
-                self.FTS_matrix[i].append(QCheckBox('r' + str(self.graphicsScene.regionCounter).zfill(2)))
-                self.FTS_matrix[i][self.graphicsScene.regionCounter-1].stateChanged.connect(self.edge_both_ways)
-                self.vbox_list[i].addWidget(self.FTS_matrix[i][self.graphicsScene.regionCounter-1])
+                self.edge_matrix[i].append(CustomCheckBox('r' + str(self.graphicsScene.regionCounter).zfill(2), i, self.graphicsScene.regionCounter-1))
+                self.edge_matrix[i][self.graphicsScene.regionCounter-1].signalStateChanged.connect(self.edge_both_ways)
+                self.vbox_list[i].addWidget(self.edge_matrix[i][self.graphicsScene.regionCounter-1])
 
         for i in range(0, len(self.groupBox_list)):
             self.groupBox_list[i].setLayout(self.vbox_list[i])
@@ -233,31 +238,34 @@ class Map_dialog(QDialog):
             self.current_arrow = self.graphicsScene.addArrow(pixel_coords, end_point)
 
     # Set the edges both ways in FTS matrix
-    @Slot(bool)
-    def edge_both_ways(self, state):        
-        for i in range(0, self.graphicsScene.regionCounter):
-            for j in range(0, self.graphicsScene.regionCounter):
-                if self.FTS_matrix[i][j].checkState() != self.FTS_matrix[j][i].checkState():
-                    if state == 2:
-                        self.FTS_matrix[j][i].setCheckState(2)
-                        if i < j:
-                            if (str(i+1) + '-' + str(j+1)) not in self.graphicsScene.line_dict.keys():
-                                self.graphicsScene.add_edge(i+1, j+1)
-                                print((str(i+1) + '-' + str(j+1)))
-                        else:
-                            if (str(j+1) + '-' + str(i+1)) not in self.graphicsScene.line_dict.keys():
-                                self.graphicsScene.add_edge(j+1, i+1)
-                                print((str(j+1) + '-' + str(i+1)))
+    @pyqtSlot(int, int, int)
+    def edge_both_ways(self, state, row, col):
+            if state == 2:
+                self.edge_matrix[row][col].setCheckState(2)
+                self.edge_matrix[col][row].setCheckState(2)
+                if row < col:
+                    if (str(row+1) + '-' + str(col+1)) not in self.graphicsScene.line_dict.keys():
+                        self.graphicsScene.add_edge(row+1, col+1)
+                        print((str(row+1) + '-' + str(col+1)))
+                else:
+                    if (str(col+1) + '-' + str(row+1)) not in self.graphicsScene.line_dict.keys():
+                        self.graphicsScene.add_edge(col+1, row+1)
+                        print((str(col+1) + '-' + str(row+1)))
+            elif state == 0:
+                self.edge_matrix[row][col].setCheckState(0)
+                self.edge_matrix[col][row].setCheckState(0)
+                if row < col:
+                    if (str(row+1) + '-' + str(col+1)) in self.graphicsScene.line_dict.keys():
+                        self.graphicsScene.remove_edge(str(row+1) + '-' + str(col+1))
+                else:
+                    if (str(col+1) + '-' + str(row+1)) in self.graphicsScene.line_dict.keys():
+                        self.graphicsScene.remove_edge(str(col+1) + '-' + str(row+1))
 
-                    elif state == 0:
-                        print((str(i+1) + '-' + str(j+1)))
-                        self.FTS_matrix[j][i].setCheckState(0)
-                        if i < j:
-                            if (str(i+1) + '-' + str(j+1)) in self.graphicsScene.line_dict.keys():
-                                self.graphicsScene.remove_edge(str(i+1) + '-' + str(j+1))
-                        else:
-                            if (str(j+1) + '-' + str(i+1)) in self.graphicsScene.line_dict.keys():
-                                self.graphicsScene.remove_edge(str(j+1) + '-' + str(i+1))
+    @Slot(bool)
+    def general_ap(self):
+        print 'now'
+        generalAP_dialog = GeneralAP_dialog(self.graphicsScene, self.FTS)
+        generalAP_dialog.exec_()
 
     # Cancel map dialog
     @Slot(bool)
@@ -294,6 +302,10 @@ class Map_dialog(QDialog):
             pixel_coords = self.graphicsScene.worldToPixel(self.FTS.region_of_interest[sorted_keys[i]]['pose']['position'])
             self.graphicsScene.add_ROI(pixel_coords)
 
+            for j in range(0, len(self.FTS.region_of_interest[sorted_keys[i]]['propos'])):
+                if sorted_keys[i] != self.FTS.region_of_interest[sorted_keys[i]]['propos'][j]:
+                    self.graphicsScene.add_ap(sorted_keys[i], self.FTS.region_of_interest[sorted_keys[i]]['propos'][j])
+
             quaternion = Quaternion(self.FTS.region_of_interest[sorted_keys[i]]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
@@ -304,15 +316,15 @@ class Map_dialog(QDialog):
             groupBox = QGroupBox(sorted_keys[i])
             self.groupBox_list.append(groupBox)
             checkBox_list = []
-            self.FTS_matrix.append(checkBox_list)
+            self.edge_matrix.append(checkBox_list)
 
             vbox = QVBoxLayout()
             self.vbox_list.append(vbox)
 
             for j in range(0, len(self.FTS.region_of_interest)):
-                    self.FTS_matrix[i].append(QCheckBox(sorted_keys[j]))
-                    self.FTS_matrix[i][j].stateChanged.connect(self.edge_both_ways)
-                    self.vbox_list[i].addWidget(self.FTS_matrix[i][j])
+                    self.edge_matrix[i].append(CustomCheckBox(sorted_keys[j], i, j))
+                    self.edge_matrix[i][j].signalStateChanged.connect(self.edge_both_ways)
+                    self.vbox_list[i].addWidget(self.edge_matrix[i][j])
 
             self.groupBox_list[i].setLayout(self.vbox_list[i])
             self.grid.addWidget(self.groupBox_list[i], 0, i+1, Qt.AlignRight)
@@ -320,4 +332,4 @@ class Map_dialog(QDialog):
         for i in range(0, len(self.FTS.region_of_interest)):
             for j in range(0, len(self.FTS.region_of_interest[sorted_keys[i]]['edges'])):
                 index = sorted_keys.index(self.FTS.region_of_interest[sorted_keys[i]]['edges'][j]['target'])
-                self.FTS_matrix[i][index].setCheckState(2)
+                self.edge_matrix[i][index].setCheckState(2)

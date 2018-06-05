@@ -138,9 +138,10 @@
      <remap from="scan" to="$(arg laser_topic)"/>
      <remap from="map" to="$(arg map_topic)"/>
    </node>
-
+<!--
    <node pkg="rqt_simulation" type="RVOController.py" name="RVOController" output="screen">
    </node>
+   -->
 
 <!--
     <group if="$(arg public_sim)">

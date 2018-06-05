@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+'''
+This is a QGraphicsScene to load the map and draw the FTS
+'''
 
 from math import atan2, cos, sin, pi, atan
 import os
@@ -22,16 +25,22 @@ class MapGraphicsScene(QGraphicsScene):
         self.items_dict = {}
 
     # Transfrom pixel coordinates to world coordinates
+    # Input:    pixel coordinates   QPointF
+    # Output:   world coordinates   (x, y, z)
     def pixelToWorld(self, pixel_coords = QPointF()):
         world_coords = ((pixel_coords.x() - self.worldOrigin.x()) * self.map_resolution, -(pixel_coords.y() - self.worldOrigin.y()) * self.map_resolution, 0.0)
         return world_coords
 
     # Transform world coordinates to pixel coordinates
+    # Input:    world coordinates   (x, y, z)
+    # Output:   pixel coordinates   QPointF
     def worldToPixel(self, world_coords):
         pixel_coords = QPointF(world_coords[0] / self.map_resolution + self.worldOrigin.x(), -world_coords[1] / self.map_resolution + self.worldOrigin.y())
         return pixel_coords
 
     # Add ROI to graphics scene
+    # Input:    pixel coordinates   QPointF
+    # Update GraphicsScene
     def add_ROI(self, pixel_coords):
         self.regionCounter += 1
 
@@ -48,19 +57,25 @@ class MapGraphicsScene(QGraphicsScene):
         ellipse_item_label.setFont(label_font)
         self.addItem(ellipse_item_label)
 
-        self.items_dict.update({region_string : {'ellipse_item' : ellipse_item, 'ellipse_item_label' : ellipse_item_label, 'pixel_coords' : pixel_coords}})
+        self.items_dict.update({region_string : {'ellipse_item' : ellipse_item, 'ellipse_item_label' : ellipse_item_label, 'pixel_coords' : pixel_coords, 'ap_item_label' : {}}})
 
     # Remove las added ROI
+    # Update GraphicsScene
     def remove_ROI(self):
         region_string = 'r' + str(self.regionCounter).zfill(2)
         self.removeItem(self.items_dict[region_string]['ellipse_item'])
         self.removeItem(self.items_dict[region_string]['ellipse_item_label'])
         self.removeArrow(self.items_dict[region_string]['arrow'])
+        for i in range(0, len(self.items_dict[region_string]['ap_item_label'].keys())):
+            self.remove_ap(region_string, self.items_dict[region_string]['ap_item_label'].keys()[i])
 
         del self.items_dict[region_string]
         self.regionCounter = self.regionCounter - 1
 
     # Add line between to ROI's
+    # Input:    number ROI 1    int
+    #           number ROI 2    int
+    # Update GraphicsScene
     def add_edge(self, roi_num_1, roi_num_2):
         pixel_coords_1 = self.items_dict['r' + str(roi_num_1).zfill(2)]['pixel_coords']
         pixel_coords_2 = self.items_dict['r' + str(roi_num_2).zfill(2)]['pixel_coords']
@@ -68,11 +83,35 @@ class MapGraphicsScene(QGraphicsScene):
         self.addItem(self.line_dict[(str(roi_num_1) + '-' + str(roi_num_2))])
 
     # Remove line between to ROI's
+    # Input:    edge label  string      e.g. 1-2
+    # Update GraphicsScene
     def remove_edge(self, edge):
         self.removeItem(self.line_dict[edge])
         del self.line_dict[edge]
 
+    # Add general atomic proposition label
+    # Input:    region label    string
+    #           ap label        string
+    # Update GraphicsScene
+    def add_ap(self, region, ap):
+        label_font = QFont()
+        label_font.setPointSize(15)
+        ap_item_label = QGraphicsTextItem(ap)
+        ap_item_label.setPos(QPointF(self.items_dict[region]['pixel_coords'].x()-25, self.items_dict[region]['pixel_coords'].y()))
+        ap_item_label.setFont(label_font)
+        self.addItem(ap_item_label)
+
+        self.items_dict[region]['ap_item_label'].update({ap : ap_item_label})
+
+    # Remove general atomic proposition label
+    # Input:    region label    string
+    #           ap label        string
+    # Update GraphicsScene
+    def remove_ap(self, region, ap):
+        self.removeItem(self.items_dict[region]['ap_item_label'][ap])
+
     # Reset graphics scene
+    # Update GraphicsScene
     def reset(self):
         for i in range(0, self.regionCounter):
             self.remove_ROI()
@@ -87,6 +126,8 @@ class MapGraphicsScene(QGraphicsScene):
         #self.arrow_list = []
 
     # Load map
+    # Input:    scenario name   string
+    # Update GraphicsScene
     def load_map(self, scenario):
         self.scenario = scenario
         map_yaml = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'scenarios', scenario, 'map.yaml')
@@ -106,21 +147,32 @@ class MapGraphicsScene(QGraphicsScene):
         self.addCoordinateSystem(self.worldOrigin, 0.0)
 
     # Send signal if mouse button is pressed
+    # Input:    click event
+    # Output:   pixel coordinates   QPointF
     def mousePressEvent(self, event):
         pos = event.lastScenePos()
         self.signalMousePressedPos.emit(pos)
 
     # Send signal if mouse button is released
+    # Input:    release event
+    # Output:   pixel coordinates   QPointF
     def mouseReleaseEvent(self, event):
         pos = event.lastScenePos()
         self.signalMouseReleasedPos.emit(pos)
 
     # Send signal if mouse is moving in graphic scene
+    # Input:    move event
+    # Output:   pixel coordinates   QPointF
     def mouseMoveEvent(self, event):
         pos = event.lastScenePos()
         self.signalMouseMovePos.emit(pos)
 
     # Add arrow to graphic scene
+    # Input:    start point     QPointF
+    #           end point       QPointF
+    #           drawing options QPen
+    # Output:   arrow           list with 3 QGraphicsLineItem
+    # Update GraphicsScene
     def addArrow(self, startPoint = QPointF(), endPoint = QPointF(), pen = QPen()):
         alpha = 5*pi/6
         arrowLength = 10
@@ -151,11 +203,16 @@ class MapGraphicsScene(QGraphicsScene):
         return arrowItems
 
     # Remove arrow from graphics scene
+    # Input:    arrow   list with 3 QGraphicsLineItem
+    # Update GraphicsScene
     def removeArrow(self, arrow):
         for n in arrow:
             self.removeItem(n)
 
     # Add coordinate system
+    # Input:    origin     QPointF
+    #           angle      Float
+    # Update GraphicsScene
     def addCoordinateSystem(self, origin = QPointF(), angle = 0.0):
         XAxis = QPointF(origin.x() + 100, origin.y())
         YAxis = QPointF(origin.x(), origin.y() - 100)
@@ -168,6 +225,7 @@ class MapGraphicsScene(QGraphicsScene):
         YLabel.setPos(YAxis)
 
     # Load the data from map.yaml file
+    # Input:    file    string
     def loadConfig(self, filename):
         stream = file(filename, 'r')
         data = yaml.load(stream)

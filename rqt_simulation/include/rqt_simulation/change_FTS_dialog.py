@@ -10,8 +10,9 @@ import codecs
 from math import atan2, cos, sin, pi, atan
 from pyquaternion import Quaternion
 
-from rqt_simulation_msgs.msg import Sense, Edge
+from rqt_simulation_msgs.msg import Sense, Edge, Roi
 from geometry_msgs.msg import Pose
+from std_msgs.msg import String
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
@@ -216,6 +217,18 @@ class Change_FTS_dialog(QDialog):
         self.FTS.add_region('r' + str(self.graphicsScene.regionCounter).zfill(2), edges, pose = self.pose_of_interest)
         self.graphicsScene.items_dict['r' + str(self.graphicsScene.regionCounter).zfill(2)].update({'arrow' : self.current_arrow})
 
+        self.FTS.add_region_marker(self.FTS.region_of_interest['r' + str(self.graphicsScene.regionCounter).zfill(2)], 'r' + str(self.graphicsScene.regionCounter).zfill(2), False)
+        print(self.FTS.marker_id_counter)
+        print(self.FTS.region_pose_marker_array_msg)
+
+        roi_msg = self.build_roi_msg('r' + str(self.graphicsScene.regionCounter).zfill(2))
+        sense_msg = Sense()
+        sense_msg.rois.append(roi_msg)
+        #print(sense_msg)
+        self.sense_pub.publish(sense_msg)
+
+
+
     # Update orientation arrow while mouse button is pressed
     def mouseMove(self, pos):
         arrow_length = 50
@@ -295,6 +308,19 @@ class Change_FTS_dialog(QDialog):
         edge.weight = weight
 
         return edge
+
+    def build_roi_msg(self, label):
+        roi = Roi()
+        string_msg = String()
+        string_msg.data = label
+
+        roi.label = string_msg
+        roi.pose = self.from_dict_to_pose_msg(label)
+
+        roi.propos_satisfied.append(string_msg)
+        print(roi)
+        return roi
+
 
     # Load FTS from a yaml file
     @Slot(bool)
