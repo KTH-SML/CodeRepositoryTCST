@@ -211,7 +211,7 @@ def prod_states_given_history(product, trace):
 
 def initial_state_given_history(product, run_history, run, index):
 	new_initial_set = set()
-	if len(run_history) < (len(run.pre_plan)-1):
+	if len(run_history) < (len(run.pre_plan)-2):
 		new_initial_set.add(run.pre_prod_edges[index][0])
 	elif len(run_history) == (len(run.pre_plan)-1):
 		new_initial_set.add(run.suf_prod_edges[0][0])

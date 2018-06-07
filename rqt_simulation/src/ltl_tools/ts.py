@@ -102,6 +102,7 @@ class MotionFts(DiGraph):
         print(region_info)
         for (n, label) in region_info.iteritems():
             self.add_node(n, label=label, status='notconfirmed')
+            changed_regs.add(n)
 
         # edges udpate
         edge_info = sense_info['edge']
@@ -191,11 +192,14 @@ class MotActModel(DiGraph):
         reg, act = self.projection(prod_node)
         # been visited before, and hasn't changed
         print('---------------------------------------------------------')
+        print(reg)
         if ((self.node[prod_node]['marker'] == 'visited') and
             (self.graph['region'].node[self.node[prod_node]['region']]['status'] == 'confirmed')):
             for prod_node_to in self.successors(prod_node):
+                print('in ts fly_successors visited')
                 yield prod_node_to, self[prod_node][prod_node_to]['weight']
         else:
+            print('in ts fly_successors')
             self.remove_edges_from(self.out_edges(prod_node))
             # actions
             label = self.graph['region'].node[reg]['label']
@@ -206,6 +210,9 @@ class MotActModel(DiGraph):
                 yield prod_node_to, cost
             # motions
             for reg_to in self.graph['region'].successors(reg):
+                print('ts successors')
+                print(reg_to)
+                #plot_automaton(self.graph['region'])
             #    if reg_to != reg:
                 prod_node_to = self.composition(reg_to, 'None')
                 cost = self.graph['region'][reg][reg_to]['weight']

@@ -5,6 +5,7 @@ This is a QGraphicsScene to load the map and draw the FTS
 '''
 
 from math import atan2, cos, sin, pi, atan
+from pyquaternion import Quaternion
 import os
 import rospkg
 import yaml
@@ -208,6 +209,44 @@ class MapGraphicsScene(QGraphicsScene):
     def removeArrow(self, arrow):
         for n in arrow:
             self.removeItem(n)
+
+    # Load ROI's and edges from a FTS
+    # Input:    FTS     dict
+    # Update GraphicsScene
+    def load_graphic_from_FTS(self, FTS):
+        sorted_keys = FTS.region_of_interest.keys()
+        sorted_keys.sort()
+
+        arrow_length = 50
+
+        # Add all the ROI's and edges
+        for i in range(0, len(FTS.region_of_interest)):
+            region_string = 'r' + str(i+1).zfill(2)
+            pixel_coords = self.worldToPixel(FTS.region_of_interest[sorted_keys[i]]['pose']['position'])
+            self.add_ROI(pixel_coords)
+
+            for j in range(0, len(FTS.region_of_interest[sorted_keys[i]]['propos'])):
+                if sorted_keys[i] != FTS.region_of_interest[sorted_keys[i]]['propos'][j]:
+                    self.add_ap(sorted_keys[i], FTS.region_of_interest[sorted_keys[i]]['propos'][j])
+
+            quaternion = Quaternion(FTS.region_of_interest[sorted_keys[i]]['pose']['orientation'])
+            rot_axis = quaternion.axis
+            theta = quaternion.angle * rot_axis[2]
+            end_point = QPointF(pixel_coords.x() + arrow_length * cos(theta), pixel_coords.y() - arrow_length * sin(theta))
+            arrow = self.addArrow(pixel_coords, end_point)
+            self.items_dict[region_string]['arrow'] = arrow
+
+        # Add all edges to graphics scene
+        for i in range(0, len(FTS.region_of_interest)):
+            for j in range(0, len(FTS.region_of_interest[sorted_keys[i]]['edges'])):
+                index = sorted_keys.index(FTS.region_of_interest[sorted_keys[i]]['edges'][j]['target'])
+                if i < index:
+                    if (str(i+1) + '-' + str(index+1)) not in self.line_dict.keys():
+                        self.add_edge(i+1, index+1)
+                else:
+                    if (str(index+1) + '-' + str(i+1)) not in self.line_dict.keys():
+                        self.add_edge(index+1, i+1)
+
 
     # Add coordinate system
     # Input:    origin     QPointF

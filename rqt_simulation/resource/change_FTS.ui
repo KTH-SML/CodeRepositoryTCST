@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1490</width>
-    <height>763</height>
+    <height>808</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,6 +53,13 @@
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0" colspan="2">
      <widget class="QGraphicsView" name="graphicsView">
       <property name="enabled">
@@ -63,6 +70,13 @@
         <width>677</width>
         <height>624</height>
        </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="button_add_AP">
+      <property name="text">
+       <string>General AP's</string>
       </property>
      </widget>
     </item>

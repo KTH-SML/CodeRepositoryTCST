@@ -85,10 +85,13 @@ class ProdAut(DiGraph):
 			for t_prod_node in self.successors(f_prod_node):
 				yield t_prod_node, self[f_prod_node][t_prod_node]['weight']
 		else:
+			print('in product fly_successors')
+			print(f_prod_node)
 			self.remove_edges_from(self.out_edges(f_prod_node))
 			for t_ts_node,cost in self.graph['ts'].fly_successors(f_ts_node):
 				for t_buchi_node in self.graph['buchi'].successors(f_buchi_node):
 					t_prod_node = self.composition(t_ts_node, t_buchi_node)
+					print(t_prod_node)
 					label = self.graph['ts'].node[f_ts_node]['label']
 					truth, dist = check_label_for_buchi_edge(self.graph['buchi'], label, f_buchi_node, t_buchi_node)
 					total_weight = cost + self.graph['alpha']*dist
@@ -103,9 +106,12 @@ class ProdAut(DiGraph):
 		changed_regions = []
 		region_info = sense_info['regions']
 		for (n, label) in region_info.iteritems():
-			prod_node = (label, 'None')
+			#prod_node = (label, 'None')
+			print(n)
+			prod_node = self.graph['ts'].composition(n, 'None')
 			if prod_node not in changed_regions:
-				changed_regions.append((label, 'None'))
+				changed_regions.append((n, 'None'))
+		#plot_automaton(self.graph['ts'])
 		edge_info = sense_info['edge']
 		for e in edge_info[0]:
 			prod_node = (e[0], 'None')
@@ -129,6 +135,7 @@ class ProdAut(DiGraph):
 					print prod_node
 					self.node[prod_node]['marker'] = 'unvisited'
 					changed_states = changed_states + 1
+		#plot_automaton(self.graph['ts'])
 		return changed_states
 
 

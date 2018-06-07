@@ -766,36 +766,7 @@ class SimulationWidget(QWidget):
 
         self.scenario_file = scenario_file[0]
 
-        arrow_length = 50
-
-        # Add all region of interest to graphics scene
-        for i in range(0, len(self.FTS.region_of_interest)):
-            region_string = 'r' + str(i+1).zfill(2)
-            pixel_coords = self.current_graphicsScene.worldToPixel(self.FTS.region_of_interest[sorted_keys[i]]['pose']['position'])
-            self.current_graphicsScene.add_ROI(pixel_coords)
-
-            for j in range(0, len(self.FTS.region_of_interest[sorted_keys[i]]['propos'])):
-                if sorted_keys[i] != self.FTS.region_of_interest[sorted_keys[i]]['propos'][j]:
-                    self.current_graphicsScene.add_ap(sorted_keys[i], self.FTS.region_of_interest[sorted_keys[i]]['propos'][j])
-
-            quaternion = Quaternion(self.FTS.region_of_interest[sorted_keys[i]]['pose']['orientation'])
-            rot_axis = quaternion.axis
-            theta = quaternion.angle * rot_axis[2]
-            end_point = QPointF(pixel_coords.x() + arrow_length * cos(theta), pixel_coords.y() - arrow_length * sin(theta))
-            arrow = self.current_graphicsScene.addArrow(pixel_coords, end_point)
-            self.current_graphicsScene.items_dict[region_string]['arrow'] = arrow
-
-
-        # Add all edges to graphics scene
-        for i in range(0, len(self.FTS.region_of_interest)):
-            for j in range(0, len(self.FTS.region_of_interest[sorted_keys[i]]['edges'])):
-                index = sorted_keys.index(self.FTS.region_of_interest[sorted_keys[i]]['edges'][j]['target'])
-                if i < index:
-                    if (str(i+1) + '-' + str(index+1)) not in self.current_graphicsScene.line_dict.keys():
-                        self.current_graphicsScene.add_edge(i+1, index+1)
-                else:
-                    if (str(index+1) + '-' + str(i+1)) not in self.current_graphicsScene.line_dict.keys():
-                        self.current_graphicsScene.add_edge(index+1, i+1)
+        self.current_graphicsScene.load_graphic_from_FTS(self.FTS)
 
         # Load robot tabs
         robot_tabs = data['Tasks']
@@ -847,6 +818,21 @@ class FTS:
         for i in range(0, len(self.region_of_interest[label]['propos'])):
             if self.region_of_interest[label]['propos'][i] == ap:
                 del self.region_of_interest[label]['propos'][i]
+
+    def load_FTS(self):
+        # Start file dialog
+        directory = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS')
+        File_dialog = QFileDialog(directory=directory, filter='.yaml')
+        FTS_file = File_dialog.getOpenFileName()
+        print(FTS_file[0])
+        stream = file(FTS_file[0], 'r')
+        data = yaml.load(stream)
+        stream.close()
+
+        # Load FTS
+        self.region_of_interest = {}
+        self.region_of_interest = data['FTS']
+
 
 
     # Add region markers for RVIZ

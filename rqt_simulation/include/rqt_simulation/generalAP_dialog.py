@@ -11,6 +11,10 @@ from python_qt_binding.QtCore import Qt, Slot, pyqtSlot
 
 from AddAP_dialog import AddAP_dialog
 from CustomCheckBox import CustomCheckBox
+from MapUtiles import MapUtiles
+
+from rqt_simulation_msgs.msg import Sense, Edge, Roi
+from std_msgs.msg import String
 
 class GeneralAP_dialog(QDialog):
     def __init__(self, graphicsScene, FTS):
@@ -22,6 +26,7 @@ class GeneralAP_dialog(QDialog):
 
         # Copy graphicsScene
         self.graphicsScene = graphicsScene
+        self.map_utiles = MapUtiles(self.graphicsScene, self.FTS)
 
         # List with AP's
         self.ap_list = []
@@ -29,6 +34,8 @@ class GeneralAP_dialog(QDialog):
         # Load ui file
         ui_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'resource', 'general_ap.ui')
         loadUi(ui_file, self)
+
+        self.sense_msg = Sense()
 
         # Sort the ROI's alphabetic, needed for FTS matrix since it's implemented with list
         self.sorted_keys = self.FTS.region_of_interest.keys()
@@ -73,6 +80,9 @@ class GeneralAP_dialog(QDialog):
 
         self.button_add_ap.clicked.connect(self.add_ap)
         self.button_save.clicked.connect(self.save)
+        self.button_cancel.clicked.connect(self.cancel)
+
+        self.sense_msg = Sense()
 
     @Slot(bool)
     def add_ap(self):
@@ -81,7 +91,6 @@ class GeneralAP_dialog(QDialog):
 
         if add_ap_dialog.new_ap:
             print(add_ap_dialog.new_ap)
-
             for i in range(0, len(self.FTS.region_of_interest)):
                 self.ap_matrix[i].append(CustomCheckBox(add_ap_dialog.new_ap, i, len(self.ap_list)))
                 self.ap_matrix[i][-1].signalStateChanged.connect(self.add_textItem)
@@ -98,12 +107,33 @@ class GeneralAP_dialog(QDialog):
 
     @Slot(bool)
     def save(self):
-
         for i in range(0, len(self.FTS.region_of_interest)):
+            for j in range(0, len(self.ap_list)):
+                roi = self.map_utiles.build_roi_msg(self.sorted_keys[i])
+                ap_changed = False
+                if (self.ap_matrix[i][j].checkState() == 2) and (self.ap_list[j] not in self.FTS.region_of_interest[self.sorted_keys[i]]['propos']):
+                    string_msg = String()
+                    string_msg.data = str(self.ap_list[j])
+                    roi.propos_satisfied.append(string_msg)
+                    ap_changed = True
+                elif (self.ap_matrix[i][j].checkState() == 0) and (self.ap_list[j] in self.FTS.region_of_interest[self.sorted_keys[i]]['propos']):
+                    string_msg = String()
+                    string_msg.data = str(self.ap_list[j])
+                    roi.propos_unsatisfied.append(string_msg)
+                    ap_changed = True
+            if ap_changed:
+                self.sense_msg.rois.append(roi)
+
+
             del self.FTS.region_of_interest[self.sorted_keys[i]]['propos'][1:]
             for j in range(0, len(self.ap_list)):
                 if (self.ap_matrix[i][j].checkState() == 2):
                     self.FTS.add_propos(self.sorted_keys[i], self.ap_list[j])
+        print(self.sense_msg)
+        self.accept()
+
+    @Slot(bool)
+    def cancel(self):
         self.accept()
 
 
