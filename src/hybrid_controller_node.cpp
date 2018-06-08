@@ -115,7 +115,7 @@ public:
 		arma::vec u_ppc = prescribed_performance_controller.u(X_std, pose_to_std_vec(poses[robot_id]), ros::Time::now().toSec());
 		arma::vec u_pfc = potential_field_controller.u(X);
 
-		arma::vec u = u_ppc + (arma::norm(u_ppc)>0 ? u_pfc : arma::zeros<arma::vec>(u_ppc.size()));
+		arma::vec u = u_ppc + u_pfc;
 		if(arma::norm(u) > u_max[0]){
 			u = u/arma::norm(u)*u_max[0];
 		}
@@ -298,7 +298,7 @@ int main(int argc, char* argv[]){
 			formula_type, formula,
 			dformula, rho_opt, K, u_max, delta, zeta_l,	V, funnel_linear);
 
-	PFC pfc(robot_id, r, R, u_max);
+	PFC pfc(robot_id, r, R, u_max, w);
 
 	ControllerNode controller_node(nh, priv_nh, ppc, n_robots, robot_id, V, robots_in_cluster, u_max, pfc, w, turtlebots);
 	

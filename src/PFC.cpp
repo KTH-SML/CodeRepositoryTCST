@@ -1,7 +1,7 @@
 #include "PFC.hpp"
 
-PFC::PFC(int robot_id, double r, double R, arma::vec u_max):
-    robot_id(robot_id), r(r), R(R), u_max(u_max), k(u_max[0]/(R-r)*R*r*r*r){
+PFC::PFC(int robot_id, double r, double R, arma::vec u_max, double w):
+    robot_id(robot_id), r(r), R(R), u_max(u_max), k(u_max[0]/(R-r)*R*r*r*r), w(w){
 }
 
 arma::vec PFC::u(arma::vec X){
@@ -13,7 +13,7 @@ arma::vec PFC::u(arma::vec X){
         double d = arma::as_scalar(arma::sqrt((x-xo).t()*(x-xo)));
         if(d < R){
             if(d < r){
-                u(arma::span(0,1)) += u_max[0] * (x - xo) / d;
+                u(arma::span(0,1)) += w * u_max[0] * (x - xo) / d;
             }
             else{
                 u(arma::span(0,1)) += k * (1/d - 1/R) / (d*d) * (x - xo) / d;
@@ -21,8 +21,8 @@ arma::vec PFC::u(arma::vec X){
         }
     }
     double norm = arma::norm(u);
-    if(norm > u_max[0]){
-        u *= u_max[0]/norm;
+    if(norm > w * u_max[0]){
+        u *= w * u_max[0]/norm;
     }
     return u;
 }
