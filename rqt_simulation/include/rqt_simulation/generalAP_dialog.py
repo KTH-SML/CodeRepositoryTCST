@@ -80,7 +80,6 @@ class GeneralAP_dialog(QDialog):
 
         self.button_add_ap.clicked.connect(self.add_ap)
         self.button_save.clicked.connect(self.save)
-        self.button_cancel.clicked.connect(self.cancel)
 
         self.sense_msg = Sense()
 
@@ -107,22 +106,28 @@ class GeneralAP_dialog(QDialog):
 
     @Slot(bool)
     def save(self):
+        print(self.ap_list)
         for i in range(0, len(self.FTS.region_of_interest)):
             for j in range(0, len(self.ap_list)):
                 roi = self.map_utiles.build_roi_msg(self.sorted_keys[i])
                 ap_changed = False
+                print(self.ap_list[j])
+                print(self.FTS.region_of_interest[self.sorted_keys[i]]['propos'])
                 if (self.ap_matrix[i][j].checkState() == 2) and (self.ap_list[j] not in self.FTS.region_of_interest[self.sorted_keys[i]]['propos']):
+                    print('---new ap---')
+                    print(self.ap_list[j])
                     string_msg = String()
                     string_msg.data = str(self.ap_list[j])
                     roi.propos_satisfied.append(string_msg)
                     ap_changed = True
+                    print('---end---')
                 elif (self.ap_matrix[i][j].checkState() == 0) and (self.ap_list[j] in self.FTS.region_of_interest[self.sorted_keys[i]]['propos']):
                     string_msg = String()
                     string_msg.data = str(self.ap_list[j])
                     roi.propos_unsatisfied.append(string_msg)
                     ap_changed = True
-            if ap_changed:
-                self.sense_msg.rois.append(roi)
+                if ap_changed:
+                    self.sense_msg.rois.append(roi)
 
 
             del self.FTS.region_of_interest[self.sorted_keys[i]]['propos'][1:]
@@ -131,10 +136,5 @@ class GeneralAP_dialog(QDialog):
                     self.FTS.add_propos(self.sorted_keys[i], self.ap_list[j])
         print(self.sense_msg)
         self.accept()
-
-    @Slot(bool)
-    def cancel(self):
-        self.accept()
-
 
 

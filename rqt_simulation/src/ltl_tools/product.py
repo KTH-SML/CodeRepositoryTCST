@@ -88,14 +88,17 @@ class ProdAut(DiGraph):
 			print('in product fly_successors')
 			print(f_prod_node)
 			self.remove_edges_from(self.out_edges(f_prod_node))
+			#plot_automaton(self)
 			for t_ts_node,cost in self.graph['ts'].fly_successors(f_ts_node):
 				for t_buchi_node in self.graph['buchi'].successors(f_buchi_node):
 					t_prod_node = self.composition(t_ts_node, t_buchi_node)
 					print(t_prod_node)
 					label = self.graph['ts'].node[f_ts_node]['label']
+					print(label)
 					truth, dist = check_label_for_buchi_edge(self.graph['buchi'], label, f_buchi_node, t_buchi_node)
 					total_weight = cost + self.graph['alpha']*dist
 					if truth:
+						print(t_prod_node)
 						self.add_edge(f_prod_node, t_prod_node, weight=total_weight)
 						yield t_prod_node, total_weight
 			self.node[f_prod_node]['marker'] = 'visited'

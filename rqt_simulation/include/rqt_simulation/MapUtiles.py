@@ -234,5 +234,4 @@ class MapUtiles(QObject):
         roi.pose = self.from_dict_to_pose_msg(label)
 
         roi.propos_satisfied.append(string_msg)
-        print(roi)
         return roi

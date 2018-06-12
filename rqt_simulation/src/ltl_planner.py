@@ -240,7 +240,11 @@ class LtlPlannerNode(object):
         regions = {}
         for i in range(0, len(sense.rois)):
             pose_tuple = self.pose_to_tuple(sense.rois[i].pose)
-            regions.update({pose_tuple : set([sense.rois[i].label.data, ])})
+            label = []
+            for j in range(0, len(sense.rois[i].propos_satisfied)):
+                label.append(sense.rois[i].propos_satisfied[j].data)
+            print(label)
+            regions.update({pose_tuple : set(label)})
         sense_info = {'regions' : regions}
         #print sense.edges
         add_edges = []

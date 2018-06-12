@@ -101,7 +101,12 @@ class MotionFts(DiGraph):
         print('---ts---')
         print(region_info)
         for (n, label) in region_info.iteritems():
-            self.add_node(n, label=label, status='notconfirmed')
+            if n not in self.nodes():
+                self.add_node(n, label=label, status='notconfirmed')
+            else:
+                self.node[n]['label'] = set(label)
+                self.node[n]['status'] = 'notconfirmed'
+                print(self.node[n]['label'])
             changed_regs.add(n)
 
         # edges udpate
@@ -153,11 +158,14 @@ class MotActModel(DiGraph):
 
     def composition(self, reg, act):
         prod_node = (reg, act)
+        new_label = self.graph['region'].node[reg]['label'].union(self.graph['action'].action[act][2])
         if not self.has_node(prod_node):
             new_label = self.graph['region'].node[reg]['label'].union(self.graph['action'].action[act][2])
             self.add_node(prod_node, label=new_label, region=reg, action=act, marker='unvisited')
             if ((reg in self.graph['region'].graph['initial']) and (act == 'None')):
                 self.graph['initial'].add(prod_node)
+        if self.node[prod_node]['label'] != new_label:
+            self.node[prod_node]['label'] = new_label
         return prod_node
 
     def projection(self, prod_node):
@@ -196,10 +204,10 @@ class MotActModel(DiGraph):
         if ((self.node[prod_node]['marker'] == 'visited') and
             (self.graph['region'].node[self.node[prod_node]['region']]['status'] == 'confirmed')):
             for prod_node_to in self.successors(prod_node):
-                print('in ts fly_successors visited')
+                #print('in ts fly_successors visited')
                 yield prod_node_to, self[prod_node][prod_node_to]['weight']
         else:
-            print('in ts fly_successors')
+            #print('in ts fly_successors')
             self.remove_edges_from(self.out_edges(prod_node))
             # actions
             label = self.graph['region'].node[reg]['label']
@@ -210,8 +218,8 @@ class MotActModel(DiGraph):
                 yield prod_node_to, cost
             # motions
             for reg_to in self.graph['region'].successors(reg):
-                print('ts successors')
-                print(reg_to)
+                #print('ts successors')
+                #print(reg_to)
                 #plot_automaton(self.graph['region'])
             #    if reg_to != reg:
                 prod_node_to = self.composition(reg_to, 'None')
