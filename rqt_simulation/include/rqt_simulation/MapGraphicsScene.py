@@ -13,7 +13,7 @@ import rospy
 
 from python_qt_binding.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsLineItem, QGraphicsEllipseItem
 from python_qt_binding.QtCore import QTimer, QEvent, pyqtSignal, QPointF, QLineF, pyqtSlot, Qt, QRectF, QSizeF
-from python_qt_binding.QtGui import QPen, QFont, QBrush, QColor, QPixmap
+from python_qt_binding.QtGui import QPen, QFont, QBrush, QColor, QPixmap, QTransform
 
 class MapGraphicsScene(QGraphicsScene):
     signalMousePressedPos = pyqtSignal(QPointF)
@@ -133,10 +133,7 @@ class MapGraphicsScene(QGraphicsScene):
         self.scenario = scenario
         map_yaml = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'scenarios', scenario, 'map.yaml')
         self.loadConfig(map_yaml)
-        if scenario == 'pal_office' or scenario == 'sml':
-            map = 'map.pgm'
-        else:
-            map = 'map.png'
+        map = 'map.png'
 
         map_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'scenarios', scenario, map)
         pixmap = QPixmap(map_file)
@@ -209,6 +206,19 @@ class MapGraphicsScene(QGraphicsScene):
     def removeArrow(self, arrow):
         for n in arrow:
             self.removeItem(n)
+
+
+    def scale_map(self, graphicsView, scenario):
+        rectF = graphicsView.geometry()
+        if (float(rectF.width())/self.mapSize.width() < float(rectF.height())/self.mapSize.height()):
+            scale = float(rectF.width())/self.mapSize.width()
+        elif scenario == 'pal_office' or scenario == 'sml':
+            scale = 0.7
+        else:
+            scale = float(rectF.height())/self.mapSize.height()
+        transform = QTransform(scale, 0, 0.0, scale, 0, 0)
+
+        return transform
 
     # Load ROI's and edges from a FTS
     # Input:    FTS     dict

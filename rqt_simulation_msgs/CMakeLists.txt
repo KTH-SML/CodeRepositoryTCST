@@ -9,10 +9,10 @@ add_message_files(
   Edge.msg
   Roi.msg
   Sense.msg
-  
+  TemporaryTask.msg
+
   )
 
 generate_messages(DEPENDENCIES std_msgs geometry_msgs)
 
 catkin_package(CATKIN_DEPENDS message_runtime std_msgs)
-

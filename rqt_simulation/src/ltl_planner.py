@@ -17,7 +17,7 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 from ms1_msgs.msg import Humans, ActionSeq
 
-from rqt_simulation_msgs.msg import Sense
+from rqt_simulation_msgs.msg import Sense, TemporaryTask
 
 from math import pi as PI
 from math import atan2, sin, cos, sqrt
@@ -41,6 +41,9 @@ from ltl_tools.FTSLoader import FTSLoader
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
 from ltl_tools.planner import ltl_planner
 from ltl_tools.automaton_vis import plot_automaton
+from ltl_tools.temporary_task import temporaryTask
+from ltl_tools.discrete_plan import initial_state_given_history, dijkstra_targets, dijkstra_plan_optimal
+from ltl_tools.product import ProdAut_Run
 import visualize_fts
 
 class LtlPlannerNode(object):
@@ -48,9 +51,16 @@ class LtlPlannerNode(object):
         #[self.robot_motion, self.init_pose, self.robot_action, self.robot_task] = robot_model
         self.node_name = "LTL Planner"
         self.active = False
+        self.beta = 10
         self.robot_pose = PoseWithCovarianceStamped()
         self.hard_task = ''
         self.soft_task = ''
+        self.temporary_task_ = temporaryTask()
+        #self.temporary_task = []
+        #self.final_propos = []
+        #self.task_end_index = []
+        #self.task_end_planner_index = []
+        #self.task_time = []
         self.robot_name = rospy.get_param('robot_name')
         self.agent_type = rospy.get_param('agent_type')
         scenario_file = rospy.get_param('scenario_file')
@@ -91,6 +101,7 @@ class LtlPlannerNode(object):
         # task from GUI
         self.sub_soft_task = rospy.Subscriber('soft_task', String, self.SoftTaskCallback)
         self.sub_hard_task = rospy.Subscriber('hard_task', String, self.HardTaskCallback)
+        self.sub_temp_task = rospy.Subscriber('temporary_task', TemporaryTask, self.TemporaryTaskCallback)
         # environment sense
         self.sub_sense = rospy.Subscriber('/environment', Sense, self.SenseCallback)
         # clear costmap manually from GUI
@@ -158,15 +169,15 @@ class LtlPlannerNode(object):
         if self.active:
             if (rospy.Time.now()-self.replan_timer).to_sec() > 10.0:
                 if self.planner.num_changed_regs > 0:
-                    self.planner.replan()
+                    self.planner.replan(self.temporary_task_)
                     self.planner.num_changed_regs = 0
-                self.replan_timer = rospy.Time.now()
+                    ### Publish plan for GUI
+                    prefix_msg = self.plan_msg_builder(self.planner.run.line, rospy.Time.now())
+                    self.PrefixPlanPublisher.publish(prefix_msg)
+                    sufix_msg = self.plan_msg_builder(self.planner.run.loop, rospy.Time.now())
+                    self.SufixPlanPublisher.publish(sufix_msg)
 
-                ### Publish plan for GUI
-                prefix_msg = self.plan_msg_builder(self.planner.run.line, rospy.Time.now())
-                self.PrefixPlanPublisher.publish(prefix_msg)
-                sufix_msg = self.plan_msg_builder(self.planner.run.loop, rospy.Time.now())
-                self.SufixPlanPublisher.publish(sufix_msg)
+                self.replan_timer = rospy.Time.now()
 
             if self.agent_type == 'ground':
                 self.checkMovement(current_pose)
@@ -205,6 +216,14 @@ class LtlPlannerNode(object):
                     print '----------Time: %.2f----------' %t.to_sec()
                     self.next_move = self.planner.next_move
                     print 'Robot %s next move is motion to %s' %(str(self.robot_name), str(self.next_move))
+                    if (self.planner.index in self.temporary_task_.propos_planner_index) and (self.planner.segment == 'line'):
+                        self.temporary_task_.remove_propos()
+                    if (self.planner.index in self.temporary_task_.task_end_planner_index) and (self.planner.segment == 'line'):
+                        self.temporary_task_.remove_task(self.planner.index)
+                    print('---index---')
+                    print(self.planner.index)
+                    print(self.temporary_task_.propos_planner_index)
+
                     self.navi_goal = self.FormatGoal(self.next_move, self.planner.index, t)
                     self.navigation.send_goal(self.navi_goal)
                     print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
@@ -235,6 +254,51 @@ class LtlPlannerNode(object):
     def HardTaskCallback(self, hard_task):
         self.hard_task = hard_task.data
 
+    def TemporaryTaskCallback(self, temporary_task):
+        #task_sequence = []
+        current_state = list(initial_state_given_history(self.planner.product, self.planner.run_history, self.planner.run, self.planner.index))
+        current_state = current_state[0]
+        print('---current state---')
+        print(current_state)
+        '''
+        for i in range(0, len(temporary_task.task)):
+            task_sequence.append(temporary_task.task[i].data)
+        self.temporary_task_.final_propos.append(task_sequence[-1])
+        self.temporary_task_.temporary_tasks.append(task_sequence)
+        self.temporary_task_.task_time.append((rospy.Time.now(), temporary_task.T_des.data))
+        '''
+        self.temporary_task_.add_task(temporary_task)
+        #temporary_task_ = temporaryTask()
+        self.temporary_task_.make_combination_set()
+        run_temp = self.temporary_task_.find_temporary_run(current_state, self.planner.product)
+
+        end_temporary = set()
+        #print(run_temp.prefix)
+        end_temporary.add(run_temp.prefix[-1])
+
+        new_run, time = dijkstra_plan_optimal(self.planner.product, self.beta, end_temporary)
+        self.planner.index = 0
+        self.planner.segment = 'line'
+        self.planner.trace = []
+        self.planner.run_history = []
+
+        prefix = run_temp.prefix[0:-1]+new_run.prefix
+        precost = run_temp.precost+new_run.precost
+        suffix = run_temp.suffix+new_run.suffix
+        sufcost = new_run.sufcost
+        totalcost = precost + self.beta*sufcost
+        print('---first state---')
+        print(prefix[0])
+        self.planner.run = ProdAut_Run(self.planner.product, prefix, precost, suffix, sufcost, totalcost)
+
+        ### Publish plan for GUI
+        prefix_msg = self.plan_msg_builder(self.planner.run.line, rospy.Time.now())
+        self.PrefixPlanPublisher.publish(prefix_msg)
+        sufix_msg = self.plan_msg_builder(self.planner.run.loop, rospy.Time.now())
+        self.SufixPlanPublisher.publish(sufix_msg)
+
+
+
     def SenseCallback(self, sense):
         #print sense.roi
         regions = {}
@@ -261,7 +325,7 @@ class LtlPlannerNode(object):
         #self.planner.run = self.planner.revise(sense_info)
         self.planner.update_knowledge(sense_info)
         if self.planner.num_changed_regs > 10:
-            self.planner.replan()
+            self.planner.replan(self.temporary_task_)
             self.planner.num_changed_regs = 0
         elif len(del_edges) > 0:
             self.planner.validate_and_revise()
@@ -348,7 +412,7 @@ class LtlPlannerNode(object):
     def plan_msg_builder(self, plan, time_stamp):
         plan_msg = PoseArray()
         plan_msg.header.stamp = time_stamp
-        print(plan)
+        #print(plan)
         for n in plan:
             pose = Pose()
             pose.position.x = n[0][0][0]
@@ -367,6 +431,9 @@ class LtlPlannerNode(object):
     def pose_to_tuple(self, pose):
         tuple = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z))
         return tuple
+
+    def euclidean_distance(self, position1, position2):
+        return (sqrt((position1[0]-position2[0])**2+(position1[1]-position2[1])**2+(position1[2]-position2[2])**2))
 
 
 

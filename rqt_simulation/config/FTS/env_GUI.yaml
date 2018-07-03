@@ -4,56 +4,70 @@ FTS:
     - cost: 1.0
       target: r01
     - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
       target: r04
+    - cost: 1.0
+      target: r05
     pose:
       orientation:
-      - 0.8031212222581566
-      - -0.0
-      - -0.0
-      - -0.5958156613908069
+      - 0.44721359549995804
+      - 0.0
+      - 0.0
+      - 0.8944271909999159
       position:
-      - -5.25
-      - -8.05
+      - -6.3500000000000005
+      - -9.65
       - 0.0
     propos:
     - r01
-    - bucket
   r02:
     edges:
     - cost: 1.0
-      target: r02
-    - cost: 1.0
-      target: r03
-    pose:
-      orientation:
-      - 0.8169348359424717
-      - -0.0
-      - -0.0
-      - -0.5767299834616255
-      position:
-      - -0.5
-      - -7.050000000000001
-      - 0.0
-    propos:
-    - r02
-    - ball
-  r03:
-    edges:
+      target: r01
     - cost: 1.0
       target: r02
     - cost: 1.0
       target: r03
     - cost: 1.0
       target: r04
+    - cost: 1.0
+      target: r05
     pose:
       orientation:
-      - 0.8040528623308296
+      - 0.8567052353111404
       - -0.0
       - -0.0
-      - -0.5945578143272527
+      - -0.5158063006502379
       position:
-      - -2.3000000000000003
-      - -1.25
+      - -7.0
+      - -6.9
+      - 0.0
+    propos:
+    - r02
+  r03:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r04
+    - cost: 1.0
+      target: r05
+    pose:
+      orientation:
+      - 0.0708890200906794
+      - 0.0
+      - 0.0
+      - 0.9974842088126424
+      position:
+      - -4.75
+      - -7.25
       - 0.0
     propos:
     - r03
@@ -62,18 +76,55 @@ FTS:
     - cost: 1.0
       target: r01
     - cost: 1.0
+      target: r02
+    - cost: 1.0
       target: r03
     - cost: 1.0
       target: r04
+    - cost: 1.0
+      target: r05
     pose:
       orientation:
-      - 0.8178828625196786
-      - -0.0
-      - -0.0
-      - -0.5753847610048572
+      - 0.3230441135571371
+      - 0.0
+      - 0.0
+      - 0.9463839076696536
       position:
-      - -7.3500000000000005
-      - -2.6500000000000004
+      - -4.1000000000000005
+      - -9.35
       - 0.0
     propos:
     - r04
+  r05:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r04
+    - cost: 1.0
+      target: r05
+    pose:
+      orientation:
+      - 0.7242654759132847
+      - -0.0
+      - -0.0
+      - -0.6895212254891819
+      position:
+      - -5.800000000000001
+      - -5.25
+      - 0.0
+    propos:
+    - r05
+Map: hotel
+Tasks:
+  robot1:
+    initial_pose: r28
+    robot_model: Turtlebot
+    tasks:
+      hard_task: '([]! lounge) '
+      soft_task: ([]<> r27) && ([]<> r06) && ([]<> r21)
+    use_qualisys: false

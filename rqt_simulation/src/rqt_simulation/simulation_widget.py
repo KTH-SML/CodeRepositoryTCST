@@ -29,6 +29,7 @@ from rqt_simulation.CustomComboBox import CustomComboBox
 from rqt_simulation.RVIZFileGenerator import RVIZFileGenerator
 from rqt_simulation.ROS_Publisher import ROS_Publisher
 from rqt_simulation.RobotTab import RobotTab
+from rqt_simulation.WidgetUtiles import WidgetUtiles
 
 from ltl_tools.planner import ltl_planner
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
@@ -94,6 +95,8 @@ class SimulationWidget(QWidget):
         # Initialize FTS
         self.FTS = FTS()
 
+        self.widget_utiles = WidgetUtiles()
+
         # Get default scenario file
         try:
             self.scenario_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
@@ -135,18 +138,8 @@ class SimulationWidget(QWidget):
         self.current_graphicsScene.load_map(self.scenario)
 
         # Scale map
-        rectF = self.graphicsView_main.geometry()
-        if (float(rectF.width())/self.current_graphicsScene.mapSize.width() < float(rectF.height())/self.current_graphicsScene.mapSize.height()):
-            scale = float(rectF.width())/self.current_graphicsScene.mapSize.width()
-        elif self.scenario == 'pal_office' or self.scenario == 'sml':
-            scale = 0.7
-        else:
-            scale = float(rectF.height())/self.current_graphicsScene.mapSize.height()
-        transform = QTransform(scale, 0, 0.0, scale, 0, 0)
+        transform = self.current_graphicsScene.scale_map(self.graphicsView_main, self.scenario)
         self.graphicsView_main.setTransform(transform)
-
-        # ROI marker msg
-        #self.region_pose_marker_array_msg = MarkerArray()
 
         # Add robot tab
         self.add_robot()
@@ -178,14 +171,7 @@ class SimulationWidget(QWidget):
         self.current_graphicsScene.load_map(self.scenario)
 
         # Scale map
-        rectF = self.graphicsView_main.geometry()
-        if (float(rectF.width())/self.current_graphicsScene.mapSize.width() < float(rectF.height())/self.current_graphicsScene.mapSize.height()):
-            scale = float(rectF.width())/self.current_graphicsScene.mapSize.width()
-        elif self.scenario == 'pal_office' or self.scenario == 'sml':
-            scale = 0.7
-        else:
-            scale = float(rectF.height())/self.current_graphicsScene.mapSize.height()
-        transform = QTransform(scale, 0, 0.0, scale, 0, 0)
+        transform = self.current_graphicsScene.scale_map(self.graphicsView_main, self.scenario)
         self.graphicsView_main.setTransform(transform)
 
         # Reset initial pose and plan textboxes
@@ -222,8 +208,8 @@ class SimulationWidget(QWidget):
                 if self.position_msg_to_tuple(n.position) == tuple(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]]['pose']['position']):
                     self.prefix_string =  self.prefix_string + self.FTS.region_of_interest.keys()[i] + ' --> '
                     #print('match')
-        print(self.prefix_string)
-        print(self.prefix_plan_topic_list)
+        #print(self.prefix_string)
+        #print(self.prefix_plan_topic_list)
         index = self.prefix_plan_topic_list.index(source)
         #print(index)
         # Send signal for received msg
@@ -235,7 +221,7 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_prefix_textbox.clear()
         self.tab_list[index].robot_prefix_textbox.insertPlainText('Prefix: ')
         self.tab_list[index].robot_prefix_textbox.insertPlainText(self.prefix_string)
-        print(self.prefix_string)
+        #print(self.prefix_string)
         #self.prefix_string = ''
         self.button_setup.setEnabled(True)
         self.button_setup_exp.setEnabled(True)
@@ -282,7 +268,7 @@ class SimulationWidget(QWidget):
         map_dialog = Map_dialog(self.current_graphicsScene, self.FTS)
         map_dialog.exec_()
 
-        # Add initial poses
+        # Add initial poses to comboBox
         if len(self.current_graphicsScene.items_dict) > 0:
             for i in range(0, self.num_robots):
                 self.tab_list[i].robot_comboBox_init.clear()
@@ -301,19 +287,12 @@ class SimulationWidget(QWidget):
     def set_init_pose_id(self, index, id):
         if self.tab_list[id -1].robot_comboBox_init.count() > 0:
             print('--------')
-            print(self.prefix_plan_topic_list)
             # Get the initial pose
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose'] = self.FTS.region_of_interest[self.tab_list[id -1].robot_comboBox_init.currentText()]['pose']
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['label'] = self.tab_list[id -1].robot_comboBox_init.currentText()
 
             # Save it in initial pose message
-            self.tab_list[id -1].init_pose_msg.position.x = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['position'][0]
-            self.tab_list[id -1].init_pose_msg.position.y = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['position'][1]
-            self.tab_list[id -1].init_pose_msg.position.z = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['position'][2]
-            self.tab_list[id -1].init_pose_msg.orientation.w = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][0]
-            self.tab_list[id -1].init_pose_msg.orientation.x = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][1]
-            self.tab_list[id -1].init_pose_msg.orientation.y = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][2]
-            self.tab_list[id -1].init_pose_msg.orientation.z = self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][3]
+            self.tab_list[id-1].build_init_pose_msg(id)
 
             # Update graphics scene
             for i in range(0, len(self.current_graphicsScene.items_dict)):
@@ -324,8 +303,9 @@ class SimulationWidget(QWidget):
                 rect = self.current_graphicsScene.items_dict[self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label']]['ellipse_item'].rect()
                 point = rect.topLeft()
                 self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'].setPos(point.x() - 11, point.y() - 22)
+            print(self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)])
+            print(id)
 
-            print(self.prefix_plan_topic_list)
 
     # Setup simulation, gazebo and RVIZ
     @Slot(bool)
@@ -349,12 +329,7 @@ class SimulationWidget(QWidget):
         robot_list = []
         tf_prefixes = []
         for i in range(0, self.num_robots):
-            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-            #    robot_list.append('tiago')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-            #    robot_list.append('turtlebot')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
-            #    robot_list.append('srd250')
+            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
             robot_list.append(self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
             tf_prefixes.append(self.tab_list[i].robot_name)
 
@@ -364,16 +339,10 @@ class SimulationWidget(QWidget):
         roslaunch.configure_logging(uuid)
 
         # Launch gazebo world
-        launch_world = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'setup_simulation.launch')])
-        sys.argv.append('scenario:=' + scenario)
-        launch_world.start()
-        del sys.argv[2:len(sys.argv)]
+        self.widget_utiles.launch_gazebo(scenario)
 
         # Launch rosbag logger
-        launch_logger = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rosbag_writer.launch')])
-        #sys.argv.append('num_robots:=' + str(self.num_robots))
-        launch_logger.start()
-        del sys.argv[2:len(sys.argv)]
+        self.widget_utiles.launch_logger()
 
         # Launch robots
         launch_robot_list = []
@@ -381,17 +350,10 @@ class SimulationWidget(QWidget):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
 
             # Get orientation from pose
+            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
             quaternion = Quaternion(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
-
-            # Get robot model
-            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-            #    sys.argv.append('robot_model:=tiago_steel')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-            #    sys.argv.append('robot_model:=turtlebot')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
-            #    sys.argv.append('robot_model:=srd250')
 
             sys.argv.append('robot_model:=' + self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
 
@@ -404,11 +366,7 @@ class SimulationWidget(QWidget):
 
             launch_robot_list[i].start()
             navigation = actionlib.SimpleActionClient('/' + self.tab_list[i].robot_name + '/move_base', MoveBaseAction)
-            rospy.loginfo("wait for the move_base action server to come up")
-            #allow up to 5 seconds for the action server to come up
-            #navigation.wait_for_server(rospy.Duration(5))
-            #wait for the action server to come up
-            #navigation.wait_for_server()
+
             del sys.argv[2:len(sys.argv)]
 
             self.FTS.add_region_marker(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)], 'start_' + str(i+1).zfill(2), True)
@@ -418,7 +376,6 @@ class SimulationWidget(QWidget):
         # Publish region marker
         for i in range(0, len(self.FTS.region_of_interest)):
             self.FTS.add_region_marker(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]], self.FTS.region_of_interest.keys()[i], False)
-        #self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.FTS.region_pose_marker_array_msg)
 
     # Setup experiment, RVIZ
     @Slot(bool)
@@ -442,12 +399,6 @@ class SimulationWidget(QWidget):
         robot_list = []
         tf_prefixes = []
         for i in range(0, self.num_robots):
-            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-            #    robot_list.append('tiago')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-            #    robot_list.append('turtlebot')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
-            #    robot_list.append('srd250')
             robot_list.append(self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
             tf_prefixes.append(self.tab_list[i].robot_name)
 
@@ -457,10 +408,7 @@ class SimulationWidget(QWidget):
         roslaunch.configure_logging(uuid)
 
         # Launch rosbag logger
-        launch_logger = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rosbag_writer.launch')])
-        #sys.argv.append('num_robots:=' + str(self.num_robots))
-        launch_logger.start()
-        del sys.argv[2:len(sys.argv)]
+        self.widget_utiles.launch_logger()
 
         # Launch rviz
         launch_rviz = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'rviz.launch')])
@@ -469,16 +417,8 @@ class SimulationWidget(QWidget):
         # Load transformation between map and qualisys
         if self.tab_list[i].robot_localization_checkBox.checkState() == 2:
             # Launch qualysis mapper
-            sys.argv.append('trans_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][0]))
-            sys.argv.append('trans_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][1]))
-            sys.argv.append('trans_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][2]))
-            sys.argv.append('orient_w:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][0]))
-            sys.argv.append('orient_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][1]))
-            sys.argv.append('orient_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][2]))
-            sys.argv.append('orient_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][3]))
-            launch_qualisys = roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'qualisys_mapper.launch')])
-            launch_qualisys.start()
-            del sys.argv[2:len(sys.argv)]
+            self.widget_utiles.set_qualisys_args(self.current_graphicsScene.tf_qualisys_to_map)
+            self.widget_utiles.launch_qualisys()
 
         # Launch robots
         launch_robot_list = []
@@ -490,12 +430,6 @@ class SimulationWidget(QWidget):
             quaternion = Quaternion(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
-            #if self.tab_list[i].robot_comboBox.currentText() == 'TiaGo':
-            #    sys.argv.append('robot_model:=tiago_steel')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'Turtlebot':
-            #    sys.argv.append('robot_model:=turtlebot')
-            #elif self.tab_list[i].robot_comboBox.currentText() == 'srd250':
-            #    sys.argv.append('robot_model:=srd250')
 
             sys.argv.append('robot_model:=' + self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
 
@@ -510,21 +444,10 @@ class SimulationWidget(QWidget):
             else:
                 sys.argv.append('use_qualisys:=false')
 
-            sys.argv.append('trans_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][0]))
-            sys.argv.append('trans_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][1]))
-            sys.argv.append('trans_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['translation'][2]))
-            sys.argv.append('orient_w:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][0]))
-            sys.argv.append('orient_x:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][1]))
-            sys.argv.append('orient_y:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][2]))
-            sys.argv.append('orient_z:=' + str(self.current_graphicsScene.tf_qualisys_to_map['rotation'][3]))
+            self.widget_utiles.set_qualisys_args(self.current_graphicsScene.tf_qualisys_to_map)
 
             launch_robot_list[i].start()
-            #navigation = actionlib.SimpleActionClient('/' + self.tab_list[i].robot_name + '/move_base', MoveBaseAction)
-            #rospy.loginfo("wait for the move_base action server to come up")
-            #allow up to 5 seconds for the action server to come up
-            #navigation.wait_for_server(rospy.Duration(5))
-            #wait for the action server to come up
-            #navigation.wait_for_server()
+
             del sys.argv[2:len(sys.argv)]
 
             self.FTS.add_region_marker(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)], 'start_' + str(i+1).zfill(2), True)
@@ -534,7 +457,6 @@ class SimulationWidget(QWidget):
         # Publish region marker
         for i in range(0, len(self.FTS.region_of_interest)):
             self.FTS.add_region_marker(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]], self.FTS.region_of_interest.keys()[i], False)
-        #self.ros_publisher.add_publisher('region_of_interest', MarkerArray, 1.0, self.FTS.region_pose_marker_array_msg)
 
     # Synthesize the tasks and start LTL Planner
     @Slot(bool)
@@ -556,22 +478,6 @@ class SimulationWidget(QWidget):
         roslaunch_task_list = []
         for i in range(0, self.num_robots):
 
-            '''
-            # Add plan topics and subscriber
-            self.prefix_plan_topic_list.append('/' + self.tab_list[i].robot_name + '/prefix_plan')
-            self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[i], PoseArray, self.prefix_callback))
-            self.sufix_plan_topic_list.append('/' + self.tab_list[i].robot_name + '/sufix_plan')
-            self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[i], PoseArray, self.sufix_callback))
-
-            self.prefix_plan_subscriber_list[i].received.connect(self.received_prefix)
-            self.sufix_plan_subscriber_list[i].received.connect(self.received_sufix)
-
-            # Add current goal subscriber
-            self.current_goal_topic_list.append('/' + self.tab_list[i].robot_name + '/move_base/goal')
-            self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[i], MoveBaseActionGoal, self.goal_callback))
-            self.current_goal_subscriber_list[i].received.connect(self.received_goal)
-            '''
-
             robot_model = self.tab_list[i].robot_comboBox.currentText()
             initial_pose = self.tab_list[i].robot_comboBox_init.currentText()
             tasks = {'hard_task' : self.tab_list[i].robot_hard_task_input.text(), 'soft_task' : self.tab_list[i].robot_soft_task_input.text()}
@@ -589,10 +495,13 @@ class SimulationWidget(QWidget):
             roslaunch_task_list[i].start()
             del sys.argv[2:len(sys.argv)]
 
+            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
+
         data.update({'Tasks' : robot_setup})
         data.update({'Map' : self.world_comboBox.currentText()})
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
+
 
     # Enable LTL-planner
     @Slot(bool)
@@ -651,21 +560,6 @@ class SimulationWidget(QWidget):
         # Connect initial pose comboBox with set_init_pose_id function
         self.tab_list[self.num_robots-1].robot_comboBox_init.signalIndexChanged.connect(self.set_init_pose_id)
 
-        '''
-        # Add plan topics and subscriber
-        self.prefix_plan_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/prefix_plan')
-        self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[self.num_robots-1], PoseArray, self.prefix_callback))
-        self.sufix_plan_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/sufix_plan')
-        self.sufix_plan_subscriber_list.append(ROS_Subscriber(self.sufix_plan_topic_list[self.num_robots-1], PoseArray, self.sufix_callback))
-
-        self.prefix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_prefix)
-        self.sufix_plan_subscriber_list[self.num_robots-1].received.connect(self.received_sufix)
-
-        # Add current goal subscriber
-        self.current_goal_topic_list.append('/' + self.tab_list[self.num_robots-1].robot_name + '/move_base/goal')
-        self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[self.num_robots-1], MoveBaseActionGoal, self.goal_callback))
-        self.current_goal_subscriber_list[self.num_robots-1].received.connect(self.received_goal)
-        '''
 
     # Initilaize Planner Publisher and Subscriber
     def init_planner_publisher_and_subscriber(self, num_robots):
@@ -680,6 +574,7 @@ class SimulationWidget(QWidget):
         self.current_goal_subscriber_list = []
 
         for i in range(0, num_robots):
+            self.tab_list[i].start_publisher_and_subscriber()
             # Add plan topics and subscriber
             self.prefix_plan_topic_list.append('/' + self.tab_list[i].robot_name + '/prefix_plan')
             self.prefix_plan_subscriber_list.append(ROS_Subscriber(self.prefix_plan_topic_list[i], PoseArray, self.prefix_callback))
@@ -694,18 +589,13 @@ class SimulationWidget(QWidget):
             self.current_goal_subscriber_list.append(ROS_Subscriber(self.current_goal_topic_list[i], MoveBaseActionGoal, self.goal_callback))
             self.current_goal_subscriber_list[i].received.connect(self.received_goal)
 
+
+
     # Remove last robot
     @Slot(bool)
     def remove_robot(self):
         if self.num_robots > 1:
             self.num_robots = self.num_robots - 1
-
-            #del self.current_goal_topic_list[self.num_robots]
-            #del self.current_goal_subscriber_list[self.num_robots]
-            #del self.prefix_plan_subscriber_list[self.num_robots]
-            #del self.sufix_plan_subscriber_list[self.num_robots]
-            #del self.prefix_plan_topic_list[self.num_robots]
-            #del self.sufix_plan_topic_list[self.num_robots]
 
             self.current_graphicsScene.removeItem(self.tab_list[self.num_robots].initial_pose['start_' + str(self.num_robots+1).zfill(2)]['text_item'])
 
@@ -782,11 +672,13 @@ class SimulationWidget(QWidget):
             print(robot_tabs[robot_tabs.keys()[i]])
             self.tab_list[i].robot_comboBox.setCurrentIndex(self.tab_list[i].robot_comboBox.findText(robot_tabs[robot_tabs.keys()[i]]['robot_model']))
             self.tab_list[i].robot_comboBox_init.setCurrentIndex(self.tab_list[i].robot_comboBox_init.findText(robot_tabs[robot_tabs.keys()[i]]['initial_pose']))
+            self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose'] = self.FTS.region_of_interest[self.tab_list[i].robot_comboBox_init.currentText()]['pose']
+            self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label'] = self.tab_list[i].robot_comboBox_init.currentText()
             if robot_tabs[robot_tabs.keys()[i]]['use_qualisys']:
                 self.tab_list[i].robot_localization_checkBox.setCheckState(Qt.Checked)
             self.tab_list[i].robot_hard_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['hard_task'])
             self.tab_list[i].robot_soft_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['soft_task'])
-            self.tab_list[i].robot_name_changed()
+            #self.tab_list[i].robot_name_changed()
 
         self.button_execute_task.setEnabled(True)
 

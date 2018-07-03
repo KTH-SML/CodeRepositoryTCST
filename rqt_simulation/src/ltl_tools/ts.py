@@ -7,9 +7,9 @@ from networkx.classes.digraph import DiGraph
 from ltl_tools.automaton_vis import plot_automaton
 
 def distance(pose1, pose2):
-    print('pose')
-    print(pose1)
-    print(pose2)
+    #print('pose')
+    #print(pose1)
+    #print(pose2)
     return (sqrt((pose1[0][0]-pose2[0][0])**2+(pose1[0][1]-pose2[0][1])**2+(pose1[0][2]-pose2[0][2])**2)+0.001)
 
 def reach_waypoint(pose, waypoint, margin):
@@ -22,15 +22,15 @@ class MotionFts(DiGraph):
     def __init__(self, node_dict, symbols, ts_type):
         DiGraph.__init__(self, symbols=symbols, type=ts_type, initial=set())
         for (n, label) in node_dict.iteritems():
-            print('---set init---')
-            print(n)
-            print(label)
+            #print('---set init---')
+            #print(n)
+            #print(label)
             self.add_node(n, label=label, status='confirmed')
 
 
     def add_un_edges(self, edge_list, unit_cost=1):
         for edge in edge_list:
-            print(edge)
+            #print(edge)
             f_node = edge[0]
             t_node = edge[1]
             dist = distance(f_node, t_node)
@@ -65,8 +65,8 @@ class MotionFts(DiGraph):
         # label udpate
         label_info = sense_info['label']
         label_info.update(com_info)
-        print('---ts---')
-        print(label_info)
+        #print('---ts---')
+        #print(label_info)
         for mes in label_info:
             print(mes)
             if mes[1]:
@@ -98,8 +98,8 @@ class MotionFts(DiGraph):
         # label udpate
         region_info = sense_info['regions']
         #plot_automaton(self)
-        print('---ts---')
-        print(region_info)
+        #print('---ts---')
+        #print(region_info)
         for (n, label) in region_info.iteritems():
             if n not in self.nodes():
                 self.add_node(n, label=label, status='notconfirmed')
@@ -111,18 +111,18 @@ class MotionFts(DiGraph):
 
         # edges udpate
         edge_info = sense_info['edge']
-        print('---edge---')
-        print edge_info
+        #print('---edge---')
+        #print edge_info
         for e in edge_info[0]:
-            print('---add edges---')
-            print(e)
+            #print('---add edges---')
+            #print(e)
             self.add_edge(e[0], e[1], weight=distance(e[0], e[1]))
             changed_regs.add(e[0])
             self.node[e[0]]['status'] = 'notconfirmed'
             #self.node[e[1]]['status'] = 'notconfirmed'
         for e in edge_info[1]:
-            print('---remove edges---')
-            print(e)
+            #print('---remove edges---')
+            #print(e)
             self.remove_edge(e[0], e[1])
             changed_regs.add(e[0])
             self.node[e[0]]['status'] = 'notconfirmed'
@@ -199,8 +199,6 @@ class MotActModel(DiGraph):
     def fly_successors(self, prod_node):
         reg, act = self.projection(prod_node)
         # been visited before, and hasn't changed
-        print('---------------------------------------------------------')
-        print(reg)
         if ((self.node[prod_node]['marker'] == 'visited') and
             (self.graph['region'].node[self.node[prod_node]['region']]['status'] == 'confirmed')):
             for prod_node_to in self.successors(prod_node):

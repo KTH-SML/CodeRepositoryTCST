@@ -43,8 +43,6 @@ class ProdAut(DiGraph):
 		return prod_node
 
 	def projection(self, prod_node):
-		print('---projection---')
-		print(prod_node)
 		ts_node = self.node[prod_node]['ts']
 		buchi_node = self.node[prod_node]['buchi']
 		return ts_node, buchi_node
@@ -85,27 +83,21 @@ class ProdAut(DiGraph):
 			for t_prod_node in self.successors(f_prod_node):
 				yield t_prod_node, self[f_prod_node][t_prod_node]['weight']
 		else:
-			print('in product fly_successors')
-			print(f_prod_node)
 			self.remove_edges_from(self.out_edges(f_prod_node))
 			#plot_automaton(self)
 			for t_ts_node,cost in self.graph['ts'].fly_successors(f_ts_node):
 				for t_buchi_node in self.graph['buchi'].successors(f_buchi_node):
 					t_prod_node = self.composition(t_ts_node, t_buchi_node)
-					print(t_prod_node)
 					label = self.graph['ts'].node[f_ts_node]['label']
-					print(label)
 					truth, dist = check_label_for_buchi_edge(self.graph['buchi'], label, f_buchi_node, t_buchi_node)
 					total_weight = cost + self.graph['alpha']*dist
 					if truth:
-						print(t_prod_node)
 						self.add_edge(f_prod_node, t_prod_node, weight=total_weight)
 						yield t_prod_node, total_weight
 			self.node[f_prod_node]['marker'] = 'visited'
 		#plot_automaton(self)
 
 	def update_prod_aut_after_ts_update(self, sense_info):
-		print 'hallo'
 		changed_regions = []
 		region_info = sense_info['regions']
 		for (n, label) in region_info.iteritems():
@@ -134,8 +126,8 @@ class ProdAut(DiGraph):
 				#print('---prod update---')
 				#print prod_node
 				if prod_node in self.nodes():
-					print('---prod update---')
-					print prod_node
+					#print('---prod update---')
+					#print prod_node
 					self.node[prod_node]['marker'] = 'unvisited'
 					changed_states = changed_states + 1
 		#plot_automaton(self.graph['ts'])
@@ -152,8 +144,8 @@ class ProdAut_Run(object):
 		self.precost = precost
 		self.suffix = suffix
 		self.changed_states = 0
-		print('---suffix---')
-		print(self.suffix)
+		#print('---suffix---')
+		#print(self.suffix)
 		self.sufcost = sufcost
 		self.totalcost = totalcost
 		self.prod_run_to_prod_edges(product)
@@ -183,19 +175,19 @@ class ProdAut_Run(object):
 		print('---ts_edges---')
 		print(len(self.pre_ts_edges))
 		for ts_edge in self.pre_ts_edges:
-			print(product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'])
+			#print(product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'])
 			if product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'] == 'goto':
 				self.pre_plan.append(ts_edge[1][0]) # motion
 			else:
-				print('here')
 				self.pre_plan.append(ts_edge[1][1]) # action
 		self.suf_plan = []
-		bridge = (self.line[-1],self.loop[0])
-		if product.graph['ts'][bridge[0]][bridge[1]]['label'] == 'goto':
-			print('bridge')
-			self.suf_plan.append(bridge[1][0]) # motion
-		else:
-			self.suf_plan.append(bridge[1][1]) # action
+		if self.loop:
+			bridge = (self.line[-1],self.loop[0])
+			if product.graph['ts'][bridge[0]][bridge[1]]['label'] == 'goto':
+				#print('bridge')
+				self.suf_plan.append(bridge[1][0]) # motion
+			else:
+				self.suf_plan.append(bridge[1][1]) # action
 
 		#self.suf_plan.append(self.loop[0][0])
 		for ts_edge in self.suf_ts_edges:

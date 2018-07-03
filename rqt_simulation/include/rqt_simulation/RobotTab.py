@@ -28,6 +28,9 @@ from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, 
 from rqt_simulation.ROS_Publisher import ROS_Publisher
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
+from rqt_simulation.TemporaryTask_dialog import TemporaryTask_dialog
+
+from rqt_simulation_msgs.msg import TemporaryTask
 
 import actionlib
 from actionlib import SimpleActionClient
@@ -67,7 +70,7 @@ class RobotTab(QWidget):
         self.robot_label = QLabel('Robot name')
         self.layout.addWidget(self.robot_label)
         self.robot_name_input = QLineEdit('robot' + str(self.num_robots))
-        self.robot_name_input.editingFinished.connect(self.robot_name_changed)
+        #self.robot_name_input.editingFinished.connect(self.robot_name_changed)
         self.layout.addWidget(self.robot_name_input)
 
         # Robot model label and comboBox
@@ -127,6 +130,11 @@ class RobotTab(QWidget):
         self.robot_resend_goal_button = QPushButton('Clear costmap')
         self.layout.addWidget(self.robot_resend_goal_button)
 
+        # Temporary task button
+        self.robot_temporary_task_button = QPushButton('Temporary task')
+        self.layout.addWidget(self.robot_temporary_task_button)
+        self.robot_temporary_task_button.clicked.connect(self.temporary_task_button_pressed)
+
         self.setLayout(self.layout)
 
         # Messages for publishing pose, soft-task, hard-task and clear_costmap
@@ -163,7 +171,7 @@ class RobotTab(QWidget):
         self.robot_current_goal = MoveBaseActionGoal()
 
         # Start all publisher and Subscriber
-        self.start_publisher_and_subscriber()
+        #self.start_publisher_and_subscriber()
 
     # AMCL pose callback
     def current_pose_amcl_callback(self, msg):
@@ -174,7 +182,7 @@ class RobotTab(QWidget):
 
             if self.agent_type == 'ground':
                 self.label_marker_msg.header = msg.header
-                self.label_marker_msg.pose = msg.pose.pose
+                self.label_marker_msg.pose = deepcopy(msg.pose.pose)
                 self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1
 
     # Localization with Qualisys
@@ -204,6 +212,21 @@ class RobotTab(QWidget):
             bool.data = True
             self.clear_costmap_publisher.publish(bool)
 
+    # Opens dialog for temporary task
+    @Slot(bool)
+    def temporary_task_button_pressed(self):
+        temporary_task_dialog = TemporaryTask_dialog()
+        temporary_task_dialog.exec_()
+        if temporary_task_dialog.atomic_propositions:
+            temporary_task_msg = TemporaryTask()
+            temporary_task_msg.header.stamp = rospy.Time.now()
+            for i in range(0, len(temporary_task_dialog.atomic_propositions)):
+                string_msg = String()
+                string_msg.data = temporary_task_dialog.atomic_propositions[i]
+                temporary_task_msg.task.append(string_msg)
+            temporary_task_msg.T_des.data = temporary_task_dialog.T_des
+            self.temporary_task_publisher.publish(temporary_task_msg)
+
     # If robot name in tab has changed the subscriber and publisher topics are updated
     def robot_name_changed(self):
         self.remove_publisher_and_subscriber()
@@ -214,11 +237,13 @@ class RobotTab(QWidget):
 
     # Start all publisher and subscriber from robot tab
     def start_publisher_and_subscriber(self):
+        self.robot_name = self.robot_name_input.text()
         self.ros_publisher = ROS_Publisher()
         self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
+        self.temporary_task_publisher = rospy.Publisher('/' + self.robot_name + '/temporary_task', TemporaryTask, queue_size=1)
         self.clear_costmap_publisher = rospy.Publisher('/' + self.robot_name + '/clear_costmap', Bool, queue_size=1)
         self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
         self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
@@ -231,6 +256,7 @@ class RobotTab(QWidget):
     def remove_publisher_and_subscriber(self):
         del self.ros_publisher
         del self.clear_costmap_publisher
+        del self.temporary_task_publisher
         del self.current_pose_amcl_subscriber
         del self.current_pose_qualisys_subscriber
         del self.current_pose_gazebo_ground_truth_subscriber
@@ -241,4 +267,13 @@ class RobotTab(QWidget):
             self.agent_type = 'arial'
         else:
             self.agent_type = 'ground'
+
+    def build_init_pose_msg(self, id):
+        self.init_pose_msg.position.x = self.initial_pose['start_' + str(id).zfill(2)]['pose']['position'][0]
+        self.init_pose_msg.position.y = self.initial_pose['start_' + str(id).zfill(2)]['pose']['position'][1]
+        self.init_pose_msg.position.z = self.initial_pose['start_' + str(id).zfill(2)]['pose']['position'][2]
+        self.init_pose_msg.orientation.w = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][0]
+        self.init_pose_msg.orientation.x = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][1]
+        self.init_pose_msg.orientation.y = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][2]
+        self.init_pose_msg.orientation.z = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][3]
 

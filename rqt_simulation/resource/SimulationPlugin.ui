@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1091</width>
-    <height>814</height>
+    <height>881</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -25,7 +25,7 @@
      <x>10</x>
      <y>10</y>
      <width>691</width>
-     <height>801</height>
+     <height>861</height>
     </rect>
    </property>
    <property name="title">
@@ -187,10 +187,10 @@
    <widget class="QPushButton" name="button_change_FTS">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>470</y>
-      <width>80</width>
-      <height>23</height>
+      <x>20</x>
+      <y>810</y>
+      <width>651</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -204,7 +204,7 @@
      <x>720</x>
      <y>30</y>
      <width>351</width>
-     <height>781</height>
+     <height>841</height>
     </rect>
    </property>
    <property name="currentIndex">

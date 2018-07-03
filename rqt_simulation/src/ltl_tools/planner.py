@@ -2,8 +2,8 @@
 from buchi import mission_to_buchi
 from product import ProdAut
 from ts import distance, reach_waypoint
-from discrete_plan import dijkstra_plan_networkX, dijkstra_plan_optimal, improve_plan_given_history, validate_and_revise_after_sense_info, validate_run_and_revise
-
+from discrete_plan import dijkstra_plan_networkX, dijkstra_plan_optimal, improve_plan_given_history, validate_and_revise_after_sense_info, validate_run_and_revise, initial_state_given_history
+from product import ProdAut_Run
 
 class ltl_planner(object):
 	def __init__(self, ts, hard_spec, soft_spec):
@@ -111,17 +111,33 @@ class ltl_planner(object):
 			self.num_changed_regs = self.num_changed_regs + len(changed_regs)
 
 
-	def replan(self):
+	def replan(self, temporary_task_):
 		new_run = improve_plan_given_history(self.product, self.trace, self.run, self.index)
 
 		if new_run:
 			self.run = new_run
-			print('---after replan---')
-			print(self.run.pre_plan)
+			#print('---after replan---')
+			#print(self.run.pre_plan)
 			self.index = 0
 			self.segment = 'line'
 			self.trace = []
 			self.run_history = []
+
+			current_state = list(initial_state_given_history(self.product, self.run_history, self.run, self.index))
+	        current_state = current_state[0]
+	        run_temp = temporary_task_.find_temporary_run(current_state, self.product)
+	        end_temporary = set()
+	        #print(run_temp.prefix)
+	        end_temporary.add(run_temp.prefix[-1])
+
+	        new_run, time = dijkstra_plan_optimal(self.product, 10, end_temporary)
+
+	        prefix = run_temp.prefix[0:-1]+new_run.prefix
+	        precost = run_temp.precost+new_run.precost
+	        suffix = run_temp.suffix+new_run.suffix
+	        sufcost = new_run.sufcost
+	        totalcost = precost + self.beta*sufcost
+	        self.run = ProdAut_Run(self.product, prefix, precost, suffix, sufcost, totalcost)
 			#self.find_next_move()
 			#self.next_move = self.run.pre_plan[self.index]
 

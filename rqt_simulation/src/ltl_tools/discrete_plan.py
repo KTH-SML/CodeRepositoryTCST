@@ -62,8 +62,8 @@ def dijkstra_plan_optimal(product, beta=10, start_set=None):
 	#print 'dijkstra plan started!'
 	runs = {}
 	accept_set = product.graph['accept']
-	print('---accept_set---')
-	print(accept_set)
+	#print('---accept_set---')
+	#print(accept_set)
 	if start_set == None:
 		init_set = product.graph['initial']
 	else:
@@ -85,8 +85,10 @@ def dijkstra_plan_optimal(product, beta=10, start_set=None):
 				#print 'find run from %s to %s and back' %(str(init_prod_node), str(prefix[-1]))
 	if runs:
 	 	prefix, precost, suffix, sufcost = min(runs.values(), key = lambda p: p[1] + beta*p[3])
-		print('---run suffix ProdAut_Run---')
-		print(suffix)
+		#print('---run prefix ProdAut_Run---')
+		#print(prefix)
+		#print('---run suffix ProdAut_Run---')
+		#print(suffix)
 	 	run = ProdAut_Run(product, prefix, precost, suffix, sufcost, precost+beta*sufcost)
 	 	#print '\n==================\n'
 	 	print 'optimal_dijkstra_olf done within %.2fs: precost %.2f, sufcost %.2f' %(time.time()-start, precost, sufcost)
@@ -216,8 +218,8 @@ def initial_state_given_history(product, run_history, run, index):
 	elif len(run_history) == (len(run.pre_plan)-1):
 		new_initial_set.add(run.suf_prod_edges[0][0])
 	else:
-		print(index)
-		print(len(run.suf_prod_edges))
+		#print(index)
+		#print(len(run.suf_prod_edges))
 		new_initial_set.add(run.suf_prod_edges[index-2][0])
 	return new_initial_set
 
@@ -225,9 +227,9 @@ def initial_state_given_history(product, run_history, run, index):
 def improve_plan_given_history(product, run_history, run, index):
 	#new_initial_set = prod_states_given_history(product, trace)
 	new_initial_set = initial_state_given_history(product, run_history, run, index)
-	print(new_initial_set)
+	#print(new_initial_set)
 	if new_initial_set:
-		new_run, time=dijkstra_plan_optimal(product, 10, new_initial_set)
+		new_run, time = dijkstra_plan_optimal(product, 10, new_initial_set)
 		return new_run
 	else:
 		return None
