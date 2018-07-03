@@ -71,14 +71,15 @@ class Plotter:
 		ax.minorticks_on()
 		ax.grid(which='major')
 		ax.grid(which='minor', alpha=0.4)
-		ax.set_ylim([-4, 0.6])
-		plt.plot(t_rel, self.robustness, color='blue', label='${\\rho}^{\psi}$(x)')
-		plt.plot(t_rel, -gamma+rho_max, color='green', label='upper and lower funnel')
-		plt.plot(t_rel, r, color='red', label='r')
-		plt.plot(t_rel, rho_max, color='green')
-		plt.legend(loc=4, fontsize='small')
+		ax.set_ylim([-2, 0.6])
+		#plt.plot(t_rel, self.robustness, color='black', linewidth='1.5', label='${\\rho}^{\psi_2}(\\mathbf{x}_{\\phi_2}(t))$')
+		plt.plot(t_rel, self.robustness, color='black', linewidth='1.5', label='${{\\rho}}^{{\\psi_{{{0}}}}}(\\mathbf{{x}}_{{\\phi_{{{0}}}}}(t))$'.format(self.robot))
+		plt.plot(t_rel, -gamma+rho_max, color='red', linewidth='1.5', label='upper and lower funnel')
+		plt.plot(t_rel, r, color='red', label='$r_{{{0}}}$'.format(self.robot), linestyle=':', linewidth='1.5')
+		plt.plot(t_rel, rho_max, color='red', linewidth='1.5')
+		plt.legend(loc=4, fontsize='large')
 		fig.savefig(os.path.dirname(os.path.dirname(__file__))+'/rho'+str(self.robot)+'.png')
-
+		'''
 		vx = np.array(list(u.linear.x for u in self.u))
 		vy = np.array(list(u.linear.y for u in self.u))
 		vx2 = np.square(vx)
@@ -102,6 +103,7 @@ class Plotter:
 		plotSignal(t_rel, upfc, self.robot, 'upfc')
 		plotSignal(t_rel, uppcdir, self.robot, 'uppcdir')
 		plotSignal(t_rel, upfcdir, self.robot, 'upfcdir')
+		'''
 		
 
 
