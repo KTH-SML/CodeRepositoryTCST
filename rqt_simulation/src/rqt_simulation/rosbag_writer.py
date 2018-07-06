@@ -42,7 +42,7 @@ class RosbagWriterNode(object):
         for i in range(0, len(self.robot_names)):
             self.file_list.append(os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'logging', self.robot_names[i] + '_trajectory_' + now.strftime("%Y-%m-%d-%H-%M") + '.txt' ))
             self.open_files.append(open(self.file_list[i], "w+"))
-            self.task_files.append(os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'logging', self.robot_names[i] + '_temp_task' + now.strftime("%Y-%m-%d-%H-%M") + '.txt' ))
+            self.task_files.append(os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'logging', self.robot_names[i] + '_temp_task_' + now.strftime("%Y-%m-%d-%H-%M") + '.txt' ))
             self.task_open_files.append(open(self.task_files[i], "w+"))
             #self.open_files[i].write("time \t pos_x \t pos_y \t pos_z \t ori_w \t ori_x \t ori_y \t ori_z \t ori_z \n")
             self.pose_sub_list.append(rospy.Subscriber('/' + self.robot_names[i] + '/pose_gui', PoseWithCovarianceStamped, self.pose_cb, self.robot_names[i]))
@@ -50,6 +50,7 @@ class RosbagWriterNode(object):
             self.temp_task_sub_list.append(rospy.Subscriber('/' + self.robot_names[i] + '/temporary_task', TemporaryTask, self.task_cb, self.robot_names[i]))
 
         #self.env_sub = rospy.Subscriber('/environment', Sense, self.env_cb)
+        #self.env_file = open(os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'logging', self.robot_names[i] + '_environment_' + now.strftime("%Y-%m-%d-%H-%M") + '.txt' ))
 
     def active_cb(self, msg):
         '''
@@ -85,7 +86,7 @@ class RosbagWriterNode(object):
             for i in range(0, len(msg.task)):
                 string.append(msg.task[i].data)
             self.task_open_files[index].write("%f \t %f \t %s\n" % (time, float(msg.T_des.data), string))
-            #self.bag.write(source + '/temporary_task', msg)
+            #self.bag.write(source + '/temporary_task', msg)          
 
     def close_files(self):
         for i in range(0, len(self.open_files)):

@@ -42,12 +42,12 @@ class Plotter():
     def load_traj(self, trajectory_file):
         d = np.loadtxt(trajectory_file, delimiter="\t")
 
-        time = []
+        self.time = []
         self.u = []
         self.v = []
 
         for i in range(0, len(d)):
-            time.append(d[i][0])
+            self.time.append(d[i][0])
             pixel_coords_u = d[i][1] / self.map_resolution + self.worldOrigin[0]
             pixel_coords_v = -d[i][2] / self.map_resolution + self.worldOrigin[1]
             self.u.append(pixel_coords_u)
