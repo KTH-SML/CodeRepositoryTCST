@@ -2,8 +2,9 @@
 
 from product import ProdAut_Run
 from collections import defaultdict
-from networkx import dijkstra_predecessor_and_distance
-import time 
+from networkx import dijkstra_predecessor_and_distance, draw
+import time
+from ltl_tools.automaton_vis import plot_automaton
 
 
 #===========================================
@@ -51,7 +52,7 @@ def dijkstra_plan_networkX(product, beta=10):
 		print 'Dijkstra_plan_networkX done within %.2fs: precost %.2f, sufcost %.2f' %(time.time()-start, precost, sufcost)
 		return run, time.time()-start
 		#print '\n==================\n'
-	print '=================='        
+	print '=================='
 	print 'No accepting run found in optimal planning!'
         return None, None
 
@@ -61,6 +62,8 @@ def dijkstra_plan_optimal(product, beta=10, start_set=None):
 	#print 'dijkstra plan started!'
 	runs = {}
 	accept_set = product.graph['accept']
+	#print('---accept_set---')
+	#print(accept_set)
 	if start_set == None:
 		init_set = product.graph['initial']
 	else:
@@ -82,6 +85,10 @@ def dijkstra_plan_optimal(product, beta=10, start_set=None):
 				#print 'find run from %s to %s and back' %(str(init_prod_node), str(prefix[-1]))
 	if runs:
 	 	prefix, precost, suffix, sufcost = min(runs.values(), key = lambda p: p[1] + beta*p[3])
+		#print('---run prefix ProdAut_Run---')
+		#print(prefix)
+		#print('---run suffix ProdAut_Run---')
+		#print(suffix)
 	 	run = ProdAut_Run(product, prefix, precost, suffix, sufcost, precost+beta*sufcost)
 	 	#print '\n==================\n'
 	 	print 'optimal_dijkstra_olf done within %.2fs: precost %.2f, sufcost %.2f' %(time.time()-start, precost, sufcost)
@@ -117,7 +124,7 @@ def dijkstra_plan_bounded(product, time_limit=3, beta=10):
 				 	print 'optimal_dijkstra done within %.2fs: precost %.2f, sufcost %.2f' %(time.time()-start, precost, sufcost)
 				 	return run, time.time()-start
 	print 'no accepting run found in optimal planning!'
-	
+
 
 def dijkstra_targets(product, prod_source, prod_targets):
 	# for product graph only, shortest path from source to a set of targets
@@ -138,7 +145,7 @@ def dijkstra_targets(product, prod_source, prod_targets):
 		visited.add(f_prod_node)
 		d = dist[f_prod_node]
 		for (t_prod_node, cost) in product.fly_successors(f_prod_node):
-		 	nd = d + cost 
+		 	nd = d + cost
 		 	if nd < dist[t_prod_node]:
 		 		dist[t_prod_node] = nd
 		 		pre_node[t_prod_node] = [f_prod_node]
@@ -204,28 +211,45 @@ def prod_states_given_history(product, trace):
 	else:
 		return set()
 
+def initial_state_given_history(product, run_history, run, index):
+	new_initial_set = set()
+	if len(run_history) < (len(run.pre_plan)-2):
+		new_initial_set.add(run.pre_prod_edges[index][0])
+	elif len(run_history) == (len(run.pre_plan)-1):
+		new_initial_set.add(run.suf_prod_edges[0][0])
+	else:
+		#print(index)
+		#print(len(run.suf_prod_edges))
+		new_initial_set.add(run.suf_prod_edges[index-2][0])
+	return new_initial_set
 
-def improve_plan_given_history(product, trace):
-	new_initial_set = prod_states_given_history(product, trace)
+
+def improve_plan_given_history(product, run_history, run, index):
+	#new_initial_set = prod_states_given_history(product, trace)
+	new_initial_set = initial_state_given_history(product, run_history, run, index)
+	#print(new_initial_set)
 	if new_initial_set:
-		new_run, time=dijkstra_plan_optimal(product, 10, new_initial_set)
+		new_run, time = dijkstra_plan_optimal(product, 10, new_initial_set)
 		return new_run
 	else:
 		return None
 
 
+
+
+
 #===========================================
 #local revision, in case of system update
 #===========================================
-def validate_and_revise_after_ts_change(run, product, sense_info, com_info):
+def validate_and_revise_after_ts_change(run, product, sense_info, com_info, margin):
 	new_prefix = None
 	new_suffix = None
 	start = time.time()
-	changed_regs = product.graph['ts'].graph['region'].update_after_region_change(sense_info, com_info)
+	changed_regs = product.graph['ts'].graph['region'].update_after_region_change(sense_info, com_info, margin)
 	if changed_regs:
 		for (index, prod_edge) in enumerate(run.pre_prod_edges):
 			(f_ts_node, f_buchi_node) = prod_edge[0]
-			(t_ts_node, t_buchi_node) = prod_edge[1] 
+			(t_ts_node, t_buchi_node) = prod_edge[1]
 			succ_prod = set()
 			for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
 				succ_prod.add(prod_node_to)
@@ -235,7 +259,7 @@ def validate_and_revise_after_ts_change(run, product, sense_info, com_info):
 					break
 		for (index, prod_edge) in enumerate(run.suf_prod_edges):
 			(f_ts_node, f_buchi_node) = prod_edge[0]
-			(t_ts_node, t_buchi_node) = prod_edge[1] 
+			(t_ts_node, t_buchi_node) = prod_edge[1]
 			succ_prod = set()
 			for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
 				succ_prod.add(prod_node_to)
@@ -255,6 +279,185 @@ def validate_and_revise_after_ts_change(run, product, sense_info, com_info):
 			print 'local revision failed'
 			return False
 
+def validate_run_and_revise(product, run):
+	new_prefix = None
+	new_suffix = None
+	start = time.time()
+	for (index, prod_edge) in enumerate(run.pre_prod_edges):
+		(f_ts_node, f_buchi_node) = prod_edge[0]
+		(t_ts_node, t_buchi_node) = prod_edge[1]
+		#print('---f_ts_node---')
+		#print(f_ts_node)
+		#print('---f_buchi_node---')
+		#print(f_buchi_node)
+		#print('---t_ts_node---')
+		#print(t_ts_node)
+		#print('---t_buchi_node---')
+		#print(t_buchi_node)
+		succ_prod = set()
+		for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
+			succ_prod.add(prod_node_to)
+		#plot_automaton(product.graph['ts'].graph['region'])
+		if t_ts_node not in succ_prod:
+				print 'Oops, the current plan prefix contains invalid edges, need revision!'
+				new_prefix = dijkstra_revise_once(product, run.prefix, index)
+				print(new_prefix)
+				break
+	print('---run.suf_prod_edges---')
+	print(run.suf_prod_edges)
+	for (index, prod_edge) in enumerate(run.suf_prod_edges):
+		print('---index---')
+		print(index)
+		print(len(run.suf_prod_edges))
+		print('---prod_edge---')
+		print(prod_edge)
+		(f_ts_node, f_buchi_node) = prod_edge[0]
+		(t_ts_node, t_buchi_node) = prod_edge[1]
+		print('---f_ts_node---')
+		print(f_ts_node)
+		print('---f_buchi_node---')
+		print(f_buchi_node)
+		print('---t_ts_node---')
+		print(t_ts_node)
+		print('---t_buchi_node---')
+		print(t_buchi_node)
+		succ_prod = set()
+		#succ_prod = []
+		#plot_automaton(product.graph['ts'])
+		for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
+			print('---prod_node_to---')
+			print(prod_node_to)
+			succ_prod.add(prod_node_to)
+			#succ_prod.append(prod_node_to)
+		#plot_automaton(product)
+		print('---succ_prod---')
+		print(succ_prod)
+		print('if ', t_ts_node, ' not in ', succ_prod)
+		if t_ts_node not in succ_prod:
+		#if t_ts_node in succ_prod:
+			print('---hali gali---')
+			print 'Oops, the current plan suffix contains invalid edges, need revision!'
+			print(index)
+			new_suffix = dijkstra_revise_once(product, run.suffix, index)
+			#plot_automaton(product)
+			#print(new_suffix)
+			break
+	if new_prefix or new_suffix:
+		if new_prefix:
+			run.prefix = new_prefix
+		if new_suffix:
+			run.suffix = new_suffix
+		run.prod_run_to_prod_edges(product)
+		run.plan_output(product)
+		print 'validate_and_revise_after_ts_change done in %.2fs' %(time.time()-start)
+		print(run.suffix)
+	else:
+		print 'local revision failed'
+		return False
+
+
+def validate_and_revise_after_sense_info(run, product, trace, sense_info):
+	new_prefix = None
+	new_suffix = None
+	start = time.time()
+	#plot_automaton(product)
+	#plot_automaton(product.graph['ts'].graph['region'])
+	changed_regs = product.graph['ts'].graph['region'].update_ts_after_sense_info(sense_info)
+	#plot_automaton(product)
+	#plot_automaton(product.graph['ts'].graph['region'])
+	print('---changed_regs---')
+	print(changed_regs)
+	#draw(product.graph['ts'])
+	if changed_regs:
+		changed_states = product.update_prod_aut_after_ts_update(sense_info)
+		run.changed_states = run.changed_states + changed_states
+		#plot_automaton(product)
+		#print('---run.pre_prod_edges---')
+		#print(run.pre_prod_edges)
+		if changed_states > 3:
+			new_run = improve_plan_given_history(product, trace)
+			print('---new_run---')
+			print(new_run.line)
+			print(new_run.loop)
+			run.line = new_run.line
+			run.loop = new_run.loop
+			print('---_run---')
+			print(run.line)
+			print(run.loop)
+			return run
+		else:
+			for (index, prod_edge) in enumerate(run.pre_prod_edges):
+				(f_ts_node, f_buchi_node) = prod_edge[0]
+				(t_ts_node, t_buchi_node) = prod_edge[1]
+				#print('---f_ts_node---')
+				#print(f_ts_node)
+				#print('---f_buchi_node---')
+				#print(f_buchi_node)
+				#print('---t_ts_node---')
+				#print(t_ts_node)
+				#print('---t_buchi_node---')
+				#print(t_buchi_node)
+				succ_prod = set()
+				for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
+					succ_prod.add(prod_node_to)
+				#plot_automaton(product.graph['ts'].graph['region'])
+				if t_ts_node not in succ_prod:
+						print 'Oops, the current plan prefix contains invalid edges, need revision!'
+						new_prefix = dijkstra_revise_once(product, run.prefix, index)
+						print(new_prefix)
+						break
+			print('---run.suf_prod_edges---')
+			print(run.suf_prod_edges)
+			for (index, prod_edge) in enumerate(run.suf_prod_edges):
+				print('---index---')
+				print(index)
+				print(len(run.suf_prod_edges))
+				print('---prod_edge---')
+				print(prod_edge)
+				(f_ts_node, f_buchi_node) = prod_edge[0]
+				(t_ts_node, t_buchi_node) = prod_edge[1]
+				print('---f_ts_node---')
+				print(f_ts_node)
+				print('---f_buchi_node---')
+				print(f_buchi_node)
+				print('---t_ts_node---')
+				print(t_ts_node)
+				print('---t_buchi_node---')
+				print(t_buchi_node)
+				succ_prod = set()
+				#succ_prod = []
+				#plot_automaton(product.graph['ts'])
+				for prod_node_to, weight in product.graph['ts'].fly_successors(f_ts_node):
+					print('---prod_node_to---')
+					print(prod_node_to)
+					succ_prod.add(prod_node_to)
+					#succ_prod.append(prod_node_to)
+				#plot_automaton(product)
+				print('---succ_prod---')
+				print(succ_prod)
+				print('if ', t_ts_node, ' not in ', succ_prod)
+				if t_ts_node not in succ_prod:
+				#if t_ts_node in succ_prod:
+					print('---hali gali---')
+					print 'Oops, the current plan suffix contains invalid edges, need revision!'
+					print(index)
+					new_suffix = dijkstra_revise_once(product, run.suffix, index)
+					#plot_automaton(product)
+					#print(new_suffix)
+					break
+			if new_prefix or new_suffix:
+				if new_prefix:
+					run.prefix = new_prefix
+				if new_suffix:
+					run.suffix = new_suffix
+				run.prod_run_to_prod_edges(product)
+				run.plan_output(product)
+				print 'validate_and_revise_after_ts_change done in %.2fs' %(time.time()-start)
+				print(run.suffix)
+			else:
+				print 'local revision failed'
+				return False
+
 
 def dijkstra_revise(product, run_segment, broken_edge_index):
 	suf_segment = run_segment[(broken_edge_index+1):-1]
@@ -268,6 +471,8 @@ def dijkstra_revise(product, run_segment, broken_edge_index):
 
 
 def dijkstra_revise_once(product, run_segment, broken_edge_index):
-	for (bridge, cost) in dijkstra_targets(product, run_segment[broken_edge_index-1], set([run_segment[-1]])):
-		new_run_segment = run_segment[0:(broken_edge_index-1)] + bridge
+	for (bridge, cost) in dijkstra_targets(product, run_segment[broken_edge_index], set([run_segment[-1]])):
+		print('---bridge---')
+		print(bridge)
+		new_run_segment = run_segment[0:(broken_edge_index)] + bridge
 		return new_run_segment

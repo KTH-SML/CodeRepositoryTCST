@@ -3,6 +3,7 @@
 from buchi import check_label_for_buchi_edge
 
 from networkx.classes.digraph import DiGraph
+from ltl_tools.automaton_vis import plot_automaton
 
 
 class ProdAut(DiGraph):
@@ -25,8 +26,10 @@ class ProdAut(DiGraph):
                                                         #print 'label,truth,total_weight', label,truth,total_weight
 							if truth:
 								self.add_edge(f_prod_node, t_prod_node, weight=total_weight)
+								#plot_automaton(self)
                                                                 #print 'add edge', (f_prod_node, t_prod_node)
-                print 'full product constructed with %d states and %s transitions' %(len(self.nodes()), len(self.edges())) 
+                print 'full product constructed with %d states and %s transitions' %(len(self.nodes()), len(self.edges()))
+		#plot_automaton(self)
 
 	def composition(self, ts_node, buchi_node):
 		prod_node = (ts_node, buchi_node)
@@ -73,14 +76,15 @@ class ProdAut(DiGraph):
 
 	def fly_successors(self, f_prod_node):
 		f_ts_node, f_buchi_node = self.projection(f_prod_node)
-		# been visited before, and hasn't changed 
-		if ((self.node[f_prod_node]['marker'] == 'visited') and 
+		# been visited before, and hasn't changed
+		if ((self.node[f_prod_node]['marker'] == 'visited') and
 			(self.graph['ts'].graph['region'].node[
 				self.graph['ts'].node[self.node[f_prod_node]['ts']]['region']]['status'] == 'confirmed')):
 			for t_prod_node in self.successors(f_prod_node):
 				yield t_prod_node, self[f_prod_node][t_prod_node]['weight']
 		else:
 			self.remove_edges_from(self.out_edges(f_prod_node))
+			#plot_automaton(self)
 			for t_ts_node,cost in self.graph['ts'].fly_successors(f_ts_node):
 				for t_buchi_node in self.graph['buchi'].successors(f_buchi_node):
 					t_prod_node = self.composition(t_ts_node, t_buchi_node)
@@ -91,6 +95,44 @@ class ProdAut(DiGraph):
 						self.add_edge(f_prod_node, t_prod_node, weight=total_weight)
 						yield t_prod_node, total_weight
 			self.node[f_prod_node]['marker'] = 'visited'
+		#plot_automaton(self)
+
+	def update_prod_aut_after_ts_update(self, sense_info):
+		changed_regions = []
+		region_info = sense_info['regions']
+		for (n, label) in region_info.iteritems():
+			#prod_node = (label, 'None')
+			print(n)
+			prod_node = self.graph['ts'].composition(n, 'None')
+			if prod_node not in changed_regions:
+				changed_regions.append((n, 'None'))
+		#plot_automaton(self.graph['ts'])
+		edge_info = sense_info['edge']
+		for e in edge_info[0]:
+			prod_node = (e[0], 'None')
+			if prod_node not in changed_regions:
+				changed_regions.append((e[0], 'None'))
+				changed_regions.append((e[1], 'None'))
+		for e in edge_info[1]:
+			prod_node = (e[0], 'None')
+			if prod_node not in changed_regions:
+				changed_regions.append((e[0], 'None'))
+				changed_regions.append((e[1], 'None'))
+
+		changed_states = 0
+		for i in range(0, len(changed_regions)):
+			for f_buchi_node in self.graph['buchi'].nodes():
+				prod_node = self.composition(changed_regions[i], f_buchi_node)
+				#print('---prod update---')
+				#print prod_node
+				if prod_node in self.nodes():
+					#print('---prod update---')
+					#print prod_node
+					self.node[prod_node]['marker'] = 'unvisited'
+					changed_states = changed_states + 1
+		#plot_automaton(self.graph['ts'])
+		return changed_states
+
 
 
 class ProdAut_Run(object):
@@ -101,9 +143,12 @@ class ProdAut_Run(object):
 		self.prefix = prefix
 		self.precost = precost
 		self.suffix = suffix
+		self.changed_states = 0
+		#print('---suffix---')
+		#print(self.suffix)
 		self.sufcost = sufcost
 		self.totalcost = totalcost
-		#self.prod_run_to_prod_edges(product)
+		self.prod_run_to_prod_edges(product)
 		self.plan_output(product)
 		#self.plan = chain(self.line, cycle(self.loop))
 		#self.plan = chain(self.loop)
@@ -115,41 +160,38 @@ class ProdAut_Run(object):
 	def plan_output(self, product):
 		self.line = [product.node[node]['ts'] for node in self.prefix]
 		self.loop = [product.node[node]['ts'] for node in self.suffix]
-                if len(self.line) == 2:
-                        self.pre_ts_edges = [(self.line[0], self.line[1])]
-                else:
-		        self.pre_ts_edges = zip(self.line[0:-1], self.line[1:])
-                if len(self.loop) == 2:
-                        self.suf_ts_edges = [(self.loop[0], self.loop[1])]
-                else:
-		        self.suf_ts_edges = zip(self.loop[0:-1], self.loop[1:])
-                self.suf_ts_edges.append((self.loop[-1],self.loop[0]))
+		if len(self.line) == 2:
+			self.pre_ts_edges = [(self.line[0], self.line[1])]
+		else:
+			self.pre_ts_edges = zip(self.line[0:-1], self.line[1:])
+		if len(self.loop) == 2:
+			self.suf_ts_edges = [(self.loop[0], self.loop[1])]
+		else:
+			self.suf_ts_edges = zip(self.loop[0:-1], self.loop[1:])
+			#self.suf_ts_edges.append((self.loop[-1],self.loop[0]))
 		# output plan
 		self.pre_plan = []
-		self.pre_plan.append(self.line[0][0]) 
+		self.pre_plan.append(self.line[0][0])
+		print('---ts_edges---')
+		print(len(self.pre_ts_edges))
 		for ts_edge in self.pre_ts_edges:
+			#print(product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'])
 			if product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'] == 'goto':
-				self.pre_plan.append(ts_edge[1][0]) # motion 
+				self.pre_plan.append(ts_edge[1][0]) # motion
 			else:
 				self.pre_plan.append(ts_edge[1][1]) # action
-                bridge = (self.line[-1],self.loop[0])
-                if product.graph['ts'][bridge[0]][bridge[1]]['label'] == 'goto':
-			self.pre_plan.append(bridge[1][0]) # motion 
-		else:
-			self.pre_plan.append(bridge[1][1]) # action
-		self.suf_plan = []		
+		self.suf_plan = []
+		if self.loop:
+			bridge = (self.line[-1],self.loop[0])
+			if product.graph['ts'][bridge[0]][bridge[1]]['label'] == 'goto':
+				#print('bridge')
+				self.suf_plan.append(bridge[1][0]) # motion
+			else:
+				self.suf_plan.append(bridge[1][1]) # action
+
+		#self.suf_plan.append(self.loop[0][0])
 		for ts_edge in self.suf_ts_edges:
 			if product.graph['ts'][ts_edge[0]][ts_edge[1]]['label'] == 'goto':
-				self.suf_plan.append(ts_edge[1][0]) # motion 
+				self.suf_plan.append(ts_edge[1][0]) # motion
 			else:
 				self.suf_plan.append(ts_edge[1][1]) # action
-
-
-
-
-
-
-
-
-
-

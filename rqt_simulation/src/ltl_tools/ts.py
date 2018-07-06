@@ -4,12 +4,13 @@ from boolean_formulas.parser import parse as parse_guard
 
 from math import sqrt
 from networkx.classes.digraph import DiGraph
+from ltl_tools.automaton_vis import plot_automaton
 
 def distance(pose1, pose2):
-    print('pose')
-    print(pose1)
-    print(pose2)
-    return (sqrt((pose1[0][0]-pose2[0][0])**2+(pose1[0][1]-pose2[0][1])**2)+0.001)
+    #print('pose')
+    #print(pose1)
+    #print(pose2)
+    return (sqrt((pose1[0][0]-pose2[0][0])**2+(pose1[0][1]-pose2[0][1])**2+(pose1[0][2]-pose2[0][2])**2)+0.001)
 
 def reach_waypoint(pose, waypoint, margin):
     if distance(pose, waypoint)<=margin:
@@ -21,12 +22,15 @@ class MotionFts(DiGraph):
     def __init__(self, node_dict, symbols, ts_type):
         DiGraph.__init__(self, symbols=symbols, type=ts_type, initial=set())
         for (n, label) in node_dict.iteritems():
+            #print('---set init---')
+            #print(n)
+            #print(label)
             self.add_node(n, label=label, status='confirmed')
 
 
     def add_un_edges(self, edge_list, unit_cost=1):
         for edge in edge_list:
-            print(edge)
+            #print(edge)
             f_node = edge[0]
             t_node = edge[1]
             dist = distance(f_node, t_node)
@@ -61,7 +65,10 @@ class MotionFts(DiGraph):
         # label udpate
         label_info = sense_info['label']
         label_info.update(com_info)
+        #print('---ts---')
+        #print(label_info)
         for mes in label_info:
+            print(mes)
             if mes[1]:
                 close_node = self.closest_node(mes[0])
                 if distance(close_node, mes[0])>margin:
@@ -84,6 +91,44 @@ class MotionFts(DiGraph):
             changed_regs.add(e[0])
             self.node[close_node]['status'] = 'notconfirmed'
         return chnaged_regs
+
+    def update_ts_after_sense_info(self, sense_info):
+        # sense_info = {'label':set((x,y), l', l'_)), 'edge': [add_edges, del_edges]}
+        changed_regs = set()
+        # label udpate
+        region_info = sense_info['regions']
+        #plot_automaton(self)
+        #print('---ts---')
+        #print(region_info)
+        for (n, label) in region_info.iteritems():
+            if n not in self.nodes():
+                self.add_node(n, label=label, status='notconfirmed')
+            else:
+                self.node[n]['label'] = set(label)
+                self.node[n]['status'] = 'notconfirmed'
+                print(self.node[n]['label'])
+            changed_regs.add(n)
+
+        # edges udpate
+        edge_info = sense_info['edge']
+        #print('---edge---')
+        #print edge_info
+        for e in edge_info[0]:
+            #print('---add edges---')
+            #print(e)
+            self.add_edge(e[0], e[1], weight=distance(e[0], e[1]))
+            changed_regs.add(e[0])
+            self.node[e[0]]['status'] = 'notconfirmed'
+            #self.node[e[1]]['status'] = 'notconfirmed'
+        for e in edge_info[1]:
+            #print('---remove edges---')
+            #print(e)
+            self.remove_edge(e[0], e[1])
+            changed_regs.add(e[0])
+            self.node[e[0]]['status'] = 'notconfirmed'
+            #self.node[e[1]]['status'] = 'notconfirmed'
+        #plot_automaton(self)
+        return changed_regs
 
 class ActionModel(object):
     # action_dict = {act_name: (cost, guard_formula, label)}
@@ -113,11 +158,14 @@ class MotActModel(DiGraph):
 
     def composition(self, reg, act):
         prod_node = (reg, act)
+        new_label = self.graph['region'].node[reg]['label'].union(self.graph['action'].action[act][2])
         if not self.has_node(prod_node):
             new_label = self.graph['region'].node[reg]['label'].union(self.graph['action'].action[act][2])
             self.add_node(prod_node, label=new_label, region=reg, action=act, marker='unvisited')
             if ((reg in self.graph['region'].graph['initial']) and (act == 'None')):
                 self.graph['initial'].add(prod_node)
+        if self.node[prod_node]['label'] != new_label:
+            self.node[prod_node]['label'] = new_label
         return prod_node
 
     def projection(self, prod_node):
@@ -154,8 +202,10 @@ class MotActModel(DiGraph):
         if ((self.node[prod_node]['marker'] == 'visited') and
             (self.graph['region'].node[self.node[prod_node]['region']]['status'] == 'confirmed')):
             for prod_node_to in self.successors(prod_node):
+                #print('in ts fly_successors visited')
                 yield prod_node_to, self[prod_node][prod_node_to]['weight']
         else:
+            #print('in ts fly_successors')
             self.remove_edges_from(self.out_edges(prod_node))
             # actions
             label = self.graph['region'].node[reg]['label']
@@ -166,11 +216,14 @@ class MotActModel(DiGraph):
                 yield prod_node_to, cost
             # motions
             for reg_to in self.graph['region'].successors(reg):
-                if reg_to != reg:
-                    prod_node_to = self.composition(reg_to, 'None')
-                    cost = self.graph['region'][reg][reg_to]['weight']
-                    self.add_edge(prod_node, prod_node_to, weight=cost, label= 'goto')
-                    yield prod_node_to, cost
+                #print('ts successors')
+                #print(reg_to)
+                #plot_automaton(self.graph['region'])
+            #    if reg_to != reg:
+                prod_node_to = self.composition(reg_to, 'None')
+                cost = self.graph['region'][reg][reg_to]['weight']
+                self.add_edge(prod_node, prod_node_to, weight=cost, label= 'goto')
+                yield prod_node_to, cost
             self.graph['region'].node[self.node[prod_node]['region']]['status'] = 'confirmed'
             self.node[prod_node]['marker'] = 'visited'
 

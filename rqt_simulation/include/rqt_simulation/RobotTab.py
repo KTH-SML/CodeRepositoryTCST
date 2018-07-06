@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+'''
+This is the robot tab. It loads all relevant interactive button and
+robot specific ros publisher and ros subscriber
+'''
 
 import os
 import sys
@@ -24,6 +28,9 @@ from python_qt_binding.QtGui import QImageReader, QImage, QMouseEvent, QCursor, 
 from rqt_simulation.ROS_Publisher import ROS_Publisher
 from rqt_simulation.ROS_Subscriber import ROS_Subscriber
 from rqt_simulation.CustomComboBox import CustomComboBox
+from rqt_simulation.TemporaryTask_dialog import TemporaryTask_dialog
+
+from rqt_simulation_msgs.msg import TemporaryTask
 
 import actionlib
 from actionlib import SimpleActionClient
@@ -36,26 +43,37 @@ class RobotTab(QWidget):
     def __init__(self, num_robots, robots):
         super(RobotTab, self).__init__()
 
-        # Variables for ROS Publisher
-        #self.ros_publisher = ROS_Publisher()
+
+        # Available robots from gui_config.yaml
         self.robots = robots
+        # Set robot type by default to ground
         self.agent_type = 'ground'
 
+        # Number of robots
         self.num_robots = num_robots
+
+        # Set the robot name by default
         self.robot_name = 'robot' + str(self.num_robots)
 
+        # Set layout for tab
         self.layout = QVBoxLayout()
+
+        # Robot tab title
         self.robot_label_name = QLabel(('Robot ' + str(self.num_robots)))
         font = QFont()
         font.setPointSize(14)
         font.setBold(True)
         self.robot_label_name.setFont(font)
         self.layout.addWidget(self.robot_label_name)
+
+        # Robot name label and input line
         self.robot_label = QLabel('Robot name')
         self.layout.addWidget(self.robot_label)
         self.robot_name_input = QLineEdit('robot' + str(self.num_robots))
-        self.robot_name_input.editingFinished.connect(self.robot_name_changed)
+        #self.robot_name_input.editingFinished.connect(self.robot_name_changed)
         self.layout.addWidget(self.robot_name_input)
+
+        # Robot model label and comboBox
         self.robot_model_label = QLabel('Robot model')
         self.layout.addWidget(self.robot_model_label)
         self.robot_comboBox = CustomComboBox(self.num_robots-1)
@@ -63,19 +81,23 @@ class RobotTab(QWidget):
         self.layout.addWidget(self.robot_comboBox)
         self.robot_comboBox.signalIndexChanged.connect(self.set_agent_type)
 
+        # Initial pose
         self.robot_label_init = QLabel('Initial pose')
         self.layout.addWidget(self.robot_label_init)
         self.robot_comboBox_init = CustomComboBox(self.num_robots)
         self.layout.addWidget(self.robot_comboBox_init)
 
+        # Add initial pose text item to graphic
         initial_pose_textItem = QGraphicsTextItem('start_' + str(self.num_robots).zfill(2))
         self.initial_pose = {'start_' + str(self.num_robots).zfill(2) : {'label' : 'r01', 'text_item' : initial_pose_textItem}}
 
+        # Use Qualisys
         self.robot_localization_label = QLabel('Localization')
         self.layout.addWidget(self.robot_localization_label)
         self.robot_localization_checkBox = QCheckBox('Use Qualisys')
         self.layout.addWidget(self.robot_localization_checkBox)
 
+        # Task specifications
         self.robot_label_task_title = QLabel('Task robot ' + str(self.num_robots))
         self.robot_label_task_title.setFont(font)
         self.layout.addWidget(self.robot_label_task_title)
@@ -88,6 +110,7 @@ class RobotTab(QWidget):
         self.robot_soft_task_input = QLineEdit()
         self.layout.addWidget(self.robot_soft_task_input)
 
+        # Plan display
         self.robot_label_prefix = QLabel('Planner prefix robot ' + str(self.num_robots))
         self.layout.addWidget(self.robot_label_prefix)
         self.robot_prefix_textbox = QTextBrowser()
@@ -97,27 +120,32 @@ class RobotTab(QWidget):
         self.robot_sufix_textbox = QTextBrowser()
         self.layout.addWidget(self.robot_sufix_textbox)
 
+        # Current goal display
         self.robot_label_current_goal = QLabel('Current goal robot ' + str(self.num_robots))
         self.layout.addWidget(self.robot_label_current_goal)
         self.robot_current_goal_textbox = QTextBrowser()
         self.layout.addWidget(self.robot_current_goal_textbox)
 
+        # Clear costmap button
         self.robot_resend_goal_button = QPushButton('Clear costmap')
         self.layout.addWidget(self.robot_resend_goal_button)
 
+        # Temporary task button
+        self.robot_temporary_task_button = QPushButton('Temporary task')
+        self.layout.addWidget(self.robot_temporary_task_button)
+        self.robot_temporary_task_button.clicked.connect(self.temporary_task_button_pressed)
 
         self.setLayout(self.layout)
 
+        # Messages for publishing pose, soft-task, hard-task and clear_costmap
         self.init_pose_msg = Pose()
         self.soft_task_msg = String()
         self.hard_task_msg = String()
-        #self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
-        #self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
-        #self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
 
         self.prefix_string = ''
         self.sufix_string = ''
 
+        # Marker displaying robots name
         self.label_marker_msg = Marker()
         self.label_marker_msg.pose = self.init_pose_msg
         self.label_marker_msg.pose.position.z = 1.0
@@ -132,29 +160,20 @@ class RobotTab(QWidget):
         self.label_marker_msg.color.b = 0.0
         self.label_marker_msg.header.frame_id = '/map'
 
-        self.last_current_pose = PoseStamped()
-        #self.last_footprint_point = PointStamped()
-
-        #self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
-
+        # Pose msg published for planner
         self.pose_msg = PoseWithCovarianceStamped()
+
+        # Init pose msg for planner
         self.pose_msg.pose.pose = self.init_pose_msg
-        #self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
-        #self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
-        #self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
-        #self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
-        #self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
 
-        self.simulation_started = False
-
-        #self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
+        # Clear costmap and resend current goal
         self.robot_resend_goal_button.clicked.connect(self.call_clear_costmap_srvs)
-
-        #self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
         self.robot_current_goal = MoveBaseActionGoal()
 
-        self.start_publisher_and_subscriber()
+        # Start all publisher and Subscriber
+        #self.start_publisher_and_subscriber()
 
+    # AMCL pose callback
     def current_pose_amcl_callback(self, msg):
         if self.robot_localization_checkBox.checkState() != 2:
             self.pose_msg.pose.pose = deepcopy(msg.pose.pose)
@@ -163,12 +182,11 @@ class RobotTab(QWidget):
 
             if self.agent_type == 'ground':
                 self.label_marker_msg.header = msg.header
-                self.label_marker_msg.pose = msg.pose.pose
+                self.label_marker_msg.pose = deepcopy(msg.pose.pose)
                 self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1
-        #print(self.pose_msg)
 
+    # Localization with Qualisys
     def current_pose_qualisys_callback(self, msg):
-        #print('got it')
         if self.robot_localization_checkBox.checkState() == 2:
             self.pose_msg.header = deepcopy(msg.header)
             self.pose_msg.pose.pose = deepcopy(msg.pose)
@@ -179,139 +197,83 @@ class RobotTab(QWidget):
                 self.label_marker_msg.pose = msg.pose
                 self.label_marker_msg.pose.position.z = deepcopy(msg.pose.position.z) + 1
 
+    # Localization with Gazebo ground truth
     def current_pose_gazebo_ground_truth_callback(self, msg):
         if self.agent_type == 'arial':
             self.label_marker_msg.header = msg.header
             self.label_marker_msg.pose = msg.pose.pose
             self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1.0
 
-    def current_pose_gui_callback(self, msg):
-        if self.simulation_started:
-            if self.agent_type == 'ground':
-                msg_pose_rounded = Pose()
-                msg_pose_rounded.position.x = round(msg.pose.pose.position.x - 0.005, 2)
-                msg_pose_rounded.position.y = round(msg.pose.pose.position.y - 0.005, 2)
-                msg_pose_rounded.position.z = round(msg.pose.pose.position.z - 0.005, 2)
-
-                msg_pose_rounded.orientation.w = round(msg.pose.pose.orientation.w - 0.005, 2)
-                msg_pose_rounded.orientation.x = round(msg.pose.pose.orientation.x - 0.005, 2)
-                msg_pose_rounded.orientation.y = round(msg.pose.pose.orientation.y - 0.005, 2)
-                msg_pose_rounded.orientation.z = round(msg.pose.pose.orientation.z - 0.005, 2)
-
-                same_pose = self.two_poses(msg_pose_rounded, self.last_current_pose.pose)
-
-                moved_distance = sqrt((msg.pose.pose.position.x - self.last_current_pose.pose.position.x)**2 + (msg.pose.pose.position.y - self.last_current_pose.pose.position.y)**2 +(msg.pose.pose.position.z - self.last_current_pose.pose.position.z)**2)
-                current_R = quaternion_matrix([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
-                last_R = quaternion_matrix([self.last_current_pose.pose.orientation.x, self.last_current_pose.pose.orientation.y, self.last_current_pose.pose.orientation.z, self.last_current_pose.pose.orientation.w])
-                performed_rotation_R = np.dot(current_R, last_R)
-                performed_rotation = np.linalg.norm(performed_rotation_R)
-
-                if (moved_distance > 0.05) and (performed_rotation > 0.05):
-                    self.last_current_pose.header.stamp = rospy.Time.now()
-
-                #if not same_pose:
-                #    self.last_current_pose.header.stamp = rospy.Time.now()
-
-                if (rospy.Time.now() - self.last_current_pose.header.stamp).to_sec() > 5.0:
-                    print('clear')
-                    self.clear_costmap()
-                    usleep = lambda x: time.sleep(x)
-                    usleep(1)
-                    self.move_base_ac.send_goal(self.robot_current_goal.goal)
-                    self.last_current_pose.header.stamp = rospy.Time.now()
-                self.last_current_pose.pose = deepcopy(msg_pose_rounded)
-
-
-
-
-
-    def two_poses(self, pose1, pose2):
-        if pose1.position.x == pose2.position.x and \
-        pose1.position.y == pose2.position.y and \
-        pose1.position.z == pose2.position.z and \
-        pose1.orientation.x == pose2.orientation.x and \
-        pose1.orientation.y == pose2.orientation.y and \
-        pose1.orientation.z == pose2.orientation.z and \
-        pose1.orientation.w == pose2.orientation.w:
-            return True
-        else:
-            return False
-
+    # Sends topic to planner to clear costmap manual
     @Slot(bool)
     def call_clear_costmap_srvs(self):
         if self.agent_type == 'ground':
-            self.clear_costmap()
-            usleep = lambda x: time.sleep(x)
-            usleep(1)
-            self.move_base_ac.send_goal(self.robot_current_goal.goal)
-            print('Costmap cleared')
+            bool = Bool()
+            bool.data = True
+            self.clear_costmap_publisher.publish(bool)
 
+    # Opens dialog for temporary task
+    @Slot(bool)
+    def temporary_task_button_pressed(self):
+        temporary_task_dialog = TemporaryTask_dialog()
+        temporary_task_dialog.exec_()
+        if temporary_task_dialog.atomic_propositions:
+            temporary_task_msg = TemporaryTask()
+            temporary_task_msg.header.stamp = rospy.Time.now()
+            for i in range(0, len(temporary_task_dialog.atomic_propositions)):
+                string_msg = String()
+                string_msg.data = temporary_task_dialog.atomic_propositions[i]
+                temporary_task_msg.task.append(string_msg)
+            temporary_task_msg.T_des.data = temporary_task_dialog.T_des
+            self.temporary_task_publisher.publish(temporary_task_msg)
+
+    # If robot name in tab has changed the subscriber and publisher topics are updated
     def robot_name_changed(self):
-        '''
-        del self.ros_publisher
-        del self.current_pose_amcl_subscriber
-        del self.current_pose_qualisys_subscriber
-        del self.current_pose_gazebo_ground_truth_subscriber
-        del self.local_footprint_subscriber
-        del self.clear_costmap
-        del self.move_base_ac
-        '''
-
         self.remove_publisher_and_subscriber()
-
         self.robot_name = self.robot_name_input.text()
-
-        '''
-        self.ros_publisher = ROS_Publisher()
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
-        self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
-        self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
-        self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
-        self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
-        self.local_footprint_subscriber = rospy.Subscriber('/' + self.robot_name + '/move_base/local_costmap/footprint', PolygonStamped, self.local_footprint_callback)
-        self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
-        self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
-        '''
-
         self.start_publisher_and_subscriber()
-
         self.label_marker_msg.text = self.robot_name
-
         self.signalRobotNameChanged.emit(self.num_robots)
 
+    # Start all publisher and subscriber from robot tab
     def start_publisher_and_subscriber(self):
+        self.robot_name = self.robot_name_input.text()
         self.ros_publisher = ROS_Publisher()
         self.ros_publisher.add_publisher('/' + self.robot_name + '/init_pose', Pose, 1.0, self.init_pose_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/soft_task', String, 1.0, self.soft_task_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/hard_task', String, 1.0, self.hard_task_msg)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/label_marker', Marker, 5.0, self.label_marker_msg)
+        self.temporary_task_publisher = rospy.Publisher('/' + self.robot_name + '/temporary_task', TemporaryTask, queue_size=1)
+        self.clear_costmap_publisher = rospy.Publisher('/' + self.robot_name + '/clear_costmap', Bool, queue_size=1)
         self.current_pose_amcl_subscriber = rospy.Subscriber('/' + self.robot_name + '/amcl_pose', PoseWithCovarianceStamped, self.current_pose_amcl_callback)
         self.current_pose_qualisys_subscriber = rospy.Subscriber('/' + self.robot_name + '/qualisys_pose_map', PoseStamped, self.current_pose_qualisys_callback)
         self.current_pose_gazebo_ground_truth_subscriber = rospy.Subscriber('/' + self.robot_name + '/ground_truth/pose_with_covariance', PoseWithCovarianceStamped, self.current_pose_gazebo_ground_truth_callback)
         self.ros_publisher.add_publisher('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, 15.0, self.pose_msg)
-        self.current_pose_gui_subscriber = rospy.Subscriber('/' + self.robot_name + '/pose_gui', PoseWithCovarianceStamped, self.current_pose_gui_callback)
-        self.clear_costmap = rospy.ServiceProxy('/' + self.robot_name + '/move_base/clear_costmaps', Empty)
-        self.move_base_ac = actionlib.SimpleActionClient('/' + self.robot_name + '/move_base', MoveBaseAction)
 
         self.label_marker_msg.text = self.robot_name
 
+    # Remove all publisher and subcriber from robot tab
     def remove_publisher_and_subscriber(self):
         del self.ros_publisher
+        del self.clear_costmap_publisher
+        del self.temporary_task_publisher
         del self.current_pose_amcl_subscriber
         del self.current_pose_qualisys_subscriber
         del self.current_pose_gazebo_ground_truth_subscriber
-        del self.current_pose_gui_subscriber
-        del self.clear_costmap
-        del self.move_base_ac
 
-
-
+    # Updates robot type if model checkbox was changed
     def set_agent_type(self):
         if self.robot_comboBox.currentText() in self.robots['robot_types']['arial']:
             self.agent_type = 'arial'
         else:
             self.agent_type = 'ground'
+
+    def build_init_pose_msg(self, id):
+        self.init_pose_msg.position.x = self.initial_pose['start_' + str(id).zfill(2)]['pose']['position'][0]
+        self.init_pose_msg.position.y = self.initial_pose['start_' + str(id).zfill(2)]['pose']['position'][1]
+        self.init_pose_msg.position.z = self.initial_pose['start_' + str(id).zfill(2)]['pose']['position'][2]
+        self.init_pose_msg.orientation.w = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][0]
+        self.init_pose_msg.orientation.x = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][1]
+        self.init_pose_msg.orientation.y = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][2]
+        self.init_pose_msg.orientation.z = self.initial_pose['start_' + str(id).zfill(2)]['pose']['orientation'][3]
 
