@@ -33,6 +33,15 @@ In as second terminal window also go to the workspace, source it and start rqt:
 
         $ cd ![catkin_ws]
         $ source devel/setup.bash
-        $ roscore
+        $ rqt
 
 Click on the top left corner on Plugins and choose simulation.
+
+*`![catkin_ws]` is the directory to your catkin workspace
+
+## Setup
+
+### Worlds
+
+Choose a world in the GUI.
+Worlds can be added by appending the list in the file [gui_config.yaml](rqt_simulation/config/gui_config.yaml) 
