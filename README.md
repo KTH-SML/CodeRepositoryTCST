@@ -46,7 +46,7 @@ Worlds can be added by:
 
 1. Appending the list in the file [gui_config.yaml](rqt_simulation/config/gui_config.yaml)
 
-2. Add a folder with <world_name> [here](rqt_simulation/scenario/). The folder contains an image from the map (map.png) and the correspoding parameterfile (map.yaml). You must follow the naming conventions of the files to load them successfully in the GUI.
+2. Add a folder with <world_name> [here](rqt_simulation/scenarios/). The folder contains an image from the map (map.png) and the correspoding parameterfile (map.yaml). You must follow the naming conventions of the files to load them successfully in the GUI.
 
 3. If you use the world for simulations, add the Gazebo world file [here](rqt_simulation/worlds/gazebo/). Again the file must be named as <world_name>.worlds
 
@@ -103,3 +103,5 @@ If everything is set up press the button "Setup experiment" in the GUI.
 ## Data logging
 
 By pressing the button "Record data" the robot trajectories and temporary task are saved [here](rqt_simulation/logging/).
+
+## Troubleshooting
