@@ -63,7 +63,6 @@ class Map_dialog(QDialog):
         self.button_save_FTS.setEnabled(False)
         sorted_keys = self.FTS.region_of_interest.keys()
         sorted_keys.sort()
-        print(sorted_keys)
         for i in range(0, len(self.map_utiles.edge_matrix)):
             self.FTS.region_of_interest[sorted_keys[i]]['edges'] = []
             for j in range(0, len(self.map_utiles.edge_matrix[0])):
@@ -72,7 +71,6 @@ class Map_dialog(QDialog):
 
         print('start saving')
         data = {'FTS' : self.FTS.region_of_interest}
-        print(data)
         env_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
@@ -116,7 +114,6 @@ class Map_dialog(QDialog):
 
     @Slot(bool)
     def general_ap(self):
-        print 'now'
         generalAP_dialog = GeneralAP_dialog(self.graphicsScene, self.FTS)
         generalAP_dialog.exec_()
 

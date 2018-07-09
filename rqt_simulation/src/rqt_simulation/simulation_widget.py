@@ -207,11 +207,7 @@ class SimulationWidget(QWidget):
             for i in range(0, len(self.FTS.region_of_interest)):
                 if self.position_msg_to_tuple(n.position) == tuple(self.FTS.region_of_interest[self.FTS.region_of_interest.keys()[i]]['pose']['position']):
                     self.prefix_string =  self.prefix_string + self.FTS.region_of_interest.keys()[i] + ' --> '
-                    #print('match')
-        #print(self.prefix_string)
-        #print(self.prefix_plan_topic_list)
         index = self.prefix_plan_topic_list.index(source)
-        #print(index)
         # Send signal for received msg
         self.prefix_plan_subscriber_list[index].received.emit(index)
 
@@ -221,8 +217,6 @@ class SimulationWidget(QWidget):
         self.tab_list[index].robot_prefix_textbox.clear()
         self.tab_list[index].robot_prefix_textbox.insertPlainText('Prefix: ')
         self.tab_list[index].robot_prefix_textbox.insertPlainText(self.prefix_string)
-        #print(self.prefix_string)
-        #self.prefix_string = ''
         self.button_setup.setEnabled(True)
         self.button_setup_exp.setEnabled(True)
 
@@ -278,15 +272,12 @@ class SimulationWidget(QWidget):
 
             self.button_execute_task.setEnabled(True)
 
-        print(self.prefix_plan_topic_list)
-
     # Change initial pose if checkBox entry changed
     # index: Is Checkbox index to set initial pose
     # id: Is the ID of the robot tab, for changing the initial pose of the right robot
     @pyqtSlot(int, int)
     def set_init_pose_id(self, index, id):
         if self.tab_list[id -1].robot_comboBox_init.count() > 0:
-            print('--------')
             # Get the initial pose
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['pose'] = self.FTS.region_of_interest[self.tab_list[id -1].robot_comboBox_init.currentText()]['pose']
             self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)]['label'] = self.tab_list[id -1].robot_comboBox_init.currentText()
@@ -303,9 +294,6 @@ class SimulationWidget(QWidget):
                 rect = self.current_graphicsScene.items_dict[self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label']]['ellipse_item'].rect()
                 point = rect.topLeft()
                 self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'].setPos(point.x() - 11, point.y() - 22)
-            print(self.tab_list[id -1].initial_pose['start_' + str(id).zfill(2)])
-            print(id)
-
 
     # Setup simulation, gazebo and RVIZ
     @Slot(bool)
@@ -329,7 +317,6 @@ class SimulationWidget(QWidget):
         robot_list = []
         tf_prefixes = []
         for i in range(0, self.num_robots):
-            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
             robot_list.append(self.robots['Models'][self.tab_list[i].robot_comboBox.currentText()]['robot_model'])
             tf_prefixes.append(self.tab_list[i].robot_name)
 
@@ -350,7 +337,6 @@ class SimulationWidget(QWidget):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot.launch')]))
 
             # Get orientation from pose
-            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
             quaternion = Quaternion(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
@@ -426,7 +412,6 @@ class SimulationWidget(QWidget):
             launch_robot_list.append(roslaunch.parent.ROSLaunchParent(uuid, [os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'launch', 'robot_exp.launch')]))
 
             # Get orientation from pose
-            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
             quaternion = Quaternion(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose']['orientation'])
             rot_axis = quaternion.axis
             theta = quaternion.angle * rot_axis[2]
@@ -494,8 +479,6 @@ class SimulationWidget(QWidget):
             sys.argv.append('scenario_file:=' + self.scenario_file)
             roslaunch_task_list[i].start()
             del sys.argv[2:len(sys.argv)]
-
-            print(self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)])
 
         data.update({'Tasks' : robot_setup})
         data.update({'Map' : self.world_comboBox.currentText()})
@@ -652,8 +635,6 @@ class SimulationWidget(QWidget):
         sorted_keys.sort()
         stream.close()
 
-        #print(self.FTS.region_of_interest)
-
         self.scenario_file = scenario_file[0]
 
         self.current_graphicsScene.load_graphic_from_FTS(self.FTS)
@@ -669,7 +650,6 @@ class SimulationWidget(QWidget):
             if i > 0:
                 self.add_robot()
             self.tab_list[i].robot_name_input.setText(robot_tabs.keys()[i])
-            print(robot_tabs[robot_tabs.keys()[i]])
             self.tab_list[i].robot_comboBox.setCurrentIndex(self.tab_list[i].robot_comboBox.findText(robot_tabs[robot_tabs.keys()[i]]['robot_model']))
             self.tab_list[i].robot_comboBox_init.setCurrentIndex(self.tab_list[i].robot_comboBox_init.findText(robot_tabs[robot_tabs.keys()[i]]['initial_pose']))
             self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['pose'] = self.FTS.region_of_interest[self.tab_list[i].robot_comboBox_init.currentText()]['pose']
@@ -716,7 +696,6 @@ class FTS:
         directory = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS')
         File_dialog = QFileDialog(directory=directory, filter='.yaml')
         FTS_file = File_dialog.getOpenFileName()
-        print(FTS_file[0])
         stream = file(FTS_file[0], 'r')
         data = yaml.load(stream)
         stream.close()

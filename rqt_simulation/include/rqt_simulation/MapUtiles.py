@@ -40,15 +40,10 @@ class MapUtiles(QObject):
 
     # Add ROI with mouse click
     def pointSelection(self, pos):
-        print('scene')
-        print(pos)
         self.clicked = True
         self.current_arrow = []
         self.graphicsScene.add_ROI(pos)
-        print(self.graphicsScene.regionCounter)
         self.pose_of_interest = {'position' : self.graphicsScene.pixelToWorld(pos)}
-        print(self.graphicsScene.pixelToWorld(pos))
-
         self.add_FTS_matrix()
 
     # Set orientation of ROI by releasing mouse button
@@ -181,11 +176,9 @@ class MapUtiles(QObject):
                 if row < col:
                     if (str(row+1) + '-' + str(col+1)) not in self.graphicsScene.line_dict.keys():
                         self.graphicsScene.add_edge(row+1, col+1)
-                        print((str(row+1) + '-' + str(col+1)))
                 else:
                     if (str(col+1) + '-' + str(row+1)) not in self.graphicsScene.line_dict.keys():
                         self.graphicsScene.add_edge(col+1, row+1)
-                        print((str(col+1) + '-' + str(row+1)))
         elif state == 0:
             if self.edge_matrix[col][row].checkState() != self.edge_matrix[row][col].checkState():
                 self.edge_matrix[col][row].setCheckState(0)

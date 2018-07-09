@@ -65,7 +65,6 @@ class Change_FTS_dialog(QDialog):
 
     @Slot(bool)
     def general_ap(self):
-        print 'now'
         generalAP_dialog = GeneralAP_dialog(self.graphicsScene, self.FTS)
         generalAP_dialog.exec_()
         self.sense_pub.publish(generalAP_dialog.sense_msg)

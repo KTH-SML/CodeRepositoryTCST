@@ -64,7 +64,6 @@ class GeneralAP_dialog(QDialog):
 
             for j in range(0, len(self.FTS.region_of_interest[self.sorted_keys[i]]['propos'])):
                 if (self.FTS.region_of_interest[self.sorted_keys[i]]['propos'][j] not in self.ap_list) and (self.FTS.region_of_interest[self.sorted_keys[i]]['propos'][j] != self.sorted_keys[i]):
-                    print(self.FTS.region_of_interest[self.sorted_keys[i]]['propos'][j])
                     self.ap_list.append(self.FTS.region_of_interest[self.sorted_keys[i]]['propos'][j])
 
         for i in range(0, len(self.FTS.region_of_interest)):
@@ -89,7 +88,6 @@ class GeneralAP_dialog(QDialog):
         add_ap_dialog.exec_()
 
         if add_ap_dialog.new_ap:
-            print(add_ap_dialog.new_ap)
             for i in range(0, len(self.FTS.region_of_interest)):
                 self.ap_matrix[i].append(CustomCheckBox(add_ap_dialog.new_ap, i, len(self.ap_list)))
                 self.ap_matrix[i][-1].signalStateChanged.connect(self.add_textItem)
@@ -106,21 +104,15 @@ class GeneralAP_dialog(QDialog):
 
     @Slot(bool)
     def save(self):
-        print(self.ap_list)
         for i in range(0, len(self.FTS.region_of_interest)):
             for j in range(0, len(self.ap_list)):
                 roi = self.map_utiles.build_roi_msg(self.sorted_keys[i])
                 ap_changed = False
-                print(self.ap_list[j])
-                print(self.FTS.region_of_interest[self.sorted_keys[i]]['propos'])
                 if (self.ap_matrix[i][j].checkState() == 2) and (self.ap_list[j] not in self.FTS.region_of_interest[self.sorted_keys[i]]['propos']):
-                    print('---new ap---')
-                    print(self.ap_list[j])
                     string_msg = String()
                     string_msg.data = str(self.ap_list[j])
                     roi.propos_satisfied.append(string_msg)
                     ap_changed = True
-                    print('---end---')
                 elif (self.ap_matrix[i][j].checkState() == 0) and (self.ap_list[j] in self.FTS.region_of_interest[self.sorted_keys[i]]['propos']):
                     string_msg = String()
                     string_msg.data = str(self.ap_list[j])
@@ -134,7 +126,6 @@ class GeneralAP_dialog(QDialog):
             for j in range(0, len(self.ap_list)):
                 if (self.ap_matrix[i][j].checkState() == 2):
                     self.FTS.add_propos(self.sorted_keys[i], self.ap_list[j])
-        print(self.sense_msg)
         self.accept()
 
 
