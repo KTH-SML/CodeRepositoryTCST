@@ -54,7 +54,7 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="0">
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="button_OK">
       <property name="text">
        <string>OK</string>
       </property>

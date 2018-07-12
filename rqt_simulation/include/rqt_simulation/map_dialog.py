@@ -69,18 +69,16 @@ class Map_dialog(QDialog):
                 if (self.map_utiles.edge_matrix[i][j].checkState() == 2):
                     self.FTS.add_edge(sorted_keys[i], sorted_keys[j], cost=1.0)
 
-        print('start saving')
         data = {'FTS' : self.FTS.region_of_interest}
         env_file = os.path.join(rospkg.RosPack().get_path('rqt_simulation'), 'config', 'FTS', 'env_GUI.yaml')
         with codecs.open(env_file, 'w', encoding='utf-8') as outfile:
             yaml.safe_dump(data, outfile, default_flow_style=False)
-
+        rospy.loginfo('rqt_simulation : The FTS has been saved in: %s.' % (env_file))
         self.accept()
 
     # Reset FTS
     @Slot(bool)
     def on_button_reset_pressed(self):
-        print('Reset')
         self.map_utiles.reset_FTS_matrix()
         self.graphicsScene.reset()
         self.FTS.region_of_interest = {}
@@ -89,9 +87,10 @@ class Map_dialog(QDialog):
     # Remove last added ROI
     @Slot(bool)
     def remove_last_ROI(self):
-        self.map_utiles.remove_FTS_matrix()
-        if self.graphicsScene.regionCounter < 1:
-            self.button_ROI.setEnabled(False)
+        if len(self.FTS.region_of_interest) > 0:
+            self.map_utiles.remove_FTS_matrix()
+            if self.graphicsScene.regionCounter < 1:
+                self.button_ROI.setEnabled(False)
 
     # Sets all edges between ROI's
     @Slot(bool)
@@ -114,8 +113,9 @@ class Map_dialog(QDialog):
 
     @Slot(bool)
     def general_ap(self):
-        generalAP_dialog = GeneralAP_dialog(self.graphicsScene, self.FTS)
-        generalAP_dialog.exec_()
+        if len(self.FTS.region_of_interest) > 0:
+            generalAP_dialog = GeneralAP_dialog(self.graphicsScene, self.FTS)
+            generalAP_dialog.exec_()
 
     # Cancel map dialog
     @Slot(bool)
@@ -128,6 +128,7 @@ class Map_dialog(QDialog):
     def load_FTS(self):
         # Reset graphics Scene
         self.on_button_reset_pressed()
+        self.button_save_FTS.setEnabled(True)
         self.FTS.load_FTS()
         self.graphicsScene.load_graphic_from_FTS(self.FTS)
         self.map_utiles.init_FTS_matrix(self.FTS)

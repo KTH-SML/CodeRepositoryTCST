@@ -75,10 +75,10 @@ class SimulationWidget(QWidget):
         # Disable buttons
         self.button_setup.setEnabled(False)
         self.button_setup_exp.setEnabled(False)
-        self.button_remove_robot.setEnabled(False)
         self.button_start_sim.setEnabled(False)
         self.button_execute_task.setEnabled(False)
         self.button_record_rosbag.setEnabled(False)
+        self.button_change_FTS.setEnabled(False)
 
         # Load configuration available robots and worlds
         try:
@@ -143,6 +143,7 @@ class SimulationWidget(QWidget):
 
         # Add robot tab
         self.add_robot()
+        self.button_remove_robot.setEnabled(False)
 
         # Publisher to set ltl_planner active
         self.start_publisher = rospy.Publisher('/planner_active', Bool, queue_size = 1)
@@ -151,9 +152,6 @@ class SimulationWidget(QWidget):
         self.logger_active_msg = Bool()
         self.logger_active_msg.data = False
         self.ros_publisher.add_publisher('/logger_active', Bool, 1.0, self.logger_active_msg)
-
-        # Counter for marker id counter
-        #self.marker_id_counter = 0
 
     # Reset is called if new map selected
     def reset(self):
@@ -168,6 +166,9 @@ class SimulationWidget(QWidget):
         self.graphicsView_main.setScene(self.current_graphicsScene)
 
         self.scenario = self.world_comboBox.currentText()
+
+        rospy.loginfo('rqt_simulation : A new world %s has been selected. Reset the chosen FTS.' % (self.scenario))
+
         self.current_graphicsScene.load_map(self.scenario)
 
         # Scale map
@@ -271,6 +272,9 @@ class SimulationWidget(QWidget):
                 self.tab_list[i].robot_comboBox_init.model().sort(0)
 
             self.button_execute_task.setEnabled(True)
+        else:
+            for i in range(0, self.num_robots):
+                self.tab_list[i].robot_comboBox_init.clear()
 
     # Change initial pose if checkBox entry changed
     # index: Is Checkbox index to set initial pose
@@ -309,7 +313,7 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
         self.button_record_rosbag.setEnabled(True)
-        #self.tabWidget.setEnabled(False)
+        self.button_change_FTS.setEnabled(True)
         self.button_load_scenario.setEnabled(False)
         self.button_execute_task.setEnabled(False)
 
@@ -377,7 +381,7 @@ class SimulationWidget(QWidget):
         self.button_start_sim.setEnabled(True)
         self.button_addRobot.setEnabled(False)
         self.button_record_rosbag.setEnabled(True)
-        #self.tabWidget.setEnabled(False)
+        self.button_change_FTS.setEnabled(True)
         self.button_load_scenario.setEnabled(False)
         self.button_execute_task.setEnabled(False)
 
@@ -513,6 +517,7 @@ class SimulationWidget(QWidget):
     # Add robot tab
     @Slot(bool)
     def add_robot(self):
+        rospy.loginfo('rqt_simulation : A new robot tab has been added.')
         # Add tab
         self.num_robots += 1
         self.tab_list.append(RobotTab(self.num_robots, self.robots))
@@ -578,6 +583,7 @@ class SimulationWidget(QWidget):
     @Slot(bool)
     def remove_robot(self):
         if self.num_robots > 1:
+            rospy.loginfo('rqt_simulation : A robot tab was removed.')
             self.num_robots = self.num_robots - 1
 
             self.current_graphicsScene.removeItem(self.tab_list[self.num_robots].initial_pose['start_' + str(self.num_robots+1).zfill(2)]['text_item'])
@@ -585,11 +591,12 @@ class SimulationWidget(QWidget):
             for i in range(0, len(self.current_graphicsScene.items_dict)):
                 self.current_graphicsScene.items_dict[self.current_graphicsScene.items_dict.keys()[i]]['ellipse_item'].setBrush(QBrush(QColor('red')))
 
-            for i in range(0, self.num_robots):
-                self.current_graphicsScene.items_dict[self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label']]['ellipse_item'].setBrush(QBrush(QColor('green')))
-                rect = self.current_graphicsScene.items_dict[self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label']]['ellipse_item'].rect()
-                point = rect.topLeft()
-                self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'].setPos(point.x() - 11, point.y() - 22)
+            if len(self.FTS.region_of_interest) > 0:
+                for i in range(0, self.num_robots):
+                    self.current_graphicsScene.items_dict[self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label']]['ellipse_item'].setBrush(QBrush(QColor('green')))
+                    rect = self.current_graphicsScene.items_dict[self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['label']]['ellipse_item'].rect()
+                    point = rect.topLeft()
+                    self.tab_list[i].initial_pose['start_' + str(i+1).zfill(2)]['text_item'].setPos(point.x() - 11, point.y() - 22)
 
             self.tabWidget.removeTab(self.num_robots)
             del self.tab_list[self.num_robots]
@@ -602,6 +609,8 @@ class SimulationWidget(QWidget):
         # Start change FTS dialog
         change_FTS_dialog = Change_FTS_dialog(self.current_graphicsScene, self.FTS)
         change_FTS_dialog.exec_()
+        print(self.FTS)
+        self.FTS = change_FTS_dialog.map_utiles.FTS
 
     # Load scenario from a yaml file
     @Slot(bool)
@@ -658,14 +667,12 @@ class SimulationWidget(QWidget):
                 self.tab_list[i].robot_localization_checkBox.setCheckState(Qt.Checked)
             self.tab_list[i].robot_hard_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['hard_task'])
             self.tab_list[i].robot_soft_task_input.setText(robot_tabs[robot_tabs.keys()[i]]['tasks']['soft_task'])
-            #self.tab_list[i].robot_name_changed()
 
         self.button_execute_task.setEnabled(True)
 
 
 class FTS:
     def __init__(self):
-        #self.region_list = []
         self.region_of_interest = {}
         self.marker_id_counter = 0
         self.region_pose_marker_array_msg = MarkerArray()
@@ -682,6 +689,7 @@ class FTS:
         for i in range(0, len(self.region_of_interest[label]['edges'])):
             if self.region_of_interest[label]['edges'][i]['target'] == target_label:
                 del self.region_of_interest[label]['edges'][i]
+                break
 
     def add_propos(self, label, ap):
         self.region_of_interest[label]['propos'].append(ap)

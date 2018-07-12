@@ -167,6 +167,8 @@ class MapUtiles(QObject):
         if state == 2:
             if self.edge_matrix[col][row].checkState() != self.edge_matrix[row][col].checkState():
                 self.edge_matrix[col][row].setCheckState(2)
+                #self.FTS.add_edge('r' + str(col+1).zfill(2), 'r' + str(row+1).zfill(2), 1.0)
+                #self.FTS.add_edge('r' + str(row+1).zfill(2), 'r' + str(col+1).zfill(2), 1.0)
                 edge = self.build_edge_msg(start_pose, target_pose, 1.0, True)               
                 if edge not in self.sense_msg.edges:
                     self.sense_msg.edges.append(edge)
@@ -182,6 +184,8 @@ class MapUtiles(QObject):
         elif state == 0:
             if self.edge_matrix[col][row].checkState() != self.edge_matrix[row][col].checkState():
                 self.edge_matrix[col][row].setCheckState(0)
+                #self.FTS.remove_edge('r' + str(col+1).zfill(2), 'r' + str(row+1).zfill(2))
+                #self.FTS.remove_edge('r' + str(row+1).zfill(2), 'r' + str(col+1).zfill(2))
                 edge = self.build_edge_msg(start_pose, target_pose, 1.0, False)
                 if edge not in self.sense_msg.edges:
                     self.sense_msg.edges.append(edge)

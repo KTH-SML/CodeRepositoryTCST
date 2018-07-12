@@ -23,7 +23,6 @@ from math import pi as PI
 from math import atan2, sin, cos, sqrt
 
 from tf.transformations import euler_from_quaternion, quaternion_from_euler, quaternion_matrix, euler_from_matrix
-#from tf2_ros import tf2_ros, TransformListener
 
 from tf2_ros import tf2_ros, TransformListener
 import tf2_geometry_msgs
@@ -48,7 +47,6 @@ import visualize_fts
 
 class LtlPlannerNode(object):
     def __init__(self):
-        #[self.robot_motion, self.init_pose, self.robot_action, self.robot_task] = robot_model
         self.node_name = "LTL Planner"
         self.active = False
         self.beta = 10
@@ -56,11 +54,6 @@ class LtlPlannerNode(object):
         self.hard_task = ''
         self.soft_task = ''
         self.temporary_task_ = temporaryTask()
-        #self.temporary_task = []
-        #self.final_propos = []
-        #self.task_end_index = []
-        #self.task_end_planner_index = []
-        #self.task_time = []
         self.robot_name = rospy.get_param('robot_name')
         self.agent_type = rospy.get_param('agent_type')
         scenario_file = rospy.get_param('scenario_file')
@@ -68,7 +61,6 @@ class LtlPlannerNode(object):
 
         self.last_current_pose = PoseStamped()
         self.clear_costmap = rospy.ServiceProxy('move_base/clear_costmaps', Empty)
-        #self.robot_current_goal = MoveBaseActionGoal()
 
         robot_model = FTSLoader(scenario_file)
         [self.robot_motion, self.init_pose, self.robot_action, self.robot_task] = robot_model.robot_model
@@ -111,8 +103,8 @@ class LtlPlannerNode(object):
         usleep = lambda x: time.sleep(x)
         usleep(3)
         self.robot_motion.set_initial(self.init_pose)
-        print(self.hard_task)
-        print(self.soft_task)
+        rospy.loginfo('%s : %s : The inital hard task is: %s' % (self.node_name, self.robot_name, self.hard_task))
+        rospy.loginfo('%s : %s : The inital soft task is: %s' % (self.node_name, self.robot_name, self.soft_task))
 
         ####### robot information
         self.full_model = MotActModel(self.robot_motion, self.robot_action)
@@ -126,26 +118,9 @@ class LtlPlannerNode(object):
         sufix_msg = self.plan_msg_builder(self.planner.run.loop, rospy.Time.now())
         self.SufixPlanPublisher.publish(sufix_msg)
 
-        print('---run---')
-        print(self.planner.run.line)
-        print(len(self.planner.run.line))
-        print(self.planner.run.loop)
-        print(len(self.planner.run.loop))
-        print('---plan---')
-        print(self.planner.run.pre_plan)
-        print(len(self.planner.run.pre_plan))
-        print(self.planner.run.suf_plan)
-        print(len(self.planner.run.suf_plan))
-
-        #plot_automaton(self.planner.product)
-        ### start up move_base
+                ### start up move_base
         self.navigation = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         self.navi_goal = GoalMsg = MoveBaseGoal()
-        #rospy.loginfo("wait for the move_base action server to come up")
-        #allow up to 5 seconds for the action server to come up
-        #navigation.wait_for_server(rospy.Duration(5))
-        #wait for the action server to come up
-        #self.navigation.wait_for_server()
 
     def SetActiveCallback(self, state):
         self.active = state.data
@@ -182,36 +157,17 @@ class LtlPlannerNode(object):
             if self.agent_type == 'ground':
                 self.checkMovement(current_pose)
 
-                position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.target_pose.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.target_pose.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.target_pose.pose.position.z)**2)
-                current_R = quaternion_matrix([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
-                goal_R = quaternion_matrix([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
-
-                #current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
-                #goal_euler = euler_from_quaternion([self.navi_goal.target_pose.pose.orientation.x, self.navi_goal.target_pose.pose.orientation.y, self.navi_goal.target_pose.pose.orientation.z, self.navi_goal.target_pose.pose.orientation.w])
             elif self.agent_type == 'arial':
                 position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.pose.position.z)**2)
                 current_R = quaternion_matrix([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
                 goal_R = quaternion_matrix([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
+                error_R = np.dot(current_R, goal_R.transpose())
+                orientation_error = np.linalg.norm(euler_from_matrix(error_R))
 
-                #current_euler = euler_from_quaternion([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
-                #goal_euler = euler_from_quaternion([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
-
-            error_R = np.dot(current_R, goal_R.transpose())
-            orientation_error = np.linalg.norm(euler_from_matrix(error_R))
-            #orientation_error = current_euler[0] - goal_euler[0] + current_euler[1] - goal_euler[1]  + current_euler[2] - goal_euler[2]
-            #print('pos_err')
-            #print(position_error)
-            #print('orien_err')
-            #print(orientation_error)
             if self.agent_type == 'ground':
-                #print('planner')
-                #if ((position_error < 0.2) and (orientation_error < 0.8)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
-                #if ((position_error < 1.5)) or (self.navigation.get_state() == GoalStatus.SUCCEEDED):
                 if (self.navigation.get_state() == GoalStatus.SUCCEEDED):
                     print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
                     self.planner.find_next_move()
-                    #while self.planner.next_move == 'None':
-                    #    self.planner.find_next_move()
                     t = rospy.Time.now()-self.t0
                     print '----------Time: %.2f----------' %t.to_sec()
                     self.next_move = self.planner.next_move
@@ -220,17 +176,11 @@ class LtlPlannerNode(object):
                         self.temporary_task_.remove_propos()
                     if (self.planner.index in self.temporary_task_.task_end_planner_index) and (self.planner.segment == 'line'):
                         self.temporary_task_.remove_task(self.planner.index)
-                    print('---index---')
-                    print(self.planner.index)
-                    print(self.temporary_task_.propos_planner_index)
-
                     self.navi_goal = self.FormatGoal(self.next_move, self.planner.index, t)
                     self.navigation.send_goal(self.navi_goal)
                     print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
-                    print('---planner index---')
-                    print(self.planner.index)
-                    print('---planner segment---')
-                    print(self.planner.segment)
+                    rospy.loginfo('%s : %s : The agent is at state number %d and the segment is %s.' % (self.node_name, self.robot_name, self.planner.index, self.planner.segment))
+
             elif self.agent_type == 'arial':
                 if ((position_error < 0.15) and (orientation_error < 0.3)):
                     print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
@@ -255,25 +205,13 @@ class LtlPlannerNode(object):
         self.hard_task = hard_task.data
 
     def TemporaryTaskCallback(self, temporary_task):
-        #task_sequence = []
         current_state = list(initial_state_given_history(self.planner.product, self.planner.run_history, self.planner.run, self.planner.index))
         current_state = current_state[0]
-        print('---current state---')
-        print(current_state)
-        '''
-        for i in range(0, len(temporary_task.task)):
-            task_sequence.append(temporary_task.task[i].data)
-        self.temporary_task_.final_propos.append(task_sequence[-1])
-        self.temporary_task_.temporary_tasks.append(task_sequence)
-        self.temporary_task_.task_time.append((rospy.Time.now(), temporary_task.T_des.data))
-        '''
         self.temporary_task_.add_task(temporary_task)
-        #temporary_task_ = temporaryTask()
         self.temporary_task_.make_combination_set()
         run_temp = self.temporary_task_.find_temporary_run(current_state, self.planner.product)
 
         end_temporary = set()
-        #print(run_temp.prefix)
         end_temporary.add(run_temp.prefix[-1])
 
         new_run, time = dijkstra_plan_optimal(self.planner.product, self.beta, end_temporary)
@@ -287,8 +225,6 @@ class LtlPlannerNode(object):
         suffix = run_temp.suffix+new_run.suffix
         sufcost = new_run.sufcost
         totalcost = precost + self.beta*sufcost
-        print('---first state---')
-        print(prefix[0])
         self.planner.run = ProdAut_Run(self.planner.product, prefix, precost, suffix, sufcost, totalcost)
 
         ### Publish plan for GUI
@@ -300,7 +236,6 @@ class LtlPlannerNode(object):
 
 
     def SenseCallback(self, sense):
-        #print sense.roi
         regions = {}
         for i in range(0, len(sense.rois)):
             pose_tuple = self.pose_to_tuple(sense.rois[i].pose)
@@ -319,10 +254,6 @@ class LtlPlannerNode(object):
             else:
                 del_edges.append((self.pose_to_tuple(sense.edges[i].start_pose), self.pose_to_tuple(sense.edges[i].target_pose)))
         sense_info.update({'edge' : [add_edges, del_edges]})
-        #print(sense_info)
-        #com_info = {((0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0)) : set(['r08',])}
-        #print(com_info)
-        #self.planner.run = self.planner.revise(sense_info)
         self.planner.update_knowledge(sense_info)
         if self.planner.num_changed_regs > 10:
             self.planner.replan(self.temporary_task_)
@@ -339,7 +270,7 @@ class LtlPlannerNode(object):
 
     def ClearCallback(self, msg):
         if msg.data:
-            print('clear')
+            rospy.loginfo('%s : %s : Costmap has been cleared and the current goal is resend.' % (self.node_name, self.robot_name))
             self.clear_costmap()
             usleep = lambda x: time.sleep(x)
             usleep(1)
@@ -356,23 +287,17 @@ class LtlPlannerNode(object):
         msg_pose_rounded.orientation.y = round(msg.pose.pose.orientation.y - 0.005, 2)
         msg_pose_rounded.orientation.z = round(msg.pose.pose.orientation.z - 0.005, 2)
 
-        #same_pose = self.two_poses(msg_pose_rounded, self.last_current_pose.pose)
         moved_distance = sqrt((msg.pose.pose.position.x - self.last_current_pose.pose.position.x)**2 + (msg.pose.pose.position.y - self.last_current_pose.pose.position.y)**2 +(msg.pose.pose.position.z - self.last_current_pose.pose.position.z)**2)
         current_R = quaternion_matrix([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
         last_R = quaternion_matrix([self.last_current_pose.pose.orientation.x, self.last_current_pose.pose.orientation.y, self.last_current_pose.pose.orientation.z, self.last_current_pose.pose.orientation.w])
         performed_rotation_R = np.dot(current_R.transpose(), last_R)
-        #print(performed_rotation_R)
         performed_rotation = np.linalg.norm(euler_from_matrix(performed_rotation_R))
-        #print(performed_rotation)
-        #performed_rotation = np.linalg.norm(performed_rotation_R)
 
         if (moved_distance > 0.05) or (performed_rotation > 0.1):
-            #print(performed_rotation)
             self.last_current_pose.header.stamp = rospy.Time.now()
 
-        #print((rospy.Time.now() - self.last_current_pose.header.stamp).to_sec())
         if (rospy.Time.now() - self.last_current_pose.header.stamp).to_sec() > 5.0:
-            print('clear')
+            rospy.loginfo('%s : %s : Costmap has been cleared and the current goal is resend.' % (self.node_name, self.robot_name))
             self.clear_costmap()
             usleep = lambda x: time.sleep(x)
             usleep(1)
@@ -402,17 +327,11 @@ class LtlPlannerNode(object):
             GoalMsg.pose.position.y = goal[0][1]
             GoalMsg.pose.position.z = 2.0
 
-            #quaternion = quaternion_from_euler(0, 0, goal[2])
-            #GoalMsg.pose.orientation.x = goal[1][1]
-            #GoalMsg.pose.orientation.y = goal[1][2]
-            #GoalMsg.pose.orientation.z = goal[1][3]
-            #GoalMsg.pose.orientation.w = goal[1][0]
         return GoalMsg
 
     def plan_msg_builder(self, plan, time_stamp):
         plan_msg = PoseArray()
         plan_msg.header.stamp = time_stamp
-        #print(plan)
         for n in plan:
             pose = Pose()
             pose.position.x = n[0][0][0]
@@ -421,45 +340,12 @@ class LtlPlannerNode(object):
             plan_msg.poses.append(pose)
         return plan_msg
 
-    #def UpdKnow(self, sense):
-    #    for i in range(0, len(sense.rois)):
-    #        print sense.rois[i]
-    #        pose_tuple = self.pose_to_tuple(sense.rois[i]['pose'])
-    #        sense_info = {sense.rois[i]['label'] : set(pose_tuple, sense.rois[i]['label'])}
-    #        self.planner.product.graph['ts'].update_after_region_change()
-
     def pose_to_tuple(self, pose):
         tuple = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z))
         return tuple
 
     def euclidean_distance(self, position1, position2):
         return (sqrt((position1[0]-position2[0])**2+(position1[1]-position2[1])**2+(position1[2]-position2[2])**2))
-
-
-
-    def convert_pose_from_map_to_mocap(self, pose, tf_mocap_to_map):
-        M_trans_M_R = Quaternion([0, pose.position.x, pose.position.y, pose.position.z])
-        M_quat_M_R = Quaternion([pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z])
-
-        Q_trans_Q_M = Quaternion([0, tf_mocap_to_map.position.x, tf_mocap_to_map.position.y, tf_mocap_to_map.position.z])
-        Q_quat_Q_M = Quaternion([tf_mocap_to_map.orientation.w, tf_mocap_to_map.orientation.x, tf_mocap_to_map.orientation.y, tf_mocap_to_map.orientation.z])
-
-        Q_trans_Q_R = Q_quat_Q_M * M_trans_M_R * Q_quat_Q_M.inversion
-        Q_quat_Q_R = Q_quat_Q_M * M_quat_M_R
-
-        Q_pose_Q_R = Pose()
-        Q_pose_Q_R.position.x = Q_trans_Q_R[1]
-        Q_pose_Q_R.position.y = Q_trans_Q_R[2]
-        Q_pose_Q_R.position.z = Q_trans_Q_R[3]
-        Q_pose_Q_R.orientation.w = Q_quat_Q_R[0]
-        Q_pose_Q_R.orientation.x = Q_quat_Q_R[1]
-        Q_pose_Q_R.orientation.y = Q_quat_Q_R[2]
-        Q_pose_Q_R.orientation.z = Q_quat_Q_R[3]
-
-        return Q_pose_Q_R
-
-
-
 
 if __name__ == '__main__':
     rospy.init_node('ltl_planner',anonymous=False)

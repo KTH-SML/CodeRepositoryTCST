@@ -1,5 +1,4 @@
 from ltl_tools.ts import MotionFts, ActionModel, MotActModel
-#from ltl_tools.planner import ltl_planner
 
 import yaml
 import codecs
@@ -11,7 +10,6 @@ import os
 class FTSLoader(object):
     def __init__(self, _file):
         self.file = _file
-        print(_file)
         stream = file(self.file, 'r')
         data_file = yaml.load(stream)
         FTS = data_file['FTS']

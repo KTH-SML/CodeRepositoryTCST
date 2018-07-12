@@ -124,7 +124,6 @@ class MapGraphicsScene(QGraphicsScene):
         self.ellipse_items_labels = []
         self.pixel_coords_list = []
         self.line_dict = {}
-        #self.arrow_list = []
 
     # Load map
     # Input:    scenario name   string

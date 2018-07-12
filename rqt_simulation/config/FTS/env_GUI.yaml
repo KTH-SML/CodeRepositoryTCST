@@ -11,13 +11,13 @@ FTS:
       target: r04
     pose:
       orientation:
-      - 0.4750492387706656
+      - 0.60663976285161
       - 0.0
       - 0.0
-      - 0.8799592153863787
+      - 0.7949768538311932
       position:
-      - -5.7
-      - -8.75
+      - -5.45
+      - -9.75
       - 0.0
     propos:
     - r01
@@ -33,13 +33,13 @@ FTS:
       target: r04
     pose:
       orientation:
-      - 0.8928580685315572
-      - -0.0
-      - -0.0
-      - -0.45033817233063544
+      - 0.48976610608526
+      - 0.0
+      - 0.0
+      - 0.8718538646643036
       position:
-      - -9.1
-      - -1.6500000000000001
+      - -0.8
+      - -7.6000000000000005
       - 0.0
     propos:
     - r02
@@ -55,13 +55,13 @@ FTS:
       target: r04
     pose:
       orientation:
-      - 0.10432131828528357
-      - -0.0
-      - -0.0
-      - -0.9945436453727009
+      - 0.4778853010099419
+      - 0.0
+      - 0.0
+      - 0.8784222441847868
       position:
-      - -2.0500000000000003
-      - -1.75
+      - -6.7
+      - -2.3000000000000003
       - 0.0
     propos:
     - r03
@@ -77,22 +77,29 @@ FTS:
       target: r04
     pose:
       orientation:
-      - 0.46410668017692425
+      - 0.44721359549995804
       - 0.0
       - 0.0
-      - 0.8857793119141777
+      - 0.8944271909999159
       position:
-      - -0.1
-      - -6.8500000000000005
+      - -1.8
+      - -1.5
       - 0.0
     propos:
     - r04
 Map: pal_office
 Tasks:
   robot1:
-    initial_pose: r01
+    initial_pose: r03
     robot_model: Turtlebot
     tasks:
-      hard_task: <>(r03 && <> r04) && ([]<> r01) && ([]<> r02)
+      hard_task: ([]<> r01) && ([]<> r02)
+      soft_task: ''
+    use_qualisys: false
+  robot2:
+    initial_pose: r04
+    robot_model: Turtlebot
+    tasks:
+      hard_task: ([]<> r01) && ([]<> r02)
       soft_task: ''
     use_qualisys: false

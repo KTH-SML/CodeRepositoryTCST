@@ -15,6 +15,7 @@ class temporaryTask(object):
         self.task_time = []
         self.propos_planner_index = []
         self.chosen_comb = []
+        self.combinations = []
 
     def add_task(self, temporary_task):
         print(self.temporary_tasks)
@@ -27,14 +28,6 @@ class temporaryTask(object):
 
     def remove_task(self, planner_index):
         index = self.task_end_planner_index.index(planner_index)
-        print('---before removing---')
-        print(index)
-        print(self.temporary_tasks)
-        print(self.final_propos)
-        print(self.task_end_index)
-        print(self.task_end_planner_index)
-        print(self.task_time)
-        #del self.temporary_tasks[index]
         del self.final_propos[self.task_end_index[index]]
         del self.task_time[self.task_end_index[index]]
         for i in range(len(self.task_end_index)):
@@ -42,14 +35,6 @@ class temporaryTask(object):
                 self.task_end_index[i] = self.task_end_index[i] - 1
         del self.task_end_index[self.task_end_index[index]]
         del self.task_end_planner_index[index]
-
-
-        print('---after removing---')
-        print(self.temporary_tasks)
-        print(self.final_propos)
-        print(self.task_end_index)
-        print(self.task_end_planner_index)
-        print(self.task_time)
 
     def remove_propos(self):
         for i in range(0, len(self.combinations)):
@@ -59,17 +44,12 @@ class temporaryTask(object):
             del self.combinations[i][index]
             counter = 0
         for i in range(0, len(self.temporary_tasks)):
-            print('---del propos---')
-            print(self.chosen_comb)
             if self.temporary_tasks[i-counter][0] == self.chosen_comb[0]:
                 del self.temporary_tasks[i][0]
                 if len(self.temporary_tasks[i-counter]) == 0:
                     del self.temporary_tasks[i-counter]
                     counter = counter + 1
         del self.chosen_comb[0]
-        print(self.temporary_tasks)
-
-
 
     def make_combination_set(self):
         propositions = []
@@ -79,7 +59,6 @@ class temporaryTask(object):
                     propositions.append(self.temporary_tasks[i][j])
         combinations = list(self.permutations(propositions))
         self.combinations = self.check_sequences(combinations)
-        print(self.combinations)
         return self.combinations
 
     def permutations(self, propositions):
@@ -124,7 +103,6 @@ class temporaryTask(object):
 
     def find_temporary_run(self, current_state, product):
         cost = float('inf')
-        print(self.final_propos)
         for i in range(0, len(self.combinations)):
             run_prefix = []
             cost_temp = 0
@@ -145,9 +123,6 @@ class temporaryTask(object):
                     for (prefix, precost) in dijkstra_targets(product, run_prefix[-1], target_set):
                         runs[(prefix[0], prefix[-1])] = (prefix, precost)
                 prefix_temp, cost_ = min(runs.values(), key = lambda p: p[1])
-                #print('---temporary---')
-                #print(prefix_temp)
-                #print(cost_)
                 run_prefix = run_prefix + prefix_temp
                 cost_temp = cost_temp + cost_
                 for m in range(1, len(prefix_temp)):

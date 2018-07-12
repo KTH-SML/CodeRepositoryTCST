@@ -49,6 +49,7 @@ class Change_FTS_dialog(QDialog):
         self.scrollAreaWidgetContents.setLayout(self.map_utiles.grid)
 
         self.button_add_AP.clicked.connect(self.general_ap)
+        self.button_OK.clicked.connect(self.on_button_OK_pressed)
 
         # Load graphics scene in graphics view
         self.graphicsView.setScene(self.graphicsScene)
@@ -71,6 +72,12 @@ class Change_FTS_dialog(QDialog):
 
     # Cancel map dialog
     @Slot(bool)
-    def on_button_cancel_pressed(self):
-        self.on_button_reset_pressed()
+    def on_button_OK_pressed(self):
+        sorted_keys = self.FTS.region_of_interest.keys()
+        sorted_keys.sort()
+        for i in range(0, len(self.map_utiles.edge_matrix)):
+            self.FTS.region_of_interest[sorted_keys[i]]['edges'] = []
+            for j in range(0, len(self.map_utiles.edge_matrix[0])):
+                if (self.map_utiles.edge_matrix[i][j].checkState() == 2):
+                    self.FTS.add_edge(sorted_keys[i], sorted_keys[j], cost=1.0)
         self.accept()
