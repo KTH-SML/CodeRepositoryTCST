@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 echo "Setting ROS_MASTER_URI..."
 if [ $# -gt 0 ]; then
-	# provided a IP, use it as ROS_MASTER_URI
+	# provided a hostname, use it as ROS_MASTER_URI
 	export ROS_MASTER_URI=http://$1:11311/
 else
 	echo "No hostname provided. Using $HOSTNAME."
