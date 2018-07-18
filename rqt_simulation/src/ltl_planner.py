@@ -15,8 +15,6 @@ from std_msgs.msg import Bool, String
 
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
-from ms1_msgs.msg import Humans, ActionSeq
-
 from rqt_simulation_msgs.msg import Sense, TemporaryTask
 
 from math import pi as PI
