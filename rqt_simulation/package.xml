@@ -21,7 +21,6 @@
   <run_depend>rostopic</run_depend>
   <run_depend>rqt_gui</run_depend>
   <run_depend>rqt_gui_py</run_depend>
-  <run_depend>c4r_simulation</run_depend>
   <run_depend>geometry_msgs</run_depend>
 
   <export>
