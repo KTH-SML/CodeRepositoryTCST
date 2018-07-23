@@ -1,6 +1,0 @@
-robot1:
-  initial_pose: r01
-  robot_model: None
-  tasks:
-    hard_task: ([]<> r01) && ([]<> r02)
-    soft_task: ''

@@ -199,7 +199,7 @@ class RobotTab(QWidget):
 
     # Localization with Gazebo ground truth
     def current_pose_gazebo_ground_truth_callback(self, msg):
-        if self.agent_type == 'arial':
+        if self.agent_type == 'aerial':
             self.label_marker_msg.header = msg.header
             self.label_marker_msg.pose = msg.pose.pose
             self.label_marker_msg.pose.position.z = deepcopy(msg.pose.pose.position.z) + 1.0
@@ -263,8 +263,8 @@ class RobotTab(QWidget):
 
     # Updates robot type if model checkbox was changed
     def set_agent_type(self):
-        if self.robot_comboBox.currentText() in self.robots['robot_types']['arial']:
-            self.agent_type = 'arial'
+        if self.robot_comboBox.currentText() in self.robots['robot_types']['aerial']:
+            self.agent_type = 'aerial'
         else:
             self.agent_type = 'ground'
 

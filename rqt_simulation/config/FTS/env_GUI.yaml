@@ -5,19 +5,15 @@ FTS:
       target: r01
     - cost: 1.0
       target: r02
-    - cost: 1.0
-      target: r06
-    - cost: 1.0
-      target: r07
     pose:
       orientation:
-      - 1.0
+      - 0.5514244893341282
       - 0.0
       - 0.0
-      - 0.0
+      - 0.8342248093665136
       position:
-      - -2.05
-      - -0.01
+      - -5.300000000000001
+      - -8.75
       - 0.0
     propos:
     - r01
@@ -27,188 +23,24 @@ FTS:
       target: r01
     - cost: 1.0
       target: r02
-    - cost: 1.0
-      target: r03
-    - cost: 1.0
-      target: r05
-    - cost: 1.0
-      target: r08
     pose:
       orientation:
-      - 0.9999842205338026
+      - 0.6587246313555392
       - 0.0
       - 0.0
-      - 0.005617711580631531
+      - 0.7523841173533031
       position:
-      - 0.02
-      - -0.02
+      - -7.3500000000000005
+      - -3.1
       - 0.0
     propos:
     - r02
-  r03:
-    edges:
-    - cost: 1.0
-      target: r02
-    - cost: 1.0
-      target: r03
-    - cost: 1.0
-      target: r04
-    - cost: 1.0
-      target: r09
-    pose:
-      orientation:
-      - 0.7071067811865476
-      - 0.0
-      - 0.0
-      - 0.7071067811865475
-      position:
-      - 2.0
-      - -0.0
-      - 0.0
-    propos:
-    - r03
-  r04:
-    edges:
-    - cost: 1.0
-      target: r03
-    - cost: 1.0
-      target: r04
-    - cost: 1.0
-      target: r05
-    pose:
-      orientation:
-      - 6.123233995736766e-17
-      - 0.0
-      - 0.0
-      - 1.0
-      position:
-      - 2.0100000000000002
-      - 1.37
-      - 0.0
-    propos:
-    - r04
-  r05:
-    edges:
-    - cost: 1.0
-      target: r02
-    - cost: 1.0
-      target: r04
-    - cost: 1.0
-      target: r05
-    - cost: 1.0
-      target: r06
-    pose:
-      orientation:
-      - 6.123233995736766e-17
-      - 0.0
-      - 0.0
-      - 1.0
-      position:
-      - -0.02
-      - 1.36
-      - 0.0
-    propos:
-    - r05
-  r06:
-    edges:
-    - cost: 1.0
-      target: r01
-    - cost: 1.0
-      target: r05
-    - cost: 1.0
-      target: r06
-    pose:
-      orientation:
-      - 0.7182374422274201
-      - -0.0
-      - -0.0
-      - -0.6957980860728299
-      position:
-      - -2.04
-      - 1.34
-      - 0.0
-    propos:
-    - r06
-  r07:
-    edges:
-    - cost: 1.0
-      target: r01
-    - cost: 1.0
-      target: r07
-    - cost: 1.0
-      target: r08
-    pose:
-      orientation:
-      - 1.0
-      - 0.0
-      - 0.0
-      - 0.0
-      position:
-      - -2.06
-      - -1.26
-      - 0.0
-    propos:
-    - r07
-  r08:
-    edges:
-    - cost: 1.0
-      target: r02
-    - cost: 1.0
-      target: r07
-    - cost: 1.0
-      target: r09
-    pose:
-      orientation:
-      - 1.0
-      - 0.0
-      - 0.0
-      - 0.0
-      position:
-      - 0.05
-      - -1.26
-      - 0.0
-    propos:
-    - r08
-  r09:
-    edges:
-    - cost: 1.0
-      target: r03
-    - cost: 1.0
-      target: r08
-    - cost: 1.0
-      target: r09
-    pose:
-      orientation:
-      - 0.7020383690430139
-      - 0.0
-      - 0.0
-      - 0.7121391215144869
-      position:
-      - 2.02
-      - -1.31
-      - 0.0
-    propos:
-    - r09
-Map: sml_arena
+Map: pal_office
 Tasks:
-  Turtlebot1:
-    initial_pose: r06
-    robot_model: Turtlebot
+  robot1:
+    initial_pose: r01
+    robot_model: srd250
     tasks:
-      hard_task: ([]<> r06) && ([]<> r03) && ([]! r02)
-      soft_task: ''
-    use_qualisys: false
-  Turtlebot2:
-    initial_pose: r09
-    robot_model: Turtlebot
-    tasks:
-      hard_task: ([]<> r09) && ([]<> r01) && ([]! r02)
-      soft_task: ''
-    use_qualisys: false
-  Turtlebot3:
-    initial_pose: r02
-    robot_model: Turtlebot
-    tasks:
-      hard_task: ([]<> r01) && ([]<> r03)
+      hard_task: ([]<> r01) && ([]<> r02)
       soft_task: ''
     use_qualisys: false

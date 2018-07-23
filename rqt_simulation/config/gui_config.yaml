@@ -17,7 +17,7 @@ Robots:
             - TiaGo
             - Turtlebot
             - nexus
-        arial:
+        aerial:
             - srd250
 Worlds:
     - pal_office

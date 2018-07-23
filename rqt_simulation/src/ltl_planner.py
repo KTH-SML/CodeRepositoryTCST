@@ -71,8 +71,8 @@ class LtlPlannerNode(object):
         self.PrefixPlanPublisher = rospy.Publisher('prefix_plan', PoseArray, queue_size = 1)
         # Synthesised sufix plan Publisher
         self.SufixPlanPublisher = rospy.Publisher('sufix_plan', PoseArray, queue_size = 1)
-        # Goal pose for arial vehicle
-        if self.agent_type == 'arial':
+        # Goal pose for aerial vehicle
+        if self.agent_type == 'aerial':
             self.GoalPublisher = rospy.Publisher('command/pose', PoseStamped, queue_size = 1)
 
         #------------
@@ -81,7 +81,7 @@ class LtlPlannerNode(object):
         if self.agent_type == 'ground':
             #localization_topic = 'amcl_pose'
             localization_topic = 'pose_gui'
-        elif self.agent_type == 'arial':
+        elif self.agent_type == 'aerial':
             localization_topic = 'ground_truth/pose_with_covariance'
         self.sub_amcl_pose = rospy.Subscriber(localization_topic, PoseWithCovarianceStamped, self.PoseCallback)
         # trigger start from GUI
@@ -132,7 +132,7 @@ class LtlPlannerNode(object):
 
             if self.agent_type == 'ground':
                 self.navigation.send_goal(self.navi_goal)
-            elif self.agent_type == 'arial':
+            elif self.agent_type == 'aerial':
                 self.GoalPublisher.publish(self.navi_goal)
 
             print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
@@ -155,7 +155,7 @@ class LtlPlannerNode(object):
             if self.agent_type == 'ground':
                 self.checkMovement(current_pose)
 
-            elif self.agent_type == 'arial':
+            elif self.agent_type == 'aerial':
                 position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.pose.position.z)**2)
                 current_R = quaternion_matrix([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
                 goal_R = quaternion_matrix([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
@@ -179,7 +179,7 @@ class LtlPlannerNode(object):
                     print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
                     rospy.loginfo('%s : %s : The agent is at state number %d and the segment is %s.' % (self.node_name, self.robot_name, self.planner.index, self.planner.segment))
 
-            elif self.agent_type == 'arial':
+            elif self.agent_type == 'aerial':
                 if ((position_error < 0.15) and (orientation_error < 0.3)):
                     print('Goal %s reached by %s.' %(str(self.next_move),str(self.robot_name)))
                     self.planner.find_next_move()
@@ -192,7 +192,7 @@ class LtlPlannerNode(object):
                     print('Goal %s sent to %s.' %(str(self.next_move), str(self.robot_name)))
 
     def GetInitPoseCallback(self, pose):
-        if self.agent_type == 'arial':
+        if self.agent_type == 'aerial':
             pose.position.z = 2.0
         self.init_pose = ((pose.position.x, pose.position.y, pose.position.z), (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w))
 
@@ -316,7 +316,7 @@ class LtlPlannerNode(object):
             GoalMsg.target_pose.pose.orientation.y = goal[1][2]
             GoalMsg.target_pose.pose.orientation.z = goal[1][3]
             GoalMsg.target_pose.pose.orientation.w = goal[1][0]
-        elif self.agent_type == 'arial':
+        elif self.agent_type == 'aerial':
             GoalMsg = PoseStamped()
             GoalMsg.header.seq = index
             GoalMsg.header.stamp = time_stamp

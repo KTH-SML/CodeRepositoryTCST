@@ -17,7 +17,7 @@ export ROS_MASTER_URI=http://12.0.5.1:11311
 echo "ROS_MASTER_URI set to $ROS_MASTER_URI"
 
 export ROS_IP=12.0.5.1
-echo "ROS_IP set to $ROS_IP
+echo "ROS_IP set to $ROS_IP"
 
 export TURTLEBOT_STACKS=hexagons
 echo "TURTLEBOT_STACKS set to $TURTLEBOT_STACKS"

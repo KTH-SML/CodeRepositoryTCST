@@ -75,7 +75,7 @@ After synthesizing the plan, the robot and task specifications are added to the 
 ## Setup experiment
 
 Assume a roscore has already been started successfully.
-Go to your catkin workspace and source the turtlebot environment with the file [turtlebot_environment.sh](turtlebot_environment.sh) and start rqt:
+Go to your catkin workspace and source the turtlebot environment with the file [turtlebot_environment.sh](turtlebot_environment.sh)(make sure that the variables ROS_HOSTNAME and ROS_IP are set to your IP-addresse and that the ROS_MASTER_URI is set to http://<IP_addresse>:11311). To launch the GUI start rqt:
 
         $ cd <catkin_ws>
         $ source src/rqt_simulation_gui/turtlebot_environment.sh
@@ -85,7 +85,14 @@ Login to the on-board computer of a Turtlebot:
 
         $ ssh <username>@<IP_addresse>
 
-The username and IP_addresse are written on the Turtelbot. The Turtlebot and ROS environment should be already sourced by the login.
+The username and IP_addresse are written on the Turtelbot. The Turtlebot and ROS environment should be already sourced by the login. You might need to change the ROS_MASTER_URI. This can be done by adapting the bashrc file.
+
+        $ sudo vim ~/.bashrc
+
+Change the ROS_MASTER_URI to your desktop computer IP. Save the file and source it again.
+
+        $ source ~/.bashrc
+
 Start the Kobuki base and astra camera driver:
 
         $ roslaunch rqt_simulation turtlebot_base_astra.launch robot_name:=<robot_name> use_qualisys:=<Bool>
@@ -104,4 +111,7 @@ If everything is set up press the button "Setup experiment" in the GUI.
 
 By pressing the button "Record data" the robot trajectories and temporary task are saved [here](rqt_simulation/logging/).
 
+## Change Turtlebot parameters for navigation
+
+The parameters for the move_base package can be found [here](rqt_simulation/config/planner/).
 ## Troubleshooting
