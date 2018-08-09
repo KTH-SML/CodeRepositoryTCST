@@ -21,7 +21,6 @@ public:
 		x += ((double) rand() / (RAND_MAX))*0.1;
 
 		control_sub = nh.subscribe("/control_input", 100, &Robot::controlCallback, this);
-		uppc_sub = nh.subscribe("/uppc", 100, &Robot::uppcCallback, this);
 		pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/pose", 100);
 	}
 	
@@ -35,12 +34,10 @@ public:
 		double s = sin(theta);
 		double dx = (msg->linear.x*c - msg->linear.y*s) * dt * 0.001;
 		double dy = (msg->linear.x*s + msg->linear.y*c) * dt * 0.001;
+		double dtheta = msg->angular.z * dt;
 		x += dx;
 		y += dy;
-	}
-
-	void uppcCallback(const geometry_msgs::Twist::ConstPtr& msg){
-		theta = atan2(msg->linear.y, msg->linear.x);
+		theta += dtheta;
 	}
 
 	void publish(){
