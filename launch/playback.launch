@@ -1,7 +1,36 @@
 <launch>
 
-    <node name="rosbag" pkg="rosbag" type="play" args="$(find hybrid_controller)/bags/_2018-03-22-19-42-29.bag" />
-    
-    <!--<node name="rviz" pkg="rviz" type="rviz"/>-->
+    <rosparam param="use_sim_time">true</rosparam>
+
+    <node pkg="tf" type="static_transform_publisher" name="qualisys_to_odom" 
+args="0 0 0 0 0 0 1 odom qualisys 10" />
+
+
+
+
+
+
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node0" output="screen">
+		<param name="~robot" type="int" value="0"/>
+	</node>
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node1" output="screen">
+		<param name="~robot" type="int" value="1"/>
+	</node>
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node2" output="screen">
+		<param name="~robot" type="int" value="2"/>
+	</node>
+
+
+
+
+
+
+    <node name="rosbag0" pkg="rosbag" type="play" args="/home/kuba/catkin_ws/src/hybrid_controller/bags/out1.bag"/>
+
+bags_scenario2_1_pics
+
+
+
+    <node name="rviz" pkg="rviz" type="rviz"/>
 
 </launch>

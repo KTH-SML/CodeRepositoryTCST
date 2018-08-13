@@ -1,0 +1,73 @@
+<launch>
+
+	<!-- qualisys: -->
+	<include file="$(find qualisys)/launch/qualisys.launch"/>
+
+	<include file="$(find qualisys)/launch/qualisys_odom.launch">
+		<arg name="model" value="nexus0" />
+	</include>
+	
+	<include file="$(find qualisys)/launch/qualisys_odom.launch">
+		<arg name="model" value="nexus1" />
+	</include>
+
+	<include file="$(find qualisys)/launch/qualisys_odom.launch">
+		<arg name="model" value="nexus2" />
+	</include>
+
+    <remap from="/turtlebot1/pose" to="/turtlebot0/pose"/>
+    <include file="$(find qualisys)/launch/qualisys_odom.launch">
+		<arg name="model" value="turtlebot1" />
+	</include>
+
+	<!-- formulas: -->
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formation.yaml" />
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formation_derivatives.yaml" />
+
+	<!-- parameters: -->
+	<rosparam param="u_max">[0.2, 6.28]</rosparam>
+	<param name="K" type="int" value="2"/>
+	<param name="delta" type="double" value="0.02"/>
+	<param name="zeta_l" type="double" value="0.2"/>
+	<param name="r" type="double" value="0.6"/>
+	<param name="R" type="double" value="0.7"/>
+	<param name="w" type="double" value="1.5"/>
+
+	<param name="n_robots" type="int" value="3"/>
+	<param name="turtlebots" type="int" value="1"/>
+
+	<!-- controllers: -->
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
+		<remap from="/cmdvel" to="/cmdvel0" />
+		<param name="~robot_id" type="int" value="0"/>
+		<remap from="/collaboration_params" to="/collaboration_params0" />
+		<remap from="/controller_params" to="/controller_params0" />
+
+		<remap from="/pose_robot0" to="/nexus0/pose"/>
+		<remap from="/pose_robot1" to="/nexus1/pose"/>
+		<remap from="/pose_robot2" to="/nexus2/pose"/>
+	</node>
+
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
+		<remap from="/cmdvel" to="/cmdvel1" />
+		<param name="~robot_id" type="int" value="1"/>
+		<remap from="/collaboration_params" to="/collaboration_params1" />
+		<remap from="/controller_params" to="/controller_params1" />
+
+		<remap from="/pose_robot0" to="/nexus0/pose"/>
+		<remap from="/pose_robot1" to="/nexus1/pose"/>
+		<remap from="/pose_robot2" to="/nexus2/pose"/>
+	</node>
+    
+    <node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller2" output="screen">
+		<remap from="/cmdvel" to="/cmdvel2" />
+		<param name="~robot_id" type="int" value="2"/>
+		<remap from="/collaboration_params" to="/collaboration_params2" />
+		<remap from="/controller_params" to="/controller_params2" />
+
+		<remap from="/pose_robot0" to="/nexus0/pose"/>
+		<remap from="/pose_robot1" to="/nexus1/pose"/>
+		<remap from="/pose_robot2" to="/nexus2/pose"/>
+	</node>
+	
+</launch>

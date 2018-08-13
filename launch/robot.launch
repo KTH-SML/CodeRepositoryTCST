@@ -1,6 +1,6 @@
 <launch>
 
-	<rosparam param="x_init">[-2.0, 0.0]</rosparam>
+	<rosparam param="x_init">[-0.0, 0.0]</rosparam>
 
 	<node pkg="robot" type="robot_node" name="robot0" output="screen">
 		<remap from="/control_input" to="/cmdvel0" />
@@ -17,6 +17,12 @@
 		<remap from="/pose" to="/pose_robot2" />
 		<remap from="/uppc" to="/uppc2"/>
 	</node>
+	<!--
+	<node pkg="robot" type="robot_node" name="robot3" output="screen">
+		<remap from="/control_input" to="/cmdvel3" />
+		<remap from="/pose" to="/pose_robot3" />
+		<remap from="/uppc" to="/uppc3"/>
+	</node>
+	-->
 	
 </launch>
-
