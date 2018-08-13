@@ -1,0 +1,3 @@
+<launch>
+    <node name="rosbag" pkg="rosbag" type="record" args="-o $(find hybrid_controller)/bags/ -a"/>
+</launch>

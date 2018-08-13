@@ -1,0 +1,54 @@
+formula0: "-1/10*log( 
+                      exp(
+                        10*(
+                          -0.1+sqrt(
+                                    (x[0]-x[9]+1*sin(x[11]))^2+(x[1]-x[10]-1*cos(x[11]))^2
+                                    )
+                          )
+                        )
+                    + exp(
+                        10*(-0.087+abs(x[2]-x[11]))
+                        ) 
+                    )"
+formula_type0: "G"
+a0: 10.0
+b0: 40.0
+rho_opt0: 0.087
+cluster0: 0
+V0: [0]
+
+formula1: "-1/10*log( 
+                      exp(
+                          10*(
+                              -0.1+sqrt(
+                                        (x[3]-x[9]-1*sin(x[11]))^2+(x[4]-x[10]+1*cos(x[11]))^2
+                                        )
+                              )
+                          )
+                    + exp(
+                          10*(-0.087+abs(x[5]-x[11]))
+                          ) 
+                    )"
+formula_type1: "G"
+a1: 10.0
+b1: 40.0
+rho_opt1: 0.087
+cluster1: 1
+V1: [1]
+
+formula2: "-1/10*log( exp(10*(-0.1+sqrt((x[6]-x[9]+1*cos(x[11]))^2+(x[7]-x[10]+1*sin(x[11]))^2)))
+                    + exp(10*(-0.087+abs(x[8]-x[11]))) )"
+formula_type2: "G"
+a2: 10.0
+b2: 40.0
+rho_opt2: 0.087
+cluster2: 1
+V2: [2]
+
+formula3: "0.1-sqrt((x[9]-2)^2+(x[10]-2)^2)"
+formula_type3: "F"
+a3: 35.0
+b3: 40.0
+rho_opt3: 0.1
+cluster3: 1
+V3: [3]
