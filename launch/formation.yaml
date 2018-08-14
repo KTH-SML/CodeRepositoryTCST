@@ -7,7 +7,7 @@ formula0: "-1/10*log(
                           )
                         )
                     + exp(
-                        10*(-0.087+abs(x[2]-x[11]))
+                        10*(-0.087+abs(x[2]-x[11])>pi ? 2*pi-abs(x[2]-x[11]) : abs(x[2]-x[11]))
                         ) 
                     )"
 formula_type0: "G"
@@ -26,7 +26,7 @@ formula1: "-1/10*log(
                               )
                           )
                     + exp(
-                          10*(-0.087+abs(x[5]-x[11]))
+                          10*(-0.087+abs(x[5]-x[11])>pi ? 2*pi-abs(x[5]-x[11]) : abs(x[5]-x[11]))
                           ) 
                     )"
 formula_type1: "G"
@@ -37,7 +37,7 @@ cluster1: 1
 V1: [1]
 
 formula2: "-1/10*log( exp(10*(-0.1+sqrt((x[6]-x[9]+1*cos(x[11]))^2+(x[7]-x[10]+1*sin(x[11]))^2)))
-                    + exp(10*(-0.087+abs(x[8]-x[11]))) )"
+                    + exp(10*(-0.087+abs(x[8]-x[11])>pi ? 2*pi-abs(x[8]-x[11]) : abs(x[8]-x[11]))) )"
 formula_type2: "G"
 a2: 10.0
 b2: 40.0
@@ -45,10 +45,11 @@ rho_opt2: 0.087
 cluster2: 1
 V2: [2]
 
-formula3: "0.1-sqrt((x[9]-2)^2+(x[10]-2)^2)"
+formula3: "-1/10*log( exp(10*(-0.1+sqrt((x[9]-2)^2+(x[10]-2)^2)))
+                    + exp(10*(-0.087+abs(x[11]-2.36)>pi ? 2*pi-abs(x[11]-2.36) : abs(x[11]-2.36))) )"
 formula_type3: "F"
 a3: 35.0
 b3: 40.0
-rho_opt3: 0.1
+rho_opt3: 0.087
 cluster3: 1
 V3: [3]

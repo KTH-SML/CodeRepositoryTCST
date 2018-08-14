@@ -116,8 +116,8 @@ public:
 		arma::vec u_pfc = potential_field_controller.u(X);
 
 		arma::vec u = u_ppc + u_pfc;
-		if(arma::norm(u) > u_max[0]){
-			u = u/arma::norm(u)*u_max[0];
+		if(arma::norm(u(arma::span(0,1))) > u_max[0]){
+			u(arma::span(0,1)) = u(arma::span(0,1))/arma::norm(u)*u_max[0];
 		}
 
 		geometry_msgs::Twist u_msg;
@@ -125,6 +125,7 @@ public:
 		double s = sin(X(robot_id*3+2));
 		u_msg.linear.x = (u(0)*c + u(1)*s)*1000.0;
 		u_msg.linear.y = (-u(0)*s + u(1)*c)*1000.0;
+		u_msg.angular.z = u(2);
 		control_input_pub.publish(u_msg);
 
 		geometry_msgs::Twist u1;

@@ -17,12 +17,10 @@
 		<remap from="/pose" to="/pose_robot2" />
 		<remap from="/uppc" to="/uppc2"/>
 	</node>
-	<!--
 	<node pkg="robot" type="robot_node" name="robot3" output="screen">
 		<remap from="/control_input" to="/cmdvel3" />
 		<remap from="/pose" to="/pose_robot3" />
 		<remap from="/uppc" to="/uppc3"/>
 	</node>
-	-->
 	
 </launch>

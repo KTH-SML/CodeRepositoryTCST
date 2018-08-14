@@ -31,7 +31,7 @@
 	<param name="zeta_l" type="double" value="0.2"/>
 	<param name="r" type="double" value="0.6"/>
 	<param name="R" type="double" value="0.7"/>
-	<param name="w" type="double" value="1.5"/>
+	<param name="w" type="double" value="2.0"/>
 
 	<param name="n_robots" type="int" value="3"/>
 	<param name="turtlebots" type="int" value="1"/>

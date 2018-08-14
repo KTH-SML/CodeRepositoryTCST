@@ -171,10 +171,14 @@ arma::vec PPC::u(std::vector<double> X, std::vector<double>x, double t){
     double e_ = e(X, t-t_0);
     arma::vec u_;
     if(std::isinf(e_)){
-        e_ = e_>0 ? u_max(0) : -u_max(0);
+        //e_ = e_>0 ? u_max(0) : -u_max(0);
+		arma::vec v(3); v(0) = u_max(0); v(1) = u_max(0); v(2) = u_max(1);
+		arma::mat d = arma::diagmat(v);
+		u_ = -arma::diagmat(e_>0?d:-d)*drho_psi(X, x.size());
     }
-    u_ = -e_*g(x).t()*drho_psi(X, x.size());
-    
+	else{
+		u_ = -e_*g(x).t()*drho_psi(X, x.size());
+	}
     double c = arma::as_scalar(arma::sqrt(u_.rows(0,1).t()*u_.rows(0,1)));
     if(c > u_max(0)){ 
         u_(0) *= u_max(0)/c;
