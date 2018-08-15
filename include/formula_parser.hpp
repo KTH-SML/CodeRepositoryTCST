@@ -17,6 +17,7 @@ public:
 
 		exprtk::symbol_table<T> symbol_table;
 		symbol_table.add_vector(param_name, var_vec);
+		symbol_table.add_constant("pi", 3.14159);
 
 		expr.register_symbol_table(symbol_table);
 
