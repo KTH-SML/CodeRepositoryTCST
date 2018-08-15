@@ -37,7 +37,9 @@ public:
 		double dtheta = msg->angular.z * dt;
 		x += dx;
 		y += dy;
-		theta += dtheta;
+		theta += dtheta; 
+		if(theta<-M_PI) theta+=2*M_PI;
+		if(theta>M_PI) theta-=2*M_PI;
 	}
 
 	void publish(){
