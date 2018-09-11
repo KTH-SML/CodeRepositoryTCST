@@ -2,27 +2,11 @@ cmake_minimum_required(VERSION 2.8.3)
 
 project(rqt_simulation)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy message_generation std_msgs)
+find_package(catkin REQUIRED)
+
+catkin_package()
 
 catkin_python_setup()
-
-
-
-
-
-add_message_files(
-  DIRECTORY include/rqt_simulation/msg
-  FILES
-  Roi.msg
-  Edge.msg
-  Sense.msg
-)
-
-generate_messages(DEPENDENCIES std_msgs)
-
-
-catkin_package(CATKIN_DEPENDS message_runtime std_msgs)
-
 
 install(FILES plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

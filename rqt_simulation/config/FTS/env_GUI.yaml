@@ -5,15 +5,17 @@ FTS:
       target: r01
     - cost: 1.0
       target: r02
+    - cost: 1.0
+      target: r03
     pose:
       orientation:
-      - 0.5514244893341282
+      - 1.0
       - 0.0
       - 0.0
-      - 0.8342248093665136
+      - 0.0
       position:
-      - -5.300000000000001
-      - -8.75
+      - -2.0500000000000003
+      - -0.1
       - 0.0
     propos:
     - r01
@@ -23,24 +25,46 @@ FTS:
       target: r01
     - cost: 1.0
       target: r02
+    - cost: 1.0
+      target: r03
     pose:
       orientation:
-      - 0.6587246313555392
+      - 1.0
       - 0.0
       - 0.0
-      - 0.7523841173533031
+      - 0.0
       position:
-      - -7.3500000000000005
-      - -3.1
+      - -1.6
+      - -2.95
       - 0.0
     propos:
     - r02
+  r03:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    pose:
+      orientation:
+      - 1.0
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - -0.9
+      - -6.800000000000001
+      - 0.0
+    propos:
+    - r03
 Map: pal_office
 Tasks:
   robot1:
     initial_pose: r01
     robot_model: srd250
     tasks:
-      hard_task: ([]<> r01) && ([]<> r02)
+      hard_task: ([]<> r01) && ([]<> r02) && ([]<> r03)
       soft_task: ''
     use_qualisys: false

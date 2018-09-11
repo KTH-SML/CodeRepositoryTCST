@@ -257,9 +257,12 @@ class RobotTab(QWidget):
         del self.ros_publisher
         del self.clear_costmap_publisher
         del self.temporary_task_publisher
-        del self.current_pose_amcl_subscriber
+        del self.current_pose_amcl_subscriber   
         del self.current_pose_qualisys_subscriber
         del self.current_pose_gazebo_ground_truth_subscriber
+
+    # ADD FUNCTION THAT JUST CHANGES SOFT AND HARD TASK!!!!
+    # DELETE OLD ONE, AND ADD NEW ONE! pass as argument the planner or previous class such that I call it here
 
     # Updates robot type if model checkbox was changed
     def set_agent_type(self):

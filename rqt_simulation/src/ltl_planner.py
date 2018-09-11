@@ -30,6 +30,7 @@ from actionlib import SimpleActionClient
 from actionlib_msgs.msg import GoalStatus
 
 from std_srvs.srv import Empty
+import rqt_simulation_msgs.srv
 
 from pyquaternion import Quaternion
 
@@ -56,6 +57,7 @@ class LtlPlannerNode(object):
         self.agent_type = rospy.get_param('agent_type')
         scenario_file = rospy.get_param('scenario_file')
         self.replan_timer = rospy.Time.now()
+        self.header = '['+self.robot_name+'] '
 
         self.last_current_pose = PoseStamped()
         self.clear_costmap = rospy.ServiceProxy('move_base/clear_costmaps', Empty)
@@ -97,6 +99,16 @@ class LtlPlannerNode(object):
         # clear costmap manually from GUI
         self.sub_clear = rospy.Subscriber('clear_costmap', Bool, self.ClearCallback)
 
+
+        #------------
+        # Services
+        #------------
+        rospy.Service(
+            name = 'human_detected',
+            service_class = rqt_simulation_msgs.srv.Region,
+            handler = self.human_region_cb
+        )
+
         ####### Wait 3 seconds to receive the initial position from the GUI
         usleep = lambda x: time.sleep(x)
         usleep(3)
@@ -109,6 +121,13 @@ class LtlPlannerNode(object):
         self.planner = ltl_planner(self.full_model, self.hard_task, self.soft_task)
         ####### initial plan synthesis
         self.planner.optimal(10, 'static')
+        ###### Store initial plan regions
+        self.init_regions = self.getRegions(self.hard_task)
+
+        # Unsubscribe topics - cleanest way out of here ahahahah
+        self.sub_soft_task.unregister()
+        self.sub_hard_task.unregister()
+        self.sub_temp_task.unregister()
 
         ### Publish plan for GUI
         prefix_msg = self.plan_msg_builder(self.planner.run.line, rospy.Time.now())
@@ -119,6 +138,47 @@ class LtlPlannerNode(object):
                 ### start up move_base
         self.navigation = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         self.navi_goal = GoalMsg = MoveBaseGoal()
+
+
+    ## The next  3 functions are only valid for COIN demo, 28th of September!
+    def getRegions(self, task):
+        hard_task = task.replace(" ", "")
+        individuals = hard_task.split('&&')
+        regions = []
+        for i in range(0,len(individuals)):
+            region = individuals[i][-4:]
+            region = region[:-1]
+            regions.append(region)
+
+        return regions
+
+    def removeRegion(self,region_r):
+        hard_task = ''
+        for i in range(0,len(self.init_regions)):
+            if self.init_regions[i] != region_r:
+                hard_task = hard_task+'([]<>'+self.init_regions[i]+') && '
+
+        hard_task = hard_task[:-3]
+
+        return hard_task
+
+
+    def human_region_cb(self,req= rqt_simulation_msgs.srv.RegionRequest()):
+
+        region = req.region.data
+        print self.header, 'Received new human region: ', region
+
+        # Build hard task message
+        self.hard_task = self.removeRegion(region)
+
+        # Replan
+        self.full_model = MotActModel(self.robot_motion, self.robot_action)
+        self.planner = ltl_planner(self.full_model, self.hard_task, self.soft_task)
+        ####### initial plan synthesis
+        self.planner.optimal(10, 'static')
+
+        rsp = rqt_simulation_msgs.srv.RegionResponse()
+        return rsp
 
     def SetActiveCallback(self, state):
         self.active = state.data

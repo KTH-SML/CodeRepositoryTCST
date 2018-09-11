@@ -578,6 +578,10 @@ class SimulationWidget(QWidget):
             self.current_goal_subscriber_list[i].received.connect(self.received_goal)
 
 
+    #### 
+    #
+    # Callback to service calls tab_list[i].change_task for the robot[i] of interest
+    #
 
     # Remove last robot
     @Slot(bool)

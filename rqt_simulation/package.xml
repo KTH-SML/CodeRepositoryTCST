@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <package>
 <name>rqt_simulation</name>
 <version>0.3.11</version>
@@ -5,10 +6,11 @@
   <maintainer email="lukasch@student.ethz.ch">Lukas Schoenbaechler</maintainer>
   <author>lukas</author>
   <license>BSD</license>
-  <!--<url>http://ros.org/wiki/rqt_mypkg</url> -->
+  <url>http://ros.org/wiki/rqt_mypkg</url> 
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>std_msgs</build_depend>
 
   <run_depend>python-rospkg</run_depend>
   <run_depend>qt_dotgraph</run_depend>
@@ -22,7 +24,12 @@
   <run_depend>rqt_gui</run_depend>
   <run_depend>rqt_gui_py</run_depend>
   <run_depend>geometry_msgs</run_depend>
-
+  
+  <run_depend>move_base_msgs</run_depend>
+  <run_depend>tf2_geometry_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>python-ply</run_depend>
+  
   <export>
     <rqt_gui plugin="${prefix}/plugin.xml"/>
   </export>

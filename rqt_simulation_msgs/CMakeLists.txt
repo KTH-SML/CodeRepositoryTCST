@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rqt_simulation_msgs)
 
-find_package(catkin REQUIRED COMPONENTS message_generation std_msgs geometry_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy message_generation std_msgs geometry_msgs)
 
 add_message_files(
   DIRECTORY msg
@@ -10,8 +10,12 @@ add_message_files(
   Roi.msg
   Sense.msg
   TemporaryTask.msg
+)
 
-  )
+add_service_files(
+  FILES
+  Region.srv
+)
 
 generate_messages(DEPENDENCIES std_msgs geometry_msgs)
 
