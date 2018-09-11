@@ -16,7 +16,6 @@
 	<include file="$(find qualisys)/launch/qualisys_odom.launch">
 		<arg name="model" value="nexus2" />
 	</include>
-	<!--
 	<remap from="/turtlebot3/pose" to="/turtlebot0/pose"/>
 	<include file="$(find qualisys)/launch/qualisys_odom.launch">
 		<arg name="model" value="turtlebot3" />
@@ -24,7 +23,7 @@
 
 	<include file="$(find qualisys)/launch/qualisys_odom.launch">
 		<arg name="model" value="turtlebot1" />
-	</include>-->
+	</include>
 
 	<!-- formulas: -->
 	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
@@ -37,10 +36,10 @@
 	<param name="zeta_l" type="double" value="0.2"/>
 	<param name="r" type="double" value="0.6"/>
 	<param name="R" type="double" value="0.7"/>
-	<param name="w" type="double" value="1.5"/>
+	<param name="w" type="double" value="2"/>
 
 	<param name="n_robots" type="int" value="3"/>
-	<param name="turtlebots" type="int" value="0"/>
+	<param name="turtlebots" type="int" value="2"/>
 
 	<!-- controllers: -->
 	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">

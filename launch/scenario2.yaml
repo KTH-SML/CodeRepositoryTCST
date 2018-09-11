@@ -1,7 +1,7 @@
 formula0: "0.6-sqrt((x[0]-x[6])^2+(x[1]-x[7])^2)"
 formula_type0: "G"
 a0: 10.0
-b0: 60.0
+b0: 90.0
 rho_opt0: 0.6
 cluster0: 0
 V0: [0]
@@ -9,7 +9,7 @@ V0: [0]
 formula1: "0.6-sqrt((x[3]-x[9])^2+(x[4]-x[10])^2)"
 formula_type1: "G"
 a1: 10.0
-b1: 60.0
+b1: 90.0
 rho_opt1: 0.6
 cluster1: 1
 V1: [1]

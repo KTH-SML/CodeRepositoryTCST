@@ -9,8 +9,6 @@ find_package(Armadillo REQUIRED)
 
 add_message_files(
   FILES
-  HybridState.msg
-  ControlInput.msg
   CriticalEvent.msg
   Params.msg
   Robustness.msg
