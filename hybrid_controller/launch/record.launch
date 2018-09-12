@@ -1,0 +1,15 @@
+<launch>
+    <node name="rosbag" pkg="rosbag" type="record" args="/c0 /c1 /c2 /
+    /clock
+    /cmdvel0 /cmdvel1 /cmdvel2
+    /collaboration_params1
+    /critical_event0 /critical_event1 /critical_event2 
+    /nexus0/odom /nexus0/pose /nexus1/odom /nexus1/pose /nexus2/odom /nexus2/pose
+    /pose_robot0 /pose_robot1 /pose_robot2 /pose_robot3
+    /qualisys/nexus0 /qualisys/nexus1 /qualisys/nexus2 /qualisys/turtlebot1 /qualisys/turtlebot3
+    /robustness0 /robustness1 /robustness2
+    /rosout /rosout_agg /tf /tf_static
+    /turtlebot0/pose /turtlebot1/odom /turtlebot1/pose /turtlebot3/odom
+    /velocity
+    -o $(find hybrid_controller)/bags/"/>
+</launch>

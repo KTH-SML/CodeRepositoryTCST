@@ -1,0 +1,68 @@
+<launch>
+
+	<rosparam param="use_sim_time">false</rosparam>
+
+	<!-- formulas: -->
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formulas.yaml" />
+	<rosparam command="load" file="$(find hybrid_controller)/launch/formula_derivatives.yaml" />
+
+
+	<rosparam param="u_max">[0.2, 1.57]</rosparam>
+	<param name="K" type="int" value="2"/>
+	<param name="n_robots" type="int" value="4"/>
+	<param name="delta" type="double" value="0.025"/>
+	<param name="zeta_l" type="double" value="0.25"/>
+	<param name="r" type="double" value="0.56"/>
+	<param name="R" type="double" value="0.65"/>
+	<param name="w" type="double" value="1.0"/>
+	<param name="funnel_linear" type="bool" value="false"/>
+	<param name="turtlebots" type="int" value="0"/>
+
+
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node0" output="screen">
+		<param name="~robot" type="int" value="0"/>
+	</node>
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node1" output="screen">
+		<param name="~robot" type="int" value="1"/>
+	</node>
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node2" output="screen">
+		<param name="~robot" type="int" value="2"/>
+	</node>
+	<node pkg="plotter" type="plotter_node.py" name="plotter_node3" output="screen">
+		<param name="~robot" type="int" value="3"/>
+	</node>
+
+
+	<!-- controllers: -->
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller0" output="screen">
+		<remap from="/cmdvel" to="/cmdvel0" />
+		<remap from="/collaboration_params" to="/collaboration_params0" />
+		<remap from="/controller_params" to="/controller_params0" />
+		<param name="~robot_id" type="int" value="0"/>
+	</node>
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller1" output="screen">
+		<remap from="/cmdvel" to="/cmdvel1" />
+		<remap from="/collaboration_params" to="/collaboration_params1" />
+		<remap from="/controller_params" to="/controller_params1" />
+		<param name="~robot_id" type="int" value="1"/>
+	</node>
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller2" output="screen">
+		<remap from="/cmdvel" to="/cmdvel2" />
+		<remap from="/collaboration_params" to="/collaboration_params2" />
+		<remap from="/controller_params" to="/controller_params2" />
+		<param name="~robot_id" type="int" value="2"/>
+	</node>
+	<node pkg="hybrid_controller" type="hybrid_controller_node" name="hybrid_controller3" output="screen">
+		<remap from="/cmdvel" to="/cmdvel3" />
+		<remap from="/collaboration_params" to="/collaboration_params3" />
+		<remap from="/controller_params" to="/controller_params3" />
+		<param name="~robot_id" type="int" value="3"/>
+	</node>
+
+	<!-- virtual robots -->
+	<!--<include file="$(find hybrid_controller)/launch/robot.launch"/>-->
+
+
+	<!--<node pkg="rviz" type="rviz" name="rviz" />-->
+	
+</launch>

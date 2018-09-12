@@ -1,0 +1,26 @@
+<launch>
+
+	<rosparam param="x_init">[-0.0, 0.0]</rosparam>
+
+	<node pkg="robot" type="robot_node" name="robot0" output="screen">
+		<remap from="/control_input" to="/cmdvel0" />
+		<remap from="/pose" to="/pose_robot0" />
+		<remap from="/uppc" to="/uppc0"/>
+	</node>
+	<node pkg="robot" type="robot_node" name="robot1" output="screen" >
+		<remap from="/control_input" to="/cmdvel1" />
+		<remap from="/pose" to="/pose_robot1" />
+		<remap from="/uppc" to="/uppc1"/>
+	</node>
+	<node pkg="robot" type="robot_node" name="robot2" output="screen">
+		<remap from="/control_input" to="/cmdvel2" />
+		<remap from="/pose" to="/pose_robot2" />
+		<remap from="/uppc" to="/uppc2"/>
+	</node>
+	<node pkg="robot" type="robot_node" name="robot3" output="screen">
+		<remap from="/control_input" to="/cmdvel3" />
+		<remap from="/pose" to="/pose_robot3" />
+		<remap from="/uppc" to="/uppc3"/>
+	</node>
+	
+</launch>

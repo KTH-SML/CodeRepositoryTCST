@@ -1,0 +1,12 @@
+<launch>
+
+    <rosparam param="use_sim_time">true</rosparam>
+
+	<node pkg="tf" type="static_transform_publisher" name="qualisys_to_odom" 
+args="0 0 0 0 0 0 1 odom qualisys 10" />
+
+    <node name="rosbag0" pkg="rosbag" type="play" args="-i /home/kuba/experiments/scenario1_try4/out2.bag"/>
+
+    <!--<node name="rviz" pkg="rviz" type="rviz"/>-->
+
+</launch>
