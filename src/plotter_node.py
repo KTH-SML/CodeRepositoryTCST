@@ -62,8 +62,7 @@ class Plotter:
 		gamma = np.array(self.gamma)
 		r = np.array(self.r)
 		rho_max = np.array(self.rho_max)
-		t_rel = np.array(self.t_rel_t0)
-		t_rel_tr = np.array(self.t_rel_tr)
+
 		g = np.zeros((tt.shape[0],))
 
 		fig = plt.figure()
@@ -72,38 +71,13 @@ class Plotter:
 		ax.grid(which='major')
 		ax.grid(which='minor', alpha=0.4)
 		ax.set_ylim([-2, 0.6])
-		#plt.plot(t_rel, self.robustness, color='black', linewidth='1.5', label='${\\rho}^{\psi_2}(\\mathbf{x}_{\\phi_2}(t))$')
-		plt.plot(t_rel, self.robustness, color='black', linewidth='1.5', label='${{\\rho}}^{{\\psi_{{{0}}}}}(\\mathbf{{x}}_{{\\phi_{{{0}}}}}(t))$'.format(self.robot))
-		plt.plot(t_rel, -gamma+rho_max, color='red', linewidth='1.5', label='upper and lower funnel')
-		plt.plot(t_rel, r, color='red', label='$r_{{{0}}}$'.format(self.robot), linestyle=':', linewidth='1.5')
-		plt.plot(t_rel, rho_max, color='red', linewidth='1.5')
+		ax.set_xlabel("t [s]")
+		plt.plot(tt, self.robustness, color='black', linewidth='1.5', label='${{\\rho}}^{{\\psi_{{{0}}}}}(\\mathbf{{x}}_{{\\phi_{{{0}}}}}(t))$'.format(self.robot))
+		plt.plot(tt, -gamma+rho_max, color='red', linewidth='1.5', label='upper and lower funnel')
+		plt.plot(tt, r, color='red', label='$r_{{{0}}}$'.format(self.robot), linestyle=':', linewidth='1.5')
+		plt.plot(tt, rho_max, color='red', linewidth='1.5')
 		plt.legend(loc=4, fontsize='large')
 		fig.savefig(os.path.dirname(os.path.dirname(__file__))+'/rho'+str(self.robot)+'.png')
-		'''
-		vx = np.array(list(u.linear.x for u in self.u))
-		vy = np.array(list(u.linear.y for u in self.u))
-		vx2 = np.square(vx)
-		vy2 = np.square(vy)
-		v = np.sqrt(vx2+vy2)
-		plotSignal(t_rel, v, self.robot, 'u')
-
-		rho = np.array(self.robustness)
-		e = (rho - rho_max)/g
-		plotSignal(t_rel, e, self.robot, 'e')
-
-		uppcx = np.array(list(u.linear.x for u in self.uppc))
-		uppcy = np.array(list(u.linear.y for u in self.uppc))
-		upfcx = np.array(list(u.linear.x for u in self.upfc))
-		upfcy = np.array(list(u.linear.y for u in self.upfc))
-		uppc = np.sqrt(np.square(uppcx)+np.square(uppcy))
-		upfc = np.sqrt(np.square(upfcx)+np.square(upfcy))
-		uppcdir = np.arctan2(uppcy, uppcx)
-		upfcdir = np.arctan2(upfcy, upfcx)
-		plotSignal(t_rel, uppc, self.robot, 'uppc')
-		plotSignal(t_rel, upfc, self.robot, 'upfc')
-		plotSignal(t_rel, uppcdir, self.robot, 'uppcdir')
-		plotSignal(t_rel, upfcdir, self.robot, 'upfcdir')
-		'''
 		
 
 
