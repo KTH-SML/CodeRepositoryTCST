@@ -2,7 +2,6 @@
 
 #include <armadillo>
 #include "geometry_msgs/PoseStamped.h"
-#include "hybrid_controller/ControlInput.h"
 #include <stdexcept>
 #include <string>
 
@@ -38,16 +37,6 @@ geometry_msgs::PoseStamped vec_to_pose(arma::vec v){
 	ps.pose.orientation.z = sin(0.5*v(2));
 	ps.pose.orientation.w = cos(0.5*v(2));
 	return ps;
-}
-
-hybrid_controller::ControlInput vec_to_control_input(arma::vec v){
-	check_vec_valid(v);
-	hybrid_controller::ControlInput u;
-	u.header.stamp = ros::Time::now();
-	u.vx = v(0);
-	u.vy = v(1);
-	u.w = v(2);
-	return u;
 }
 
 void check_vec_valid(arma::vec v){
