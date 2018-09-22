@@ -126,6 +126,8 @@ class RVIZFileGenerator:
             tf_prefix = self.robot_name
         elif robot_model == 'srd250':
             tf_prefix = ''
+        elif robot_model == 'crazyflie':
+            tf_prefix = self.robot_name
         robot_folder.append(self.add_robot_model(self.robot_name, tf_prefix))
 
         # Robot odometry
@@ -277,6 +279,9 @@ class RVIZFileGenerator:
             goal_topic = '/' + self.robot_name + '/move_base/current_goal'
         elif robot_model == 'srd250':
             goal_topic = '/' + self.robot_name + '/command/pose'
+        elif robot_model == 'crazyflie': 
+            goal_topic = '/' + self.robot_name + '/command/pose'
+            
         base_folder.append(self.add_goal_marker(self.robot_name, goal_topic))
 
         dict_base_folder.update({'Displays' : base_folder})

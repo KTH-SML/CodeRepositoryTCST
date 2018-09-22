@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="scenario" default="sml" /> <!-- Empty scenario to make sure it is consistent if required -->
+    <arg name="scenario_path" default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
+    <arg name="use_qualisys" default="false" />
+
+    <arg name="robot_name" default="/" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+
+    <!-- TF from qualisys to map -->
+    <arg name="trans_x" default="0.111"/>
+    <arg name="trans_y" default="0.105"/>
+    <arg name="trans_z" default="0.0"/>
+    <arg name="orient_x" default="0.0"/>
+    <arg name="orient_y" default="0.0"/>
+    <arg name="orient_z" default="0.358"/>
+    <arg name="orient_w" default="0.934"/>
+
+    <arg name="gzpose" value="-x $(arg initial_pose_x) -y $(arg initial_pose_y) -z 0.0 -R 0.0 -P 0.0 -Y $(arg initial_pose_a)"/>
+    
+    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_qualisys" args="$(arg trans_x) $(arg trans_y) $(arg trans_z) $(arg orient_x) $(arg orient_y) $(arg orient_z) $(arg orient_w) qualisys /map 100"/>
+    
+    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_bc" args="0 0 0 0 0 0 1 map $(arg robot_name)/map 100"/>
+    
+    <node pkg="tf" type="static_transform_publisher" name="$(arg robot_name)_qualisys_to_map_odom" args="$(arg trans_x) $(arg trans_y) $(arg trans_z) $(arg orient_x) $(arg orient_y) $(arg orient_z) $(arg orient_w) nexus1 $(arg robot_name)/base_footprint 100"/>
+
+    <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find crazyflie_description)/urdf/crazyflie2.urdf.xacro'" />
+    <param name="robot_description" command="$(arg urdf_file)" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="5.0" />
+      <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
+    </node>
+
+    <arg name="map_file" default="$(arg scenario_path)/map.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+      <param name="frame_id" value="/map" />
+    </node>
+
+    <!-- Load interface to vehicles -->
+    <include file="$(find coin_cf_demo)/launch/start_uav.launch" clear_params="false" pass_all_args="false">
+      <arg name="robot_name" default="$(arg robot_name)" />
+    </include>
+
+
+</launch>

@@ -217,6 +217,7 @@ class LtlPlannerNode(object):
 
             elif self.agent_type == 'aerial':
                 position_error = sqrt((current_pose.pose.pose.position.x - self.navi_goal.pose.position.x)**2 + (current_pose.pose.pose.position.y - self.navi_goal.pose.position.y)**2 + (current_pose.pose.pose.position.z - self.navi_goal.pose.position.z)**2)
+                print "Position error: ", position_error
                 current_R = quaternion_matrix([current_pose.pose.pose.orientation.x, current_pose.pose.pose.orientation.y, current_pose.pose.pose.orientation.z, current_pose.pose.pose.orientation.w])
                 goal_R = quaternion_matrix([self.navi_goal.pose.orientation.x, self.navi_goal.pose.orientation.y, self.navi_goal.pose.orientation.z, self.navi_goal.pose.orientation.w])
                 error_R = np.dot(current_R, goal_R.transpose())

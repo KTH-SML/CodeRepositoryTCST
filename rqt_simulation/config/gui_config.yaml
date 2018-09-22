@@ -12,6 +12,9 @@ Robots:
         nexus:
             robot_model: nexus
             localization_topic: pose
+        crazyflie:
+            robot_model: crazyflie
+            localization_topic: pose
     robot_types:
         ground:
             - TiaGo
@@ -19,6 +22,7 @@ Robots:
             - nexus
         aerial:
             - srd250
+            - crazyflie
 Worlds:
     - pal_office
     - hospital
