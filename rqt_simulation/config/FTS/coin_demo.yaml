@@ -1,0 +1,118 @@
+FTS:
+  r01:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    pose:
+      orientation:
+      - 1.0
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - -2.0
+      - -0.0
+      - 0.0
+    propos:
+    - r01
+  r02:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r05
+    pose:
+      orientation:
+      - 0.9999842205338026
+      - 0.0
+      - 0.0
+      - 0.005617711580631531
+      position:
+      - 0.0
+      - -0.0
+      - 0.0
+    propos:
+    - r02
+  r03:
+    edges:
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r04
+    pose:
+      orientation:
+      - 0.7071067811865476
+      - 0.0
+      - 0.0
+      - 0.7071067811865475
+      position:
+      - 2.0
+      - -0.0
+      - 0.0
+    propos:
+    - r03
+  r04:
+    edges:
+    - cost: 1.0
+      target: r03
+    - cost: 1.0
+      target: r04
+    - cost: 1.0
+      target: r05
+    pose:
+      orientation:
+      - 6.123233995736766e-17
+      - 0.0
+      - 0.0
+      - 1.0
+      position:
+      - 2.0
+      - 1.0
+      - 0.0
+    propos:
+    - r04
+  r05:
+    edges:
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r04
+    - cost: 1.0
+      target: r05
+    pose:
+      orientation:
+      - 6.123233995736766e-17
+      - 0.0
+      - 0.0
+      - 1.0
+      position:
+      - -0.0
+      - 1.
+      - 0.0
+    propos:
+    - r05
+
+Map: sml_arena
+Tasks:
+  # crazyflie_1:
+  #   initial_pose: r01
+  #   robot_model: crazyflie
+  #   tasks:
+  #     hard_task: ([]<> r01) && ([]<> r02) && ([]<> r03)
+  #     soft_task: ''
+  #   use_qualisys: true
+  turtlebot1:
+    initial_pose: r04
+    robot_model: Turtlebot
+    tasks:
+      hard_task: ([]<> r04) && ([]<> r03) && ([]<> r02)
+      soft_task: ''
+    use_qualisys: true

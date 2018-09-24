@@ -13,7 +13,6 @@
     <remap from="~qualisys_subject" to="qualisys/$(arg model)"/>
     <remap from="$(arg model)/odom" to="$(arg model)/qualisys_odom"/>
     <remap from="$(arg model)/pose" to="$(arg model)/qualisys_pose"/>
-
   </node>
 
 </launch>

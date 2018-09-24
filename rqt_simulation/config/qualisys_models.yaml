@@ -1,7 +1,3 @@
 models:
-  - nexus0
-  - nexus1
-  - nexus2
+  - crazyflie_1
   - turtlebot1
-  - turtlebot2
-  - turtlebot3
