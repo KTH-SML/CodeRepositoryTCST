@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>932</width>
+    <height>627</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>General propositions</string>
+  </property>
+  <widget class="QScrollArea" name="scrollArea">
+   <property name="geometry">
+    <rect>
+     <x>219</x>
+     <y>9</y>
+     <width>701</width>
+     <height>601</height>
+    </rect>
+   </property>
+   <property name="widgetResizable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="scrollAreaWidgetContents">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>699</width>
+      <height>599</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="button_add_ap">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>370</y>
+     <width>181</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Add atomic proposition</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_save">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>500</y>
+     <width>181</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="scenario" default="sml" /> <!-- Empty scenario to make sure it is consistent if required -->
+    <arg name="scenario_path" default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
+
+    <arg name="robot_name" default="robot1" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+    <arg name="robot_model" default="turtlebot" />
+
+    <arg name="use_qualisys" default="false" />
+
+    <!-- TF from qualisys to map -->
+    <arg name="trans_x" default="0.111"/>
+    <arg name="trans_y" default="0.105"/>
+    <arg name="trans_z" default="0.0"/>
+    <arg name="orient_x" default="0.0"/>
+    <arg name="orient_y" default="0.0"/>
+    <arg name="orient_z" default="0.358"/>
+    <arg name="orient_w" default="0.934"/>
+
+
+    <!-- The given behavior is automatically executed on start -->
+    <arg name="behavior_name" default="Example Behavior" />
+
+    <group ns="$(arg robot_name)">
+
+        <!-- Run robot-specific software and spawn robot -->
+        <include file="$(find rqt_simulation)/launch/robot_exp_$(arg robot_model).launch">
+            <arg name="scenario" value="$(arg scenario)" />
+            <arg name="scenario_path" value="$(arg scenario_path)" />
+            <arg name="robot_name" value="$(arg robot_name)" />
+            <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
+            <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
+            <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
+            <arg name="use_qualisys" value="$(arg use_qualisys)" />
+            <!-- -->
+            <arg name="trans_x" value="$(arg trans_x)"/>
+            <arg name="trans_y" value="$(arg trans_y)"/>
+            <arg name="trans_z" value="$(arg trans_z)"/>
+            <arg name="orient_x" value="$(arg orient_x)"/>
+            <arg name="orient_y" value="$(arg orient_y)"/>
+            <arg name="orient_z" value="$(arg orient_z)"/>
+            <arg name="orient_w" value="$(arg orient_w)"/>
+
+        </include>
+
+    </group>
+
+</launch>

@@ -1,0 +1,27 @@
+Sn:
+  props: []
+  description: 'normal'
+  edges:
+  - {target: Sn}
+  - target: So
+    cond: [[m]]
+    probability: 0.2
+  - target: Sa
+    cond: []
+    probability: 0.1
+So:
+  props: ['o']
+  description: 'machine outage'
+  edges:
+  - {target: So}
+  - target: Sn
+    cond: []
+    probability: 1
+Sa:
+  props: ['alarm']
+  description: 'alarm'
+  edges:
+  - {target: Sa}
+  - target: Sn
+    cond: [[r]]
+    probability: 0.1

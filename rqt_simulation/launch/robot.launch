@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="simulator" default="gazebo" />
+
+    <arg name="scenario" default="" /> <!-- Empty scenario to make sure it is consistent if required -->
+    <arg name="scenario_path" default="$(find rqt_simulation)/scenarios/$(arg scenario)" />
+
+    <arg name="robot_name" default="robot" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+    <arg name="robot_model" default="tiago_steel" />
+    <arg name="color" default="red" />
+
+    <!-- The given behavior is automatically executed on start -->
+    <arg name="behavior_name" default="Example Behavior" />
+
+    <group ns="$(arg robot_name)">
+
+        <!-- Run robot-specific software and spawn robot -->
+        <include file="$(find rqt_simulation)/launch/robot_$(arg robot_model).launch">
+            <arg name="simulator" value="$(arg simulator)" />
+            <arg name="scenario" value="$(arg scenario)" />
+            <arg name="scenario_path" value="$(arg scenario_path)" />
+            <arg name="robot_name" value="$(arg robot_name)" />
+            <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
+            <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
+            <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
+            <arg name="color" value="$(arg color)" />
+        </include>
+
+    </group>
+
+</launch>

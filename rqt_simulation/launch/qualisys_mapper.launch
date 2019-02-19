@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <!-- TF from qualisys to map -->
+  <arg name="trans_x" default="0.111"/>
+  <arg name="trans_y" default="0.105"/>
+  <arg name="trans_z" default="0.0"/>
+  <arg name="orient_x" default="0.0"/>
+  <arg name="orient_y" default="0.0"/>
+  <arg name="orient_z" default="0.358"/>
+  <arg name="orient_w" default="0.934"/>
+
+  <node pkg="rqt_simulation" type="qualisys_map_tf.py" name="qualisys_map_tf" output="screen" >
+    <param name="trans_x" value="$(arg trans_x)"/>
+    <param name="trans_y" value="$(arg trans_y)"/>
+    <param name="trans_z" value="$(arg trans_z)"/>
+    <param name="orient_x" value="$(arg orient_x)"/>
+    <param name="orient_y" value="$(arg orient_y)"/>
+    <param name="orient_z" value="$(arg orient_z)"/>
+    <param name="orient_w" value="$(arg orient_w)"/>
+  </node>
+
+</launch>

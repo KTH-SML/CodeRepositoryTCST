@@ -1,0 +1,38 @@
+x:
+    props: ['n']
+    description: 'free'
+    edges:
+    - {target: x, cost: 0}
+    - target: l
+      cost: 1
+      cond: [['a'], ['b'], ['c'], ['m']]
+    - target: w
+      cost: 1
+      cond: [['m']]
+    - target: e
+      cost: 1
+      cond: [['r1']]
+l: # carries an object
+    props: ['l']
+    description: 'carrying an object'
+    edges:
+    - {target: l, cost: 0}
+    - target: x
+      cost: 1
+      cond: [['m'], ['r']]
+w: # carries waste
+    props: ['w']
+    description: 'carrying waste'
+    edges:
+    - {target: w, cost: 0}
+    - target: x
+      cost: 1
+      cond: [['r2']]
+e: # special equipment
+    props: ['e']
+    description: 'equipped'
+    edges:
+    - {target: e, cost: 0}
+    - target: x
+      cost: 1
+      cond: [['r1']]

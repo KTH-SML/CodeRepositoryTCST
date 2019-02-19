@@ -1,0 +1,34 @@
+x:
+    props: ['n']
+    edges:
+    - {target: x, cost: 0}
+    - target: x
+      label: 'Charging...'
+      cost: 2
+      cond: ['m and battery < 100']
+      effect: ['battery = battery + 11 if battery < 89 else 100']
+    - target: c
+      label: 'Pick-up object'
+      cost: 1
+      cond: ['s and (not s1 or drinks_s1 > 0) and (not s2 or drinks_s2 > 0)']
+      effect: ['drinks_s1 -= 1 if s1 else 0', 'drinks_s2 -= 1 if s2 else 0']
+    - target: w
+      label: 'Clean'
+      cost: 1
+      cond: [['h']]
+c: # carries an object
+    props: ['c']
+    edges:
+    - {target: c, cost: 0}
+    - target: x
+      label: 'Deliver object'
+      cost: 1
+      cond: [['h']]
+w: # carries waste
+    props: ['w']
+    edges:
+    - {target: w, cost: 0}
+    - target: x
+      label: 'Dispose waste'
+      cost: 1
+      cond: [['s']]

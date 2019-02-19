@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+	<param name="use_sim_time" value="true"/> 
+
+	<arg name="world" default="pal_office" />
+	<arg name="headless" default="false" />
+
+	<node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen" args="$(find rqt_simulation)/worlds/gazebo/$(arg world).world" />
+
+	<node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" output="screen" unless="$(arg headless)" />
+
+</launch>

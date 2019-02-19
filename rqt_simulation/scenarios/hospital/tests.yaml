@@ -1,0 +1,73 @@
+simple:
+    system: R1
+    initial_condition: 'M2.x.x'
+    goal: 'F s2'
+    valid: True
+    cost: 5
+simple_team:
+    system: 'R1, R2, R3'
+    initial_condition: 'M2.x.x, M18.x.x, M13.x.x'
+    goal: 'F s2 & F s4 & F s1'
+    valid: True
+    cost: 7
+sequence:
+    system: 'R1, R2, R3'
+    initial_condition: 'M2.x.x, M18.x.x, M13.x.x'
+    goal: 'F(s3 & F(s4 & F(s2 & F(s5 & F s1))))'
+    valid: True
+    cost: 37 # R2
+invalid_environment:
+    system: R1
+    initial_condition: 'M2.x.x'
+    goal: 'F (s2 & s4)'
+    valid: False
+    cost: 0
+invalid_ltl:
+    system: R1
+    initial_condition: 'M2.x.x'
+    goal: 'F s2 & G(s2 -> e) & G(!e)'
+    valid: False
+    cost: 0
+delivery_simple:
+    system: 'R1'
+    initial_condition: 'M2.x.x, M18.x.x, M13.c.x'
+    goal: 'F(!c && p2 && X c U (s3 && X s3 U !c))'
+    valid: True
+    cost: 15
+delivery_equipped:
+   system: 'R1, R2, R3'
+   initial_condition: 'M2.x.x, M18.x.x, M13.e.x'
+   goal: 'F(!c && p3 && X c U (s5 && X s5 U !c))'
+   valid: True
+   cost: 13
+tsp:
+    system: 'R1, R2, R3'
+    initial_condition: 'M2.x.x, M17.x.x, M13.x.x'
+    goal: 'F s1 & F s2 & F s3 & F s4 & F s5'
+    valid: True
+    cost: 9
+station_tour:
+    system: 'R1, R2, R3'
+    initial_condition: 'M2.x.x, M17.x.x, M13.x.x'
+    goal: 'F s1 & F s2 & F s3 & F s4 & F s5 & G(s -> e) & G(e -> !a)'
+    valid: True
+    cost: 17 # R1 -> s1, s2, s3; R2 -> s4; R3 -> s5
+room_cleaning:
+    system: 'R1, R2, R3'
+    initial_condition: 'M2.c.x, M18.x.x, M13.e.x'
+    goal: 'F(s3 && X w U (d && X d U !w)) & F(s4 && X w U (d && X d U !w)) & F(s5 && X w U (d && X d U !w))'
+    valid: True
+    cost: 16 # R1 -> s4; R2 -> s3; R3 -> s5
+    #path: 'R1##M2.c.x, R1##M1.c.x, R1##M1.x.x, R1##M2.x.x, R1##M5.x.x, R1##M7.x.x, R1##M7.w.x, R1##M5.w.x, R1##M4.w.x, R1##M1.w.x, R1##M1.x.x, R2##M17.x.x, R2##M16.x.x, R2##M10.x.x, R2##M10.w.x, R2##M16.w.x, R2##M18.w.x, R2##M18.x.x, R3##M13.e.x, R3##M15.e.x, R3##M15.x.x, R3##M13.x.x, R3##M12.x.x, R3##M12.w.x, R3##M13.w.x, R3##M15.w.x, R3##M15.x.x'
+deliver_drinks:
+    system: 'R1, R2, R3'
+    initial_condition: 'M2.x.x, M18.x.x, M13.x.x'
+    goal: 'F (s1 & n) & F (s2 & n) & F (s3 & n) & F (s4 & n) & F (s5 & n) & G ((!s & X s) -> c)'
+    valid: True
+    cost: 24 # R1 -> s4, s1; R2 -> s2; R3 -> s5, s3
+mixed_dependency:
+    system: 'R1, R2, R3'
+    initial_condition: 'M2.x.x, M18.x.x, M13.x.x'
+    goal: 'F s5 & (!s5 U s2) & F s1 & (!s1 U s4)'
+    valid: True
+    cost: 12

@@ -1,0 +1,10 @@
+s:          # station rooms
+    s1: 0
+    s2: 0
+    s3: 0
+    s4: 0
+    s5: 0
+p:          # pickup:
+    p1: 0   # - meal 1
+    p2: 0   # - meal 2
+    p3: 0   # - drink

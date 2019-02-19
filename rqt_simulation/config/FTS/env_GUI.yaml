@@ -1,0 +1,70 @@
+FTS:
+  r01:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    pose:
+      orientation:
+      - 0.9238795325112867
+      - 0.0
+      - 0.0
+      - 0.3826834323650898
+      position:
+      - -0.84
+      - 0.63
+      - 0.0
+    propos:
+    - r01
+  r02:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    pose:
+      orientation:
+      - 1.0
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - -0.75
+      - -1.16
+      - 0.0
+    propos:
+    - r02
+  r03:
+    edges:
+    - cost: 1.0
+      target: r01
+    - cost: 1.0
+      target: r02
+    - cost: 1.0
+      target: r03
+    pose:
+      orientation:
+      - 1.0
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 1.2
+      - -1.0
+      - 0.0
+    propos:
+    - r03
+Map: sml_arena
+Tasks:
+  turtlebot1:
+    initial_pose: r04
+    robot_model: Turtlebot
+    tasks:
+      hard_task: ([]<> r04) && ([]<> r03) && ([]<> r02)
+      soft_task: ''
+    use_qualisys: true

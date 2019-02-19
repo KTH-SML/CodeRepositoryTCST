@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+      <node name="rosbag_writer" pkg="rqt_simulation" type="rosbag_writer.py" output="screen"/>
+
+</launch>

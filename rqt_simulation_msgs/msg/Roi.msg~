@@ -1,0 +1,3 @@
+std_msgs/String label
+std_msgs/String[] propos_satisfied
+std_msgs/String[] propos_unsatisfied
