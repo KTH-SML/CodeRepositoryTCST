@@ -1,4 +1,0 @@
-std_msgs/String start_label
-std_msgs/String target_label
-std_msgs/Bool add
-float32 weight
